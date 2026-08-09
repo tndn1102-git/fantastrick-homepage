@@ -2,6 +2,23 @@ import { getSupabase } from "./supabase";
 import { formatDate, normalizePhone } from "./util";
 import { IMPORTED_SOURCE } from "./data";
 import { THEME_TEMPLATES, TYPE_FALLBACK, type SmsType } from "./sms-templates";
+import {
+  gabiaConfigured, gabiaAlimtalkConfigured, gabiaSendSms, gabiaSendAlimtalk,
+} from "./sms-gabia";
+
+/* ─── 어느 업체로 보내나 (2026-08-09) ────────────────────────────────────
+ * 기본은 NHN Cloud 였다. 그런데 **NHN 본인인증이 막혀 알림톡을 켤 수 없었다.**
+ * 가비아 문자는 기존 사이트에서 쓰던 것이라 계정·발신번호·잔액이 살아 있어서 그리로 옮긴다.
+ *
+ * 규칙은 하나: **가비아 열쇠가 등록돼 있으면 가비아로, 아니면 NHN 으로.**
+ * 스위치를 따로 두지 않는 이유 — 스위치와 열쇠가 어긋나면 "켰는데 안 나가는" 상태가 된다.
+ * 되돌리려면 가비아 열쇠(GABIA_SMS_ID)를 지우면 그 순간 NHN 으로 돌아간다.
+ *
+ * ⚠️ 업체가 바뀌어도 **차단 규칙(SENDABLE_TYPES·연습용 번호·가져온 예약)은 그대로 지난다.**
+ *    갈아끼우기가 차단을 우회하는 구멍이 되면 안 된다. */
+function useGabia(): boolean {
+  return gabiaConfigured();
+}
 
 // ─── NHN Cloud 발송 공통 (Notification > SMS / KakaoTalk Bizmessage) ──────
 // 왜 NHN Cloud 인가 (2026-07-29):
@@ -230,11 +247,15 @@ export async function sendSms(phone: string, body: string, type: string): Promis
     return { ok: false, skipped: true };
   }
 
-  if (!process.env.NHN_SMS_APPKEY || !process.env.NHN_SMS_SECRET || !process.env.NHN_SENDER) {
-    await writeLog({ phone, body, type, status: "skipped", channel: "sms", error: "NHN SMS 키 미설정(미발송)" });
+  const nhnReady = !!(process.env.NHN_SMS_APPKEY && process.env.NHN_SMS_SECRET && process.env.NHN_SENDER);
+  if (!useGabia() && !nhnReady) {
+    await writeLog({ phone, body, type, status: "skipped", channel: "sms", error: "문자 키 미설정(미발송)" });
     return { ok: false, skipped: true };
   }
-  const r = await nhnSendSms(phone, body);
+  // 실패 사유 앞에 업체를 적어둔다 — 로그만 보고 "어느 쪽에서 막혔나"를 알 수 있어야 한다.
+  const r = useGabia()
+    ? await gabiaSendSms(phone, body, LMS_TITLE).then((x) => ({ ...x, error: x.error && `[가비아] ${x.error}` }))
+    : await nhnSendSms(phone, body).then((x) => ({ ...x, error: x.error && `[NHN] ${x.error}` }));
   await writeLog({ phone, body, type, status: r.ok ? "sent" : "failed", channel: "sms", error: r.ok ? null : r.error });
   return { ok: r.ok };
 }
@@ -254,7 +275,7 @@ export async function sendSms(phone: string, body: string, type: string): Promis
 export async function notifyOwner(body: string, tag: string): Promise<{ ok: boolean; skipped?: boolean }> {
   const to = process.env.ALERT_PHONE;
   if (!to) return { ok: false, skipped: true };
-  const r = await nhnSendSms(to, body);
+  const r = useGabia() ? await gabiaSendSms(to, body, LMS_TITLE) : await nhnSendSms(to, body);
   await writeLog({
     phone: normalizePhone(to), body, type: `alert_${tag}`, channel: "sms",
     status: r.ok ? "sent" : "failed", error: r.ok ? null : r.error,
@@ -276,6 +297,8 @@ function kakaoTemplateCode(type: string): string | undefined {
 //    발신번호 등록 심사는 오래 걸리는데, 그동안 카카오 심사가 먼저 끝나면
 //    알림톡만이라도 나가는 편이 낫다 — 여기에 발신번호를 넣어두면 그마저 막힌다.
 export function kakaoConfigured(type?: string): boolean {
+  // 가비아로 보내는 중이면 가비아 알림톡 설정만 본다(NHN 열쇠는 상관없다).
+  if (useGabia()) return gabiaAlimtalkConfigured() && (!type || isSendableType(type));
   const base = !!(
     process.env.NHN_ALIMTALK_APPKEY &&
     process.env.NHN_ALIMTALK_SECRET &&
@@ -284,6 +307,16 @@ export function kakaoConfigured(type?: string): boolean {
   if (!type) return base;
   return base && !!kakaoTemplateCode(type);
 }
+
+/* ⚠️ **가비아 알림톡은 변수를 이름이 아니라 "순서"로 넣는다** (변수1|변수2|변수3).
+ *    NHN 은 params.이름 처럼 이름표로 넣었지만 가비아는 자리로만 맞춘다.
+ *    → 카카오 템플릿을 만들 때 정한 #{} 순서와 이 배열 순서가 **반드시 같아야 한다.**
+ *      어긋나면 손님에게 "이름 자리에 날짜"가 찍힌 문자가 나간다. 조용히 틀리는 종류의 사고다.
+ *
+ *    그래서 템플릿은 아래 순서로 만든다 — 심사 넣을 때 이 순서 그대로:
+ *      #{이름} → #{테마} → #{날짜} → #{시간}
+ */
+export const GABIA_VAR_ORDER = ["이름", "테마", "날짜", "시간"] as const;
 
 // 카카오 알림톡 발송(NHN Cloud). resendParameter 로 알림톡 실패 시 문자 대체발송까지 함께 요청한다.
 //   미설정이면 null → 호출측이 SMS 폴백. body=문자 대체 본문, vars=템플릿 치환값(키는 #{} 없이).
@@ -299,6 +332,23 @@ export async function sendAlimtalk(
   if (isTestPhone(phone)) {
     await writeLog({ phone, body, type, status: "skipped", channel: "alimtalk", error: "연습용 데이터(가져온 예약) — 발송 차단" });
     return { ok: false };
+  }
+
+  /* 가비아 경로 — 알림톡이 설정돼 있을 때만. 지금은 잔액 0건·템플릿 미등록이라
+     gabiaAlimtalkConfigured() 가 false 이고, 그래서 null 을 돌려 **문자로 내려간다.**
+     알림톡 심사가 끝나 GABIA_TPL_CONFIRM 이 붙는 순간 자동으로 알림톡이 1순위가 된다. */
+  if (useGabia()) {
+    if (!gabiaAlimtalkConfigured()) return null; // 미설정 → SMS 폴백
+    const r = await gabiaSendAlimtalk(phone, GABIA_VAR_ORDER.map((k) => vars[k] ?? ""));
+    await writeLog({
+      phone, body, type, channel: "alimtalk",
+      status: r.ok ? "sent" : "failed", error: r.ok ? null : `[가비아] ${r.error}`,
+    });
+    /* ⚠️ 가비아 알림톡 API 에는 "문자 대체발송" 파라미터가 없다(관리툴 설정으로 도는 방식).
+       그 설정이 API 발송에도 걸리는지 확인되기 전까지는, **실패하면 문자로 한 번 더** 보낸다.
+       null 을 돌려주면 호출측(sendReservationSms)이 sendSms 를 이어서 부른다.
+       설정이 잘 걸려 있다면 이 자리까지 오지 않는다. */
+    return r.ok ? { ok: true } : null;
   }
 
   const templateCode = kakaoTemplateCode(type);
