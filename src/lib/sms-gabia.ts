@@ -176,13 +176,25 @@ export async function gabiaSendAlimtalk(to: string, vars: string[]): Promise<Gab
  *   · 토큰까지 나오고 잔여건수가 보이면 → 직접 호출 가능. 중계소 필요 없음.
  *   · IP 관련 오류가 나면        → 중계소가 필요하다는 뜻.
  */
-export async function gabiaCheck(): Promise<{ ok: boolean; step: string; detail: string; remain?: number }> {
-  if (!gabiaConfigured()) {
-    return { ok: false, step: "열쇠", detail: "GABIA_SMS_ID / GABIA_API_KEY / GABIA_SENDER 가 등록되지 않았습니다." };
+export async function gabiaCheck(): Promise<{
+  ok: boolean; step: string; detail: string; remain?: number; blockedIp?: string;
+}> {
+  // 시험에는 발신번호가 필요 없다(보내지 않으므로). ID·키만 있으면 IP 판정이 가능하다.
+  if (!process.env.GABIA_SMS_ID || !process.env.GABIA_API_KEY) {
+    return { ok: false, step: "열쇠", detail: "GABIA_SMS_ID / GABIA_API_KEY 가 등록되지 않았습니다." };
   }
   cachedToken = null; // 시험은 항상 새로 받아본다(캐시된 토큰이면 IP 검사를 안 거친다)
   const { token, error } = await getToken();
-  if (!token) return { ok: false, step: "토큰", detail: error ?? "토큰을 받지 못했습니다." };
+  if (!token) {
+    /* 가비아는 막을 때 "(현재 IP : 1.2.3.4)" 로 **부른 쪽 주소를 알려준다.**
+       이 주소를 뽑아 두면 "관리툴에 무엇을 등록해야 하는지"가 바로 나온다.
+       ⚠️ Cloudflare 는 이 값이 호출할 때마다 달라진다 — 그래서 등록해도 소용없다는 증거이기도 하다. */
+    const ip = /(\d{1,3}(?:\.\d{1,3}){3})/.exec(error ?? "")?.[1];
+    return {
+      ok: false, step: "토큰", detail: error ?? "토큰을 받지 못했습니다.",
+      ...(ip ? { blockedIp: ip } : {}),
+    };
+  }
 
   // 잔여 건수 조회 — 발송이 아니라 조회라서 차감이 없다.
   try {

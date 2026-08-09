@@ -55,10 +55,33 @@ if (SMS_ID === 'PUT_YOUR_SMS_ID' || API_KEY === 'PUT_YOUR_API_KEY' || RELAY_KEY 
         'message' => 'send.php 위쪽 설정 4줄을 아직 안 채웠습니다.'], JSON_UNESCAPED_UNICODE));
 }
 
-// GET 으로 열면 "살아있다"만 알려준다. 열쇠도 번호도 보여주지 않는다.
+/* GET 으로 열면 자가진단을 한다 — **문자는 안 나간다.**
+   가비아에 토큰을 한 번 받아보고, 막히면 그 오류를 그대로 보여준다.
+   가비아는 막을 때 "(현재 IP : x.x.x.x)" 로 **부른 쪽 주소를 알려준다.**
+   그래서 이 화면 한 번이면 "관리툴에 등록할 주소"가 바로 나온다 — 따로 찾을 필요가 없다. */
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    exit(json_encode(['code' => 'ready',
-        'message' => '중계소가 살아 있습니다. 문자 발송은 POST 로만 받습니다.'], JSON_UNESCAPED_UNICODE));
+    $t = gabia_post('https://sms.gabia.com/oauth/token',
+        base64_encode(SMS_ID . ':' . API_KEY), ['grant_type' => 'client_credentials']);
+
+    if (!empty($t['access_token'])) {
+        exit(json_encode(['code' => 'ready',
+            'message' => '준비 끝. 이 서버 주소가 관리툴에 등록돼 있고 가비아가 받아줍니다.'], JSON_UNESCAPED_UNICODE));
+    }
+
+    $msg = isset($t['message']) ? $t['message'] : '토큰 발급 실패';
+    $ip  = null;
+    // "(현재 IP : 1.2.3.4)" 에서 주소만 뽑아낸다.
+    if (preg_match('/(\d{1,3}(?:\.\d{1,3}){3})/', $msg, $m)) $ip = $m[1];
+
+    http_response_code(502);
+    exit(json_encode([
+        'code'    => 'ip_not_registered',
+        'message' => $msg,
+        'register_this_ip' => $ip,
+        'how'     => $ip
+            ? "관리툴(sms.gabia.com) › 관리자 › 기본 설정 › 이용 중인 설정 항목 › API 발송 IP설정 에 [{$ip}] 를 넣고 저장한 뒤, 이 페이지를 새로고침하세요."
+            : '관리툴 › 관리자 › 기본 설정 › API 발송 IP설정 을 확인하세요.',
+    ], JSON_UNESCAPED_UNICODE));
 }
 
 $raw = file_get_contents('php://input');
