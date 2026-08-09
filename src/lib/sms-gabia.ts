@@ -124,7 +124,7 @@ async function seal(payload: unknown): Promise<string> {
   return btoa(bin);
 }
 
-async function viaRelay(kind: "sms" | "lms" | "alimtalk", form: Record<string, string>): Promise<GabiaResult> {
+async function viaRelay(kind: string, form: Record<string, string>): Promise<GabiaResult> {
   const url = relayUrl();
   if (!url) return { ok: false, error: "중계 주소 미설정" };
   try {
@@ -207,6 +207,23 @@ export async function gabiaCheck(): Promise<{
   // 시험에는 발신번호가 필요 없다(보내지 않으므로). ID·키만 있으면 IP 판정이 가능하다.
   if (!process.env.GABIA_SMS_ID || !process.env.GABIA_API_KEY) {
     return { ok: false, step: "열쇠", detail: "GABIA_SMS_ID / GABIA_API_KEY 가 등록되지 않았습니다." };
+  }
+
+  /* 중계소를 쓰는 중이면 **중계소 길을 시험한다.** 여기서 가비아를 직접 부르면 IP 에 막히는 게
+     당연해서, 정작 실제로 쓰는 길이 살았는지는 알 수 없다.
+     방법: 잠근 봉투에 종류를 일부러 엉뚱하게("probe") 넣어 보낸다.
+       · bad_kind 가 오면 → 봉투가 열렸다는 뜻. 주소·열쇠·시계가 모두 맞다. **문자는 안 나간다.**
+       · unauthorized → 열쇠가 어긋남 · stale → 시계가 5분 이상 어긋남 */
+  if (relayUrl()) {
+    const r = await viaRelay("probe", { ts: String(Math.floor(Date.now() / 1000)) });
+    const msg = r.error ?? "";
+    if (msg.includes("bad_kind")) {
+      return { ok: true, step: "완료", detail: "중계소까지 길이 열려 있습니다. 잠금과 시계 모두 정상입니다." };
+    }
+    if (msg.includes("unauthorized")) return { ok: false, step: "중계소 열쇠", detail: "GABIA_RELAY_KEY 가 중계소와 다릅니다." };
+    if (msg.includes("stale")) return { ok: false, step: "시계", detail: "양쪽 시각이 5분 이상 차이납니다." };
+    if (msg.includes("ip_not_registered")) return { ok: false, step: "중계소 IP", detail: msg };
+    return { ok: false, step: "중계소", detail: msg || "중계소가 응답하지 않습니다." };
   }
   cachedToken = null; // 시험은 항상 새로 받아본다(캐시된 토큰이면 IP 검사를 안 거친다)
   const { token, error } = await getToken();
