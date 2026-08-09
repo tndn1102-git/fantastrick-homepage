@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin } from "@/lib/admin";
-import { gabiaCheck } from "@/lib/sms-gabia";
+import { gabiaCheck, gabiaSendSms } from "@/lib/sms-gabia";
+import { logSms } from "@/lib/sms";
+import { normalizePhone, isValidPhone } from "@/lib/util";
 
 /* 가비아 연결 시험 — **문자는 한 통도 나가지 않는다.**
  *
@@ -21,4 +23,30 @@ export async function GET(req: NextRequest) {
   if (!(await authorized(req))) return NextResponse.json({ error: "권한이 없습니다." }, { status: 401 });
   const r = await gabiaCheck();
   return NextResponse.json(r, { status: r.ok ? 200 : 502 });
+}
+
+/* 시험 문자 한 통 — **진짜로 나간다(1건 차감).**
+ *
+ * GET 은 "길이 열렸나"까지만 본다. 그런데 길이 열린 것과 손님 폰에 실제로 뜨는 것은 다른 문제라
+ * (발신번호 승인, 통신사 필터, 문구 길이…), 마지막 한 칸은 실제로 보내봐야 안다.
+ *
+ * ⚠️ 문구는 여기 고정이다. 밖에서 내용을 정하게 두면 이 창구가 "아무 문자나 보내는 창구"가 된다.
+ *    받는 번호만 받는다. 관리자 또는 CRON_SECRET 이 있어야 부를 수 있다.
+ * ⚠️ sendSms 를 쓰지 않고 발송기를 직접 부른다 — 확정문자만 나가게 막아둔 게이트를
+ *    시험 때문에 열면 안 되기 때문이다. 기록은 남긴다. */
+const TEST_BODY = "[판타스트릭] 새 홈페이지 문자 시험입니다. 이 문자가 보이면 정상입니다.";
+
+export async function POST(req: NextRequest) {
+  if (!(await authorized(req))) return NextResponse.json({ error: "권한이 없습니다." }, { status: 401 });
+
+  const body = (await req.json().catch(() => ({}))) as { phone?: string };
+  const phone = normalizePhone(String(body.phone ?? ""));
+  if (!isValidPhone(phone)) return NextResponse.json({ error: "받는 번호를 확인해 주세요." }, { status: 400 });
+
+  const r = await gabiaSendSms(phone, TEST_BODY, "판타스트릭 문자 시험");
+  await logSms({
+    phone, body: TEST_BODY, type: "test", channel: "sms",
+    status: r.ok ? "sent" : "failed", error: r.ok ? null : `[가비아] ${r.error}`,
+  });
+  return NextResponse.json({ ok: r.ok, sent: r.ok ? TEST_BODY : undefined, error: r.error });
 }

@@ -227,6 +227,12 @@ export async function getTemplate(type: string, themeId?: string): Promise<strin
 
 // 발송 로그 기록. 실패해도 발송 자체는 막지 않되, 조용히 삼키지 말고 서버 로그에 남긴다.
 // (channel 컬럼 마이그레이션 누락으로 로그가 통째로 안 쌓이는 걸 오래 못 본 적이 있음)
+/** 발송 기록 한 줄. 시험 창구 등 밖에서도 같은 표에 남길 수 있게 내보낸다
+    — 표 이름과 칸 이름을 여러 곳에 적어두면 나중에 한 곳만 고치는 사고가 난다. */
+export async function logSms(row: Record<string, unknown>) {
+  return writeLog(row);
+}
+
 async function writeLog(row: Record<string, unknown>) {
   const db = getSupabase();
   if (!db) return;
