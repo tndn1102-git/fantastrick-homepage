@@ -239,6 +239,29 @@ export async function sendSms(phone: string, body: string, type: string): Promis
   return { ok: r.ok };
 }
 
+/* ─── 사장님에게 보내는 알림 문자 (손님 문자가 아니다) ──────────────────
+ *
+ * 위 SENDABLE_TYPES 게이트는 **손님에게 나가는 문자**를 확정문자 하나로 묶는 방침이다.
+ * 이 길은 그 게이트를 지나지 않는다 — 받는 사람이 손님이 아니라 사장님 본인이고,
+ * 내용도 안내가 아니라 "문의 들어왔습니다" 같은 알림이기 때문이다.
+ *
+ * 대신 **받는 번호를 ALERT_PHONE 하나로 못 박는다.** 번호를 인자로 받지 않는 이유가 그것이다.
+ * 이 함수는 손님 번호로는 구조적으로 보낼 수 없다.
+ *
+ * env: ALERT_PHONE — 알림 받을 번호(하이픈 있어도 됨). 비워두면 조용히 건너뛴다.
+ *                    번호가 없다고 문의 접수 자체가 실패하면 안 된다.
+ */
+export async function notifyOwner(body: string, tag: string): Promise<{ ok: boolean; skipped?: boolean }> {
+  const to = process.env.ALERT_PHONE;
+  if (!to) return { ok: false, skipped: true };
+  const r = await nhnSendSms(to, body);
+  await writeLog({
+    phone: normalizePhone(to), body, type: `alert_${tag}`, channel: "sms",
+    status: r.ok ? "sent" : "failed", error: r.ok ? null : r.error,
+  });
+  return { ok: r.ok };
+}
+
 // 타입 → 카카오 알림톡 템플릿코드. 입금확인/확정=확정 템플릿, 취소=취소 템플릿.
 // ⚠️ process.env 를 모듈 로드 시점에 한 번만 읽으면 워커에서 값이 늦게 붙는 경우 undefined 로 굳는다.
 //    함수로 감싸 호출할 때마다 읽는다.

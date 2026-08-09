@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase, DB_NOT_CONFIGURED } from "@/lib/supabase";
-import { normalizePhone, isValidPhone, sanitizeText } from "@/lib/util";
+import { normalizePhone, isValidPhone, sanitizeText, formatPhone } from "@/lib/util";
 import { rateLimit, getClientIp } from "@/lib/ratelimit";
+import { notifyOwner } from "@/lib/sms";
 
 /* 비즈니스(B2B) 도입 문의 접수 — /business 페이지의 폼이 여기로 보낸다.
    손님 예약과 달리 "아직 손님이 아닌 사람"이 남기는 것이라 예약 표와 섞지 않고
@@ -62,6 +63,17 @@ export async function POST(req: NextRequest) {
     }
     console.error("[B2B 문의 저장 실패]", error.message);
     return NextResponse.json({ error: "문의 접수 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요." }, { status: 500 });
+  }
+  // 저장까지 끝났으면 사장님 폰으로 알림 한 통. 관리자 화면을 열어봐야만 알 수 있으면
+  // 놓친다. ⚠️ 여기서 실패해도 문의는 이미 저장됐으므로 손님에게는 성공으로 답한다.
+  try {
+    const line = [storeName, area, rooms ? `방 ${rooms}개` : ""].filter(Boolean).join(" / ");
+    await notifyOwner(
+      `[판타스트릭] 도입 문의가 들어왔습니다.\n${kind ?? "종류 미선택"}\n${line}\n${formatPhone(phone)}\n관리자 › 도입 문의에서 확인하세요.`,
+      "biz"
+    );
+  } catch (e) {
+    console.error("[B2B 문의 알림 실패]", e);
   }
   return NextResponse.json({ ok: true });
 }
