@@ -50,7 +50,6 @@ header('Content-Type: application/json; charset=utf-8');
 
 // 설정을 안 채웠으면 먼저 알려준다 — 엉뚱한 오류를 쫓는 시간을 없앤다.
 if (SMS_ID === 'PUT_YOUR_SMS_ID' || API_KEY === 'PUT_YOUR_API_KEY' || RELAY_KEY === 'PUT_A_LONG_RANDOM_SECRET') {
-    http_response_code(500);
     exit(json_encode(['code' => 'not_configured',
         'message' => 'send.php 위쪽 설정 4줄을 아직 안 채웠습니다.'], JSON_UNESCAPED_UNICODE));
 }
@@ -65,7 +64,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
     if (!empty($t['access_token'])) {
         exit(json_encode(['code' => 'ready',
-            'message' => '준비 끝. 이 서버 주소가 관리툴에 등록돼 있고 가비아가 받아줍니다.'], JSON_UNESCAPED_UNICODE));
+            'message' => '준비 끝. 이 서버 주소가 관리툴에 등록돼 있고 가비아가 받아줍니다.',
+            'php'     => PHP_VERSION,
+            // 잠금(AES-256-GCM)을 이 서버가 지원하는지. false 면 홈페이지가 보낸 걸 못 연다.
+            'gcm'     => in_array('aes-256-gcm', openssl_get_cipher_methods(), true),
+        ], JSON_UNESCAPED_UNICODE));
     }
 
     $msg = isset($t['message']) ? $t['message'] : '토큰 발급 실패';
@@ -73,7 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     // "(현재 IP : 1.2.3.4)" 에서 주소만 뽑아낸다.
     if (preg_match('/(\d{1,3}(?:\.\d{1,3}){3})/', $msg, $m)) $ip = $m[1];
 
-    http_response_code(502);
     exit(json_encode([
         'code'    => 'ip_not_registered',
         'message' => $msg,
@@ -84,17 +86,51 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     ], JSON_UNESCAPED_UNICODE));
 }
 
+/* ─── 요청 열기 ───────────────────────────────────────────────────────
+   ⚠️ fantastrick.co.kr 에는 SSL 인증서가 없다(https 로 열면 가비아 403 으로 튕긴다).
+      그래서 홈페이지 → 이 파일 구간은 **평문 http** 다. 그냥 보내면 손님 전화번호와
+      문자 내용, 열쇠까지 인터넷에 그대로 흘러간다.
+      → 그래서 **내용물 자체를 잠가서** 보낸다(AES-256-GCM). 길이 아니라 짐을 잠근 셈이다.
+        · 열쇠는 오가지 않는다 — 양쪽이 같은 열쇠로 풀 수 있느냐로 신원을 대신한다.
+        · GCM 이라 내용이 한 글자라도 바뀌면 복호화 자체가 실패한다(위조 차단).
+        · 안에 보낸 시각을 넣어 5분이 지난 요청은 버린다(같은 요청 재사용 차단).
+      나중에 이 도메인에 SSL 이 붙으면 이 잠금은 그대로 두어도 무해하다(이중으로 안전). */
 $raw = file_get_contents('php://input');
-$in  = json_decode($raw, true);
+$env = json_decode($raw, true);
+
+if (!is_array($env) || empty($env['d'])) {
+    exit(json_encode(['code' => 'bad_request', 'message' => '잘못된 요청입니다.'], JSON_UNESCAPED_UNICODE));
+}
+if (!in_array('aes-256-gcm', openssl_get_cipher_methods(), true)) {
+    exit(json_encode(['code' => 'no_gcm',
+        'message' => '이 서버의 PHP 가 aes-256-gcm 을 지원하지 않습니다. (PHP ' . PHP_VERSION . ')'], JSON_UNESCAPED_UNICODE));
+}
+
+$blob = base64_decode((string)$env['d'], true);
+// [앞 12바이트 = IV][가운데 = 잠긴 내용][뒤 16바이트 = 확인표]
+if ($blob === false || strlen($blob) < 12 + 16 + 2) {
+    exit(json_encode(['code' => 'bad_request', 'message' => '잘못된 요청입니다.'], JSON_UNESCAPED_UNICODE));
+}
+$iv     = substr($blob, 0, 12);
+$tag    = substr($blob, -16);
+$cipher = substr($blob, 12, strlen($blob) - 28);
+
+// 열쇠 문자열을 그대로 쓰지 않고 SHA-256 으로 32바이트를 만든다(양쪽 규칙이 같아야 한다).
+$plain = openssl_decrypt($cipher, 'aes-256-gcm', hash('sha256', RELAY_KEY, true),
+    OPENSSL_RAW_DATA, $iv, $tag);
+
+if ($plain === false) {
+    exit(json_encode(['code' => 'unauthorized', 'message' => '열 수 없는 요청입니다.'], JSON_UNESCAPED_UNICODE));
+}
+$in = json_decode($plain, true);
 if (!is_array($in)) {
-    http_response_code(400);
     exit(json_encode(['code' => 'bad_request', 'message' => '잘못된 요청입니다.'], JSON_UNESCAPED_UNICODE));
 }
 
-// 열쇠 확인. hash_equals 를 쓰는 이유 — 한 글자씩 비교하면 걸린 시간으로 열쇠를 알아낼 수 있다.
-if (!isset($in['key']) || !hash_equals(RELAY_KEY, (string)$in['key'])) {
-    http_response_code(401);
-    exit(json_encode(['code' => 'unauthorized', 'message' => '열쇠가 맞지 않습니다.'], JSON_UNESCAPED_UNICODE));
+// 오래된 요청 거절 — 누가 통째로 복사해 두었다가 나중에 다시 던져도 안 먹게.
+$ts = isset($in['ts']) ? (int)$in['ts'] : 0;
+if (abs(time() - $ts) > 300) {
+    exit(json_encode(['code' => 'stale', 'message' => '요청 시각이 너무 차이납니다.'], JSON_UNESCAPED_UNICODE));
 }
 
 $kind = isset($in['kind']) ? $in['kind'] : '';
@@ -104,7 +140,6 @@ $paths = [
     'alimtalk' => '/api/send/alimtalk',
 ];
 if (!isset($paths[$kind])) {
-    http_response_code(400);
     exit(json_encode(['code' => 'bad_kind', 'message' => '보낼 종류가 잘못됐습니다.'], JSON_UNESCAPED_UNICODE));
 }
 
@@ -136,7 +171,6 @@ $tok = gabia_post('https://sms.gabia.com/oauth/token',
     base64_encode(SMS_ID . ':' . API_KEY), ['grant_type' => 'client_credentials']);
 
 if (empty($tok['access_token'])) {
-    http_response_code(502);
     exit(json_encode(['code' => 'token_error',
         'message' => isset($tok['message']) ? $tok['message'] : '토큰 발급 실패'], JSON_UNESCAPED_UNICODE));
 }
@@ -154,5 +188,7 @@ if ($kind !== 'alimtalk') $fields['callback'] = SENDER;
 $res = gabia_post('https://sms.gabia.com' . $paths[$kind],
     base64_encode(SMS_ID . ':' . $tok['access_token']), $fields);
 
-if (!isset($res['code']) || (string)$res['code'] !== '200') http_response_code(502);
+/* ⚠️ 실패라고 HTTP 상태를 500·502 로 주면 **가비아 웹서버가 본문을 자기 오류 페이지로 갈아치운다.**
+      그러면 "왜 안 갔는지"가 사라진다. 그래서 항상 200 으로 답하고,
+      성공·실패는 본문의 code 로만 구분한다(가비아 성공 = code "200"). 홈페이지도 그렇게 읽는다. */
 exit(json_encode($res, JSON_UNESCAPED_UNICODE));

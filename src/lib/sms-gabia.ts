@@ -100,14 +100,39 @@ function ok(r: { code?: string; message?: string }): GabiaResult {
 /* ─── 중계 경로 ─────────────────────────────────────────────────────────
    고정 IP 서버의 send.php 에 "무엇을 보낼지"만 넘기고, 가비아 호출은 그쪽이 한다.
    열쇠(GABIA_RELAY_KEY)가 맞아야 받아준다 — 주소가 새 나가도 아무나 못 쓴다. */
+/* ⚠️ 중계소가 있는 fantastrick.co.kr 에는 SSL 인증서가 없다 — https 로 열면 가비아 403 으로 튕긴다.
+      즉 이 구간은 **평문 http** 다. 손님 전화번호와 문자 내용이 그대로 흐르면 안 되므로
+      **보낼 내용을 우리가 먼저 잠근다**(AES-256-GCM). 길이 아니라 짐을 잠그는 방식이다.
+        · 열쇠 자체는 오가지 않는다 — 같은 열쇠로 풀리느냐가 곧 신원 확인이다.
+        · 내용이 한 글자라도 바뀌면 상대가 못 연다(위조 차단).
+        · 보낸 시각(ts)을 함께 넣어, 5분 지난 요청은 중계소가 버린다(재사용 차단).
+      보내는 모양: { d: base64( [IV 12] + [잠긴내용] + [확인표 16] ) } */
+async function seal(payload: unknown): Promise<string> {
+  const secret = process.env.GABIA_RELAY_KEY ?? "";
+  const raw = new TextEncoder().encode(JSON.stringify(payload));
+  // 열쇠 문자열을 그대로 쓰지 않고 SHA-256 으로 32바이트를 만든다(PHP 쪽 규칙과 같아야 한다).
+  const keyBytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(secret));
+  const key = await crypto.subtle.importKey("raw", keyBytes, "AES-GCM", false, ["encrypt"]);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const sealed = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, raw));
+
+  const out = new Uint8Array(iv.length + sealed.length);
+  out.set(iv, 0);
+  out.set(sealed, iv.length);
+  let bin = "";
+  for (const b of out) bin += String.fromCharCode(b);
+  return btoa(bin);
+}
+
 async function viaRelay(kind: "sms" | "lms" | "alimtalk", form: Record<string, string>): Promise<GabiaResult> {
   const url = relayUrl();
   if (!url) return { ok: false, error: "중계 주소 미설정" };
   try {
+    const d = await seal({ kind, ts: Math.floor(Date.now() / 1000), ...form });
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ key: process.env.GABIA_RELAY_KEY ?? "", kind, ...form }),
+      body: JSON.stringify({ d }),
     });
     const j = (await res.json().catch(() => ({}))) as { code?: string; message?: string };
     return ok(j);
