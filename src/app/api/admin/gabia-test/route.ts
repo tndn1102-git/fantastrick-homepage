@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin } from "@/lib/admin";
-import { gabiaCheck, gabiaSendSms } from "@/lib/sms-gabia";
-import { logSms } from "@/lib/sms";
+import { gabiaCheck } from "@/lib/sms-gabia";
+import { sendTestSms } from "@/lib/sms";
 import { normalizePhone, isValidPhone } from "@/lib/util";
 
 /* 가비아 연결 시험 — **문자는 한 통도 나가지 않는다.**
@@ -43,10 +43,7 @@ export async function POST(req: NextRequest) {
   const phone = normalizePhone(String(body.phone ?? ""));
   if (!isValidPhone(phone)) return NextResponse.json({ error: "받는 번호를 확인해 주세요." }, { status: 400 });
 
-  const r = await gabiaSendSms(phone, TEST_BODY, "판타스트릭 문자 시험");
-  await logSms({
-    phone, body: TEST_BODY, type: "test", channel: "sms",
-    status: r.ok ? "sent" : "failed", error: r.ok ? null : `[가비아] ${r.error}`,
-  });
-  return NextResponse.json({ ok: r.ok, sent: r.ok ? TEST_BODY : undefined, error: r.error });
+  // 지금 켜져 있는 업체로 보낸다 — 어느 쪽으로 나갔는지 응답에 적어준다.
+  const r = await sendTestSms(phone, TEST_BODY);
+  return NextResponse.json({ ok: r.ok, vendor: r.vendor, sent: r.ok ? TEST_BODY : undefined, error: r.error });
 }

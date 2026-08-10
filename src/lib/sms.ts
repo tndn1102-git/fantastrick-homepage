@@ -289,6 +289,22 @@ export async function notifyOwner(body: string, tag: string): Promise<{ ok: bool
   return { ok: r.ok };
 }
 
+/** 시험 발송 전용 — **지금 쓰는 업체로** 한 통 보낸다(가비아든 NHN 이든).
+ *
+ *  ⚠️ 확정문자만 나가게 막아둔 게이트(SENDABLE_TYPES)를 지나지 않는다.
+ *     시험 때문에 그 게이트를 열면 안 되기 때문에, 게이트를 건드리는 대신 이 길을 따로 둔다.
+ *     문구는 부르는 쪽(/api/admin/gabia-test)이 고정해 두었고 관리자만 부를 수 있다.
+ *     손님에게 나가는 문자는 여전히 sendSms / sendAlimtalk 두 길뿐이다. */
+export async function sendTestSms(phone: string, body: string): Promise<{ ok: boolean; vendor: string; error?: string }> {
+  const vendor = useGabia() ? "가비아" : "NHN";
+  const r = useGabia() ? await gabiaSendSms(phone, body, LMS_TITLE) : await nhnSendSms(phone, body);
+  await writeLog({
+    phone: normalizePhone(phone), body, type: "test", channel: "sms",
+    status: r.ok ? "sent" : "failed", error: r.ok ? null : `[${vendor}] ${r.error}`,
+  });
+  return { ok: r.ok, vendor, error: r.error };
+}
+
 // 타입 → 카카오 알림톡 템플릿코드. 입금확인/확정=확정 템플릿, 취소=취소 템플릿.
 // ⚠️ process.env 를 모듈 로드 시점에 한 번만 읽으면 워커에서 값이 늦게 붙는 경우 undefined 로 굳는다.
 //    함수로 감싸 호출할 때마다 읽는다.
