@@ -138,6 +138,8 @@ $paths = [
     'sms'      => '/api/send/sms',
     'lms'      => '/api/send/lms',
     'alimtalk' => '/api/send/alimtalk',
+    // 조회 전용 — 계정에 무엇이 붙어 있고 잔액이 얼마인지 본다. **발송이 아니라 차감이 없다.**
+    'info'     => '/api/user/info',
 ];
 if (!isset($paths[$kind])) {
     exit(json_encode(['code' => 'bad_kind', 'message' => '보낼 종류가 잘못됐습니다.'], JSON_UNESCAPED_UNICODE));
@@ -183,7 +185,22 @@ foreach ($allow as $k) {
     if (isset($in[$k]) && $in[$k] !== '') $fields[$k] = (string)$in[$k];
 }
 // 발신번호는 홈페이지가 아니라 **여기서** 넣는다. 밖에서 바꿔 끼울 수 없게.
-if ($kind !== 'alimtalk') $fields['callback'] = SENDER;
+if ($kind !== 'alimtalk' && $kind !== 'info') $fields['callback'] = SENDER;
+
+// 잔액 조회만 GET 이다(발송은 전부 POST).
+if ($kind === 'info') {
+    $ch = curl_init();
+    curl_setopt_array($ch, [
+        CURLOPT_URL            => 'https://sms.gabia.com/api/user/info',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 20,
+        CURLOPT_HTTPHEADER     => ['Authorization: Basic ' . base64_encode(SMS_ID . ':' . $tok['access_token'])],
+    ]);
+    $b = curl_exec($ch); curl_close($ch);
+    $j = json_decode($b, true);
+    exit(json_encode(is_array($j) ? $j : ['code' => 'parse_error', 'message' => substr((string)$b, 0, 300)],
+        JSON_UNESCAPED_UNICODE));
+}
 
 $res = gabia_post('https://sms.gabia.com' . $paths[$kind],
     base64_encode(SMS_ID . ':' . $tok['access_token']), $fields);
