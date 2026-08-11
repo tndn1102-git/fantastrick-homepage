@@ -83,6 +83,10 @@ export async function POST(req: NextRequest) {
       source_url: draft.url,
       consent_note: consentNote,
       consent_at: new Date().toISOString(),
+      /* 후기 날짜 = **원글이 쓰인 날**. 우리가 옮겨 담은 날이 아니다.
+         등록일을 보여주면 2년 전 후기가 오늘 쓴 것처럼 보인다 — 손님을 속이는 셈이 된다.
+         목록 정렬도 이 값을 쓰므로, 원글 순서대로 놓인다. */
+      ...(draft.postedAt ? { created_at: new Date(draft.postedAt + "T12:00:00+09:00").toISOString() } : {}),
     };
     const { error } = await db.from("reviews").insert(row);
     if (error) {
