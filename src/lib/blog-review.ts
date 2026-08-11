@@ -61,26 +61,44 @@ function toText(html: string): string {
     .replace(/<br\s*\/?>/gi, "\n")
     .replace(/<\/(p|div|h[1-6]|li|tr)>/gi, "\n")
     .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, " ").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"')
+    // 숫자·16진수 기호(&#39; &#x27; 따위)도 글자로 바꾼다. 안 그러면 손님 화면에 &#x27; 가 그대로 보인다.
+    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)))
+    // &amp; 는 **맨 마지막에** 푼다. 먼저 풀면 &amp;#x27; 이 &#x27; 로 바뀐 뒤 위 규칙을 못 만난다.
+    .replace(/&amp;/g, "&")
     .replace(/[ \t ]+/g, " ")
     .replace(/\n{3,}/g, "\n\n")
     .split("\n").map((l) => l.trim()).join("\n")
     .trim();
 }
 
-/** 본문 영역만 잘라낸다. 못 찾으면 통째로 넘겨 뒤에서 걸러낸다. */
-function pickBody(html: string): string {
-  // 네이버 스마트에디터 본문 컨테이너들 — 버전마다 다르다.
-  for (const re of [
-    /<div[^>]+class="[^"]*se-main-container[^"]*"[\s\S]*?<\/div>\s*<\/div>/i,
-    /<div[^>]+id="postViewArea"[\s\S]*?<\/div>/i,
-    /<div[^>]+class="[^"]*post_ct[^"]*"[\s\S]*?<\/div>/i,
-  ]) {
+/**
+ * 본문 글자만 뽑는다.
+ *
+ * [⚠️ 왜 "본문 div 를 통째로 잘라내기" 가 아닌가 — 2026-08-11 실제로 깨져서 고침]
+ *   처음엔 se-main-container div 를 정규식으로 잘라냈다. 그런데 네이버 본문은 div 가
+ *   수십 겹으로 겹쳐 있어서, 정규식이 **첫 </div> 에서 멈춰 1,660자만** 집어왔다.
+ *   (실제 후기 글이 3,375자였는데 본문을 못 찾았다고 실패했다.)
+ *   div 짝을 정규식으로 맞추는 건 원리상 불가능하다 — 겹친 만큼 셀 줄 알아야 한다.
+ *
+ * → 그래서 **문단 태그를 하나씩 줍는다.** 스마트에디터는 문단마다
+ *   <p class="se-text-paragraph"> 를 붙이므로, 겹침을 셀 필요가 없다.
+ *   구버전 에디터(se-text-paragraph 없음)를 위해 옛 방식도 남겨둔다.
+ */
+function pickBodyText(html: string): string {
+  const paras = [...html.matchAll(/<p[^>]*class="[^"]*se-text-paragraph[^"]*"[^>]*>([\s\S]*?)<\/p>/gi)]
+    .map((m) => toText(m[1]))
+    .filter(Boolean);
+
+  if (paras.length >= 3) return paras.join("\n");
+
+  // 옛 에디터 — 본문 영역이 하나의 덩어리로 있다.
+  for (const re of [/<div[^>]+id="postViewArea"([\s\S]*)/i, /<div[^>]+class="[^"]*post_ct[^"]*"([\s\S]*)/i]) {
     const m = re.exec(html);
-    if (m && m[0].length > 200) return m[0];
+    if (m?.[1]) return toText(m[1].slice(0, 60_000));
   }
-  return html;
+  return toText(html);
 }
 
 function pick(html: string, res: RegExp[]): string | undefined {
@@ -125,17 +143,52 @@ function detectTheme(title: string, body: string): { id: string; name: string; b
  * 그래서 **문단을 통째로** 담고, 다음 문단을 담으면 상한을 넘을 때 멈춘다.
  * 첫 문단이 이미 상한을 넘으면 그때만 문장(.!?) 경계에서 자른다.
  */
-function makeExcerpt(body: string): string {
-  const paras = body.split(/\n{1,}/).map((p) => p.trim())
-    // 사진 설명·해시태그·군더더기 줄은 뺀다.
-    .filter((p) => p.length >= 15 && !/^#/.test(p) && !/^(사진|이미지|출처|▶|▲)/.test(p));
+/* 후기다운 문장에 붙는 말들. 이게 많은 대목이 "테마 이야기"다.
+   블로그 글 앞부분은 대개 인사말과 글쓴이 자기소개라서, 앞에서부터 400자를 자르면
+   정작 우리 테마 얘기가 한 줄도 안 들어간다(실제로 첫 시도에서 그렇게 나왔다). */
+const GOOD = /재밌|재미|즐겁|좋았|좋고|좋은|추천|만족|인상|퀄리|스케일|몰입|놀랍|놀랐|최고|감탄|완성도|디테일|연출|웅장|압도|긴장|여운|친절|성공|탈출|경험|분위기|무섭|소름|신선/g;
+/* 결말·정답을 드러내는 대목은 피한다. 후기를 읽고 오는 손님의 재미를 우리가 깎으면 안 된다. */
+const SPOIL = /스포|정답|답은|비밀번호|자물쇠는|힌트는|마지막 문제|엔딩은|범인/;
+
+function makeExcerpt(body: string, title: string): string {
+  const norm = (s: string) => s.replace(/\s/g, "");
+  const t = norm(title);
+
+  const paras = body.split(/\n{1,}/)
+    // 보이지 않는 글자(zero-width space)만 있는 줄은 네이버 본문에 아주 많다. 먼저 지운다.
+    .map((p) => p.replace(/[​﻿]/g, "").trim())
+    .filter((p) =>
+      p.length >= 20 &&
+      !/^#/.test(p) &&
+      !/^(사진|이미지|출처|▶|▲)/.test(p) &&
+      !SPOIL.test(p) &&
+      // 제목이 본문 첫 줄에 그대로 또 있는 경우가 흔하다. 카드에 제목을 두 번 보일 필요는 없다.
+      !(t && norm(p) === t)
+    );
+  if (!paras.length) return "";
+
+  /* 어디서부터 뽑을지 고른다.
+     각 시작점마다 "400자 안에 담기는 문단들"을 모아 점수를 매기고, 제일 높은 곳을 쓴다.
+     점수 = 후기다운 표현 수 (+ 글자 수는 아주 약하게만 반영해서, 길기만 한 대목이 이기지 않게 한다). */
+  let best = { start: 0, score: -1 };
+  for (let i = 0; i < paras.length; i++) {
+    let len = 0, score = 0;
+    for (let j = i; j < paras.length; j++) {
+      if (j > i && len + paras[j].length > EXCERPT_MAX) break;
+      score += (paras[j].match(GOOD) ?? []).length;
+      len += paras[j].length + 1;
+      if (len >= EXCERPT_MAX) break;
+    }
+    score += len / 4000; // 동점일 때만 갈리는 아주 작은 가중치
+    if (score > best.score) best = { start: i, score };
+  }
 
   const out: string[] = [];
   let len = 0;
-  for (const p of paras) {
-    if (out.length && len + p.length > EXCERPT_MAX) break;
-    out.push(p);
-    len += p.length + 1;
+  for (let j = best.start; j < paras.length; j++) {
+    if (out.length && len + paras[j].length > EXCERPT_MAX) break;
+    out.push(paras[j]);
+    len += paras[j].length + 1;
     if (len >= EXCERPT_MAX) break;
   }
   let text = out.join("\n");
@@ -145,7 +198,8 @@ function makeExcerpt(body: string): string {
     const end = Math.max(cut.lastIndexOf("."), cut.lastIndexOf("!"), cut.lastIndexOf("?"), cut.lastIndexOf("다"));
     text = (end > EXCERPT_MAX * 0.5 ? cut.slice(0, end + 1) : cut).trim() + " …";
   }
-  return text;
+  // 글 중간에서 시작하면 앞이 잘린 티를 내준다 — 원문을 옮겨온 것이지 전부가 아님을 보이는 표시다.
+  return (best.start > 0 ? "… " : "") + text;
 }
 
 /** 주소 하나로 후기 초안을 만든다. 저장은 하지 않는다(부르는 쪽이 결정). */
@@ -187,7 +241,7 @@ export async function fetchBlogReview(rawUrl: string): Promise<BlogDraft> {
       /<meta property="og:article:author" content="([^"]+)"/i,
     ]) ?? id.blogId;
 
-  const bodyText = toText(pickBody(html));
+  const bodyText = pickBodyText(html);
   if (bodyText.length < 40) {
     return { ok: false, error: "본문을 찾지 못했습니다. 글이 이미지로만 되어 있을 수 있습니다." };
   }
@@ -208,7 +262,7 @@ export async function fetchBlogReview(rawUrl: string): Promise<BlogDraft> {
     themeId: theme?.id,
     themeName: theme?.name,
     matchedBy: theme?.by ?? "테마 이름을 못 찾음 — 직접 골라주세요",
-    excerpt: makeExcerpt(bodyText),
+    excerpt: makeExcerpt(bodyText, title),
     fullLength: bodyText.length,
   };
 }
