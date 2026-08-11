@@ -2045,7 +2045,7 @@ function ReviewImport({ onDone }: { onDone: () => void }) {
       <b>네이버 블로그 후기 옮기기 (주소만 붙여넣으면 끝)</b>
       <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 6, lineHeight: 1.6 }}>
         별점은 넣지 않습니다(블로그에 별점이 없습니다). 전문이 아니라 <b>발췌 + 원문 링크</b>로 실립니다.
-        <br />⚠️ <b>작성자 동의를 받은 글만</b> 올려주세요. 아래 칸에 어떻게 동의받았는지 남기면 나중에 근거가 됩니다.
+        <br />⚠️ <b>작성자 동의를 받은 글만</b> 올려주세요. 동의 경로와 시각이 기록으로 남습니다.
       </div>
       <div className="admin-tools" style={{ marginTop: 12, marginBottom: 8 }}>
         <input type="text" placeholder="https://blog.naver.com/아이디/글번호" value={url}
@@ -2055,7 +2055,7 @@ function ReviewImport({ onDone }: { onDone: () => void }) {
           {THEMES.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.storeTag})</option>)}
         </select>
       </div>
-      <input type="text" placeholder="동의받은 경로 (예: 2026-08-11 블로그 댓글로 동의)" value={consent}
+      <input type="text" placeholder="동의받은 경로 — 비워두면 ‘직접 연락해 동의 받음’ 으로 기록됩니다" value={consent}
         onChange={(e) => setConsent(e.target.value)}
         style={{ width: "100%", background: "var(--bg2)", border: "1px solid var(--line)", borderRadius: 9, color: "var(--text)", padding: 10, fontSize: 13 }} />
 

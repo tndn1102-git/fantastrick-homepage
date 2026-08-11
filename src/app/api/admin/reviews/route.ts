@@ -70,7 +70,10 @@ export async function POST(req: NextRequest) {
     const { data: dup } = await db.from("reviews").select("id").eq("source_url", draft.url!).maybeSingle();
     if (dup) return NextResponse.json({ error: "이미 등록된 글입니다." }, { status: 409 });
 
-    const consentNote = sanitizeText(String(body.consentNote || "")) || "작성자 동의 받음(경로 미기재)";
+    /* 사장님 방침(2026-08-11): 여기에 올리는 블로그는 **전부 직접 연락해 동의를 받은 것**이다.
+   그래서 비워두면 그 사실을 기본으로 남긴다. 동의 시각(consent_at)은 등록 시각으로 함께 찍힌다.
+   ⚠️ 동의 없는 글을 올리는 통로가 되면 안 된다 — 붙여넣기 전에 동의부터가 순서다. */
+const consentNote = sanitizeText(String(body.consentNote || "")) || "사장님이 작성자에게 직접 연락해 동의 받음";
     const row: Record<string, unknown> = {
       theme_id: theme.id,
       theme_name: theme.name,

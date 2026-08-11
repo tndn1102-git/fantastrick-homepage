@@ -7,7 +7,7 @@ const g = (k: string) => (env.match(new RegExp("^" + k + "=(.*)$", "m")) || [])[
 const URL_ = g("SUPABASE_URL"), KEY = g("SUPABASE_SERVICE_ROLE_KEY");
 
 const url = process.argv[2];
-const consent = process.argv[3] || "작성자 동의 받음(경로 미기재)";
+const consent = process.argv[3] || "사장님이 작성자에게 직접 연락해 동의 받음";
 const d = await fetchBlogReview(url);
 if (!d.ok) { console.log("읽기 실패: " + d.error); process.exit(1); }
 if (!d.themeId) { console.log("테마를 못 찾았습니다 — 직접 지정이 필요합니다."); process.exit(1); }
