@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   const theme = req.nextUrl.searchParams.get("theme");
   let q = db
     .from("reviews")
-    .select("id, theme_id, theme_name, name, phone, rating, body, source, created_at")
+    .select("id, theme_id, theme_name, name, phone, rating, body, source, source_url, created_at")
     .eq("status", "approved") // 승인된 후기만 공개
     .order("created_at", { ascending: false })
     .limit(100);

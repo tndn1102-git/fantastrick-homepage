@@ -957,6 +957,11 @@ footer ul li{padding:3px 0}
 .rev .rev-h .who{font-weight:700;font-size:14px}
 .rev .rev-h .date{font-size:12px;color:var(--faint)}
 .rev .rev-theme{font-size:12px;color:var(--cyan);font-weight:600;margin-bottom:4px}
+/* 출처 링크 — 눌러서 원문으로 간다. 밑줄로 "눌리는 것"임을 알리되,
+   테마명보다 조용하게 둔다. 주인공은 후기 내용이지 출처가 아니다. */
+.rev .rev-src{margin-left:8px;font-size:11px;font-weight:600;color:var(--faint);
+  text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+.rev .rev-src:hover{color:var(--cyan)}
 .rev .rev-body{font-size:14px;color:var(--muted);line-height:1.6}
 .rev .rev-stars{color:#b06f00;font-size:14px;letter-spacing:1px}
 .subtab{display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid var(--line)}

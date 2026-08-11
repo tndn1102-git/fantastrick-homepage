@@ -1943,7 +1943,8 @@ function NoticeTab() {
 /* ============ 리뷰 탭 ============ */
 type AdminReview = {
   id: string; theme_id: string; theme_name: string; name: string; phone: string;
-  rating: number; body: string; source: string | null; status: string; created_at: string;
+  rating: number | null; body: string; source: string | null; status: string; created_at: string;
+  source_url?: string | null;
 };
 const REV_ST_LABEL: Record<string, string> = { pending: "대기", approved: "게시", rejected: "거부" };
 
@@ -1967,6 +1968,7 @@ function ReviewsAdminTab() {
 
   return (
     <>
+      <ReviewImport onDone={load} />
       <ReviewAdd onDone={load} />
       <div className="admin-tools">
         <select value={status} onChange={(e) => setStatus(e.target.value)}>
@@ -1984,7 +1986,10 @@ function ReviewsAdminTab() {
             <div className="head" style={{ cursor: "default" }}>
               <span className="tname">{r.theme_name}</span>
               {/* --gold 는 보라(--violet)라 관리자 별만 보라였음 → 손님 후기 화면과 같은 #e0930c 로 통일 */}
-              <span className="rev-stars" style={{ color: "#b06f00", fontWeight: 700 }}>{r.rating}/5</span>
+              {typeof r.rating === "number" && r.rating > 0
+                ? <span className="rev-stars" style={{ color: "#b06f00", fontWeight: 700 }}>{r.rating}/5</span>
+                : <span className="src-tag">별점 없음</span>}
+              {r.source_url && <a href={r.source_url} target="_blank" rel="nofollow noopener noreferrer" className="src-tag" title="원문 보기">원문 ↗</a>}
               <span className="who">{r.name}{r.phone ? ` · ${formatPhone(r.phone)}` : ""}</span>
               {r.source && <span className="src-tag">{r.source}</span>}
               <span className={`badge-st st-${r.status === "approved" ? "confirmed" : r.status === "rejected" ? "cancelled" : "pending"}`}>{REV_ST_LABEL[r.status] || r.status}</span>
@@ -2005,6 +2010,74 @@ function ReviewsAdminTab() {
           </div>
         ))}
     </>
+  );
+}
+
+/* 블로그 주소 하나로 후기 옮기기 — 사장님은 주소만 붙여넣는다.
+   글 읽기 → 닉네임·작성일 뽑기 → 테마 알아내기 → 발췌까지 전부 자동이다.
+   [가져오기] 로 먼저 확인하고 [등록] 하거나, 바로 [붙여넣고 등록] 해도 된다. */
+function ReviewImport({ onDone }: { onDone: () => void }) {
+  const [url, setUrl] = useState("");
+  const [consent, setConsent] = useState("");
+  const [themeId, setThemeId] = useState("");   // 비우면 글에서 알아서 찾는다
+  const [draft, setDraft] = useState<null | Record<string, string | number | undefined>>(null);
+  const [err, setErr] = useState(""); const [msg, setMsg] = useState(""); const [busy, setBusy] = useState(false);
+
+  async function run(preview: boolean) {
+    setErr(""); setMsg(""); setBusy(true);
+    const res = await fetch("/api/admin/reviews", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "import", url, preview, consentNote: consent, themeId: themeId || undefined }),
+    });
+    const j = await res.json().catch(() => ({}));
+    setBusy(false);
+    if (res.ok) {
+      setDraft(j.draft ?? null);
+      if (!preview) { setMsg("등록되었습니다 ✅ 후기 화면에 바로 보입니다."); setUrl(""); onDone(); }
+    } else {
+      setErr(j.error || "가져오기 실패");
+      if (j.draft) setDraft(j.draft);
+    }
+  }
+
+  return (
+    <div className="admin-card">
+      <b>네이버 블로그 후기 옮기기 (주소만 붙여넣으면 끝)</b>
+      <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 6, lineHeight: 1.6 }}>
+        별점은 넣지 않습니다(블로그에 별점이 없습니다). 전문이 아니라 <b>발췌 + 원문 링크</b>로 실립니다.
+        <br />⚠️ <b>작성자 동의를 받은 글만</b> 올려주세요. 아래 칸에 어떻게 동의받았는지 남기면 나중에 근거가 됩니다.
+      </div>
+      <div className="admin-tools" style={{ marginTop: 12, marginBottom: 8 }}>
+        <input type="text" placeholder="https://blog.naver.com/아이디/글번호" value={url}
+          onChange={(e) => setUrl(e.target.value)} style={{ minWidth: 320, flex: 1 }} />
+        <select value={themeId} onChange={(e) => setThemeId(e.target.value)}>
+          <option value="">테마 자동 찾기</option>
+          {THEMES.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.storeTag})</option>)}
+        </select>
+      </div>
+      <input type="text" placeholder="동의받은 경로 (예: 2026-08-11 블로그 댓글로 동의)" value={consent}
+        onChange={(e) => setConsent(e.target.value)}
+        style={{ width: "100%", background: "var(--bg2)", border: "1px solid var(--line)", borderRadius: 9, color: "var(--text)", padding: 10, fontSize: 13 }} />
+
+      {draft && (
+        <div style={{ marginTop: 10, padding: 12, background: "var(--bg2)", border: "1px solid var(--line)", borderRadius: 9, fontSize: 13 }}>
+          <div style={{ color: "var(--muted)", fontSize: 12, marginBottom: 6 }}>
+            <b style={{ color: "var(--text)" }}>{String(draft.themeName ?? "테마 못 찾음")}</b>
+            {" · "}{String(draft.author ?? "")}{draft.postedAt ? ` · ${String(draft.postedAt)}` : ""}
+            <br />{String(draft.matchedBy ?? "")}
+            {draft.fullLength ? ` · 원문 ${draft.fullLength}자 중 ${String(draft.excerpt ?? "").length}자 발췌` : ""}
+          </div>
+          <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.7 }}>{String(draft.excerpt ?? "")}</div>
+        </div>
+      )}
+
+      {err && <div className="msg-err" style={{ marginTop: 8 }}>{err}</div>}
+      {msg && <div className="notice ok" style={{ marginTop: 8 }}>{msg}</div>}
+      <div className="admin-tools" style={{ marginTop: 10 }}>
+        <button className="btn sm ghost" onClick={() => run(true)} disabled={busy || !url}>{busy ? "읽는 중…" : "가져와서 보기"}</button>
+        <button className="btn primary sm" onClick={() => run(false)} disabled={busy || !url}>{busy ? "처리 중…" : "등록(즉시 게시)"}</button>
+      </div>
+    </div>
   );
 }
 

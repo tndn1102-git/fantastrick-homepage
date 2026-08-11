@@ -170,15 +170,32 @@ export default function ReviewsClient({ initialReviews }: { initialReviews: Revi
         <div className="rev-list">
           {shown.map((r) => (
             <div key={r.id} className="rev">
-              <div className="rev-theme">{r.theme_name}{r.source && r.source !== "자체" ? <span style={{ marginLeft: 8, fontSize: 11, color: "var(--faint)", fontWeight: 600 }}>· {r.source}</span> : null}</div>
+              {/* 출처 — 원문 주소가 있으면 **눌러서 원글로 갈 수 있게** 한다.
+                  글을 써주신 분께 방문이 돌아가야 인용이지, 가져오기가 아니다.
+                  rel 의 nofollow 는 "이 글의 원본은 우리가 아니다"를 검색엔진에 알리는 표시다. */}
+              <div className="rev-theme">
+                {r.theme_name}
+                {r.source && r.source !== "자체" ? (
+                  r.source_url ? (
+                    <a href={r.source_url} target="_blank" rel="nofollow noopener noreferrer"
+                       className="rev-src" title="원문 보기 (새 창)">· {r.source} ↗</a>
+                  ) : (
+                    <span style={{ marginLeft: 8, fontSize: 11, color: "var(--faint)", fontWeight: 600 }}>· {r.source}</span>
+                  )
+                ) : null}
+              </div>
               <div className="rev-h">
                 <span className="who">{r.name} <span style={{ color: "var(--faint)", fontWeight: 400, fontSize: 12 }}>{r.phone}</span></span>
-                <span className="rev-stars" aria-label={`5점 만점에 ${r.rating}점`}>
-                  <span aria-hidden="true">
-                    {Array.from({ length: r.rating }, (_, i) => <IconStar key={i} />)}
-                    <span style={{ color: "var(--faint)" }}>{Array.from({ length: 5 - r.rating }, (_, i) => <IconStar key={i} />)}</span>
+                {/* 별점이 없는 후기(블로그에서 옮겨온 것)는 별을 그리지 않는다.
+                    0점짜리 빈 별 다섯 개가 뜨면 "형편없다"는 뜻으로 읽힌다 — 없는 것과 나쁜 것은 다르다. */}
+                {typeof r.rating === "number" && r.rating > 0 ? (
+                  <span className="rev-stars" aria-label={`5점 만점에 ${r.rating}점`}>
+                    <span aria-hidden="true">
+                      {Array.from({ length: r.rating }, (_, i) => <IconStar key={i} />)}
+                      <span style={{ color: "var(--faint)" }}>{Array.from({ length: 5 - r.rating }, (_, i) => <IconStar key={i} />)}</span>
+                    </span>
                   </span>
-                </span>
+                ) : null}
               </div>
               <div className="rev-body">{r.body}</div>
               <div className="date" style={{ fontSize: 12, color: "var(--faint)", marginTop: 8 }}>{formatDate(r.created_at.slice(0, 10))}</div>

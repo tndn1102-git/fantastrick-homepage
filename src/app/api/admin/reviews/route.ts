@@ -3,8 +3,9 @@ import { getSupabase, DB_NOT_CONFIGURED } from "@/lib/supabase";
 import { isAdmin } from "@/lib/admin";
 import { sanitizeText } from "@/lib/util";
 import { themeById } from "@/lib/data";
+import { fetchBlogReview } from "@/lib/blog-review";
 
-const COLS = "id, theme_id, theme_name, name, phone, rating, body, source, status, created_at";
+const COLS = "id, theme_id, theme_name, name, phone, rating, body, source, source_url, status, created_at";
 
 // 리뷰 목록 (관리자) — ?status=pending|approved|all (기본 pending)
 export async function GET(req: NextRequest) {
@@ -43,6 +44,57 @@ export async function POST(req: NextRequest) {
     const { error } = await db.from("reviews").update({ status }).eq("id", id);
     if (error) return NextResponse.json({ error: "상태 변경 중 오류가 발생했습니다." }, { status: 500 });
     return NextResponse.json({ ok: true });
+  }
+
+  /* 블로그 주소 하나로 후기 등록 — **주소만 넣으면 나머지는 전부 자동이다.**
+     preview: true 면 읽어보기만 하고 저장하지 않는다(화면에서 확인용).
+
+     ⚠️ 별점은 넣지 않는다(null). 블로그 글에는 별점이 없고, 없는 점수를 지어내면 손님을 속이는 것이다.
+     ⚠️ 전문이 아니라 발췌만 담는다. 원문 링크가 함께 가므로 읽고 싶은 사람은 원글로 간다. */
+  if (action === "import") {
+    const url = String(body.url || "").trim();
+    const draft = await fetchBlogReview(url);
+    if (!draft.ok) return NextResponse.json({ error: draft.error }, { status: 400 });
+
+    // 테마를 못 고르면 저장하지 않는다 — 엉뚱한 테마에 붙은 후기는 손님을 헷갈리게 한다.
+    const themeId = String(body.themeId || draft.themeId || "");
+    const theme = themeById(themeId);
+    if (!theme) {
+      return NextResponse.json({
+        error: "글에서 테마 이름을 못 찾았습니다. 테마를 직접 골라 다시 눌러주세요.", draft,
+      }, { status: 400 });
+    }
+    if (body.preview) return NextResponse.json({ ok: true, draft: { ...draft, themeId: theme.id, themeName: theme.name } });
+
+    // 같은 글을 두 번 올리지 않는다.
+    const { data: dup } = await db.from("reviews").select("id").eq("source_url", draft.url!).maybeSingle();
+    if (dup) return NextResponse.json({ error: "이미 등록된 글입니다." }, { status: 409 });
+
+    const consentNote = sanitizeText(String(body.consentNote || "")) || "작성자 동의 받음(경로 미기재)";
+    const row: Record<string, unknown> = {
+      theme_id: theme.id,
+      theme_name: theme.name,
+      name: draft.author,
+      phone: null,
+      rating: null,                       // 블로그 후기는 별점 없음
+      body: draft.excerpt,
+      status: "approved",
+      source: "네이버 블로그",
+      source_url: draft.url,
+      consent_note: consentNote,
+      consent_at: new Date().toISOString(),
+    };
+    const { error } = await db.from("reviews").insert(row);
+    if (error) {
+      // 표를 아직 안 고쳤을 때 무엇을 해야 하는지 알려준다.
+      if (/source_url|consent_note|consent_at|rating|phone/.test(error.message || "")) {
+        return NextResponse.json({
+          error: "표에 칸이 아직 없습니다. supabase/migration_review_source_url_APPLY_ME.sql 을 Supabase SQL Editor 에서 한 번 실행해 주세요.",
+        }, { status: 503 });
+      }
+      return NextResponse.json({ error: "후기 등록 중 오류가 발생했습니다." }, { status: 500 });
+    }
+    return NextResponse.json({ ok: true, draft });
   }
 
   // 외부 후기 수동 등록 (예약이력 검증 없음 — 관리자 우회, 즉시 게시)
