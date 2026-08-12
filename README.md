@@ -2,6 +2,24 @@
 
 > 무엇을 바꿨는지 시간 순으로 적는 곳이에요. (최신이 위)
 
+## 2026-08-12 — 도메인 이전 준비 (Cloudflare 존 등록·DNS 정리까지)
+
+### 아직 아무것도 안 바뀌었다 — 네임서버 변경 전이라 옛 사이트·메일·TGC 전부 그대로다
+fantastrick.co.kr 을 Cloudflare 존으로 등록하고(상태 pending), DNS 를 전부 옮겨 적었다.
+**스위치(네임서버 변경)만 남았고, 그건 사장님이 가비아에서 하는 마지막 단계다.**
+- 배정 네임서버: `marek.ns.cloudflare.com` · `pam.ns.cloudflare.com` ← 가비아에 넣을 값
+- 토큰: CF_DOMAIN_TOKEN(.env.local, 존 한정, ~8/31) — 끝나면 대시보드에서 삭제
+
+🔴 **자동 스캔이 두 개를 빠뜨렸다 — tgc 와 hiworks.**
+tgc(A 76.76.21.21, Vercel)는 손님이 실제 예약하는 사이트라, 그대로 넘겼으면 **주소가 통째로 사라졌다.**
+미리 nslookup 으로 만든 실측 목록과 대조해서 잡았다. "자동 임포트를 믿지 말고 대조하라"가 실증됐다.
+
+🔴 **스캔이 가져온 레코드 6개가 전부 주황(Proxied)이었다.**
+Cloudflare 프록시는 웹(HTTP)만 통과시킨다 — db(MySQL)·mail/pop3(메일)은 주황이면 **그 순간 끊긴다.**
+db·mail·pop3·webmail·tgc·hiworks 를 회색(DNS only)으로 정리. 주황은 @·www(웹)만 남김.
+- 참고: mail 은 내 조사(A 211.47.76.59)와 스캔(CNAME mailapp.hiworks.co.kr)이 달랐는데,
+  mailapp 이 그 IP 로 풀리는 걸 확인 — CNAME 이 맞고 오히려 하이웍스 서버 이동을 자동 추종한다.
+
 ## 2026-08-12 — 알림톡 연결 완료 + 블로그 후기 자동 수집
 
 ### 예약 확정 알림톡이 나가기 시작했다
