@@ -2,6 +2,25 @@
 
 > 무엇을 바꿨는지 시간 순으로 적는 곳이에요. (최신이 위)
 
+## 2026-08-12 — 도메인 이전 준비 ②: 미리 할 수 있는 것 전부
+
+### 이전하는 날 = 네임서버 두 줄 교체뿐, 나머지는 오늘 다 해뒀다
+- **@·www 를 워커(새 홈페이지)에 미리 연결.** 옛 서버 A 레코드는 지웠다 —
+  네임서버 변경 전이라 실제 접속엔 무영향, 바꾸는 순간 즉시 새 사이트가 뜬다.
+  옛 워드프레스 뒷문으로 old.fantastrick.co.kr(회색)만 남겨둠(안정되면 삭제).
+- **robots.txt·sitemap.xml 신설** + metadataBase/canonical = https://fantastrick.co.kr 선언.
+  임시 주소(workers.dev)로 들어온 검색엔진도 "원본은 fantastrick.co.kr"로 읽는다.
+- **옛 워드프레스 주소 넘김**(next.config redirects): /booking→/reserve, /faqs→/faq,
+  /policy→/privacy, /contacts→/business, wp-admin·wp-login·feed→/.
+  /rooms/{id} 는 옛/새 구조가 같아 그대로 이어진다(옛 사이트 실측).
+- **www→대표주소 301**(middleware) — www 호스트일 때만 동작, 지금 접속엔 무영향.
+- **네이버 소유확인 파일 이식.** ⚠️ public/ 에 두면 정적 서버가 .html 을 307 로 튕긴다(실측)
+  → 라우트로 정확한 주소에서 200 직접 응답.
+
+🔴 **WP_DB_HOST 를 IP 로 바꿨다가 코드 주석 보고 즉시 원복** — 워커는 원시 IP 연결을 막는다(1104).
+  db.fantastrick.co.kr 이 맞고, 이 이름은 새 DNS 에도 그대로 옮겨뒀으니 이전 후에도 안전.
+  원복 후 wp-sync 실발송 확인(read 121 · errors 0).
+
 ## 2026-08-12 — 도메인 이전 준비 (Cloudflare 존 등록·DNS 정리까지)
 
 ### 아직 아무것도 안 바뀌었다 — 네임서버 변경 전이라 옛 사이트·메일·TGC 전부 그대로다
