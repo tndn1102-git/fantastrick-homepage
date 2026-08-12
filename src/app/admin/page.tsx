@@ -2359,7 +2359,10 @@ type MissedRow = { id: string; phone: string; body: string; type: string; error:
 function readBody(body: string) {
   const g = (re: RegExp) => re.exec(body)?.[1]?.trim() ?? "";
   return {
-    name: g(/예약자명\s*:\s*(.+?)님/),
+    /* ⚠️ 이름은 **줄 끝의 마지막 "님"** 까지 욕심껏 가져온다.
+       (.+?)님 처럼 짧게 끊으면 이름 안에 님이 있을 때 잘린다 — "확인용손님님" → "확인용손".
+       손님 이름을 틀리게 부르는 건 직접 연락할 때 제일 곤란한 실수다. */
+    name: g(/예약자명\s*:\s*(.+)님\s*$/m),
     when: g(/예약시간\s*:\s*(.+)/),
     theme: g(/테마명\s*:\s*(.+)/),
   };
