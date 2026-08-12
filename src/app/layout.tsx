@@ -4,8 +4,14 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import NoticeModal from "@/components/NoticeModal";
 import ThemeShell from "@/components/ThemeShell";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
+  /* 대표 주소 — 공유(카톡·페북) 미리보기와 검색 원본 표시가 이 주소 기준으로 나간다.
+     임시 주소(workers.dev)로 접속해도 "원본은 fantastrick.co.kr"로 선언된다.
+     도메인 이전 준비의 일부(2026-08-12) — 이전하는 날 이 파일은 손댈 게 없다. */
+  metadataBase: new URL(SITE_URL),
+  alternates: { canonical: "/" },
   title: "판타스트릭 FANTASTRICK — 강남 이머시브 방탈출 & 머더룸",
   description:
     "일상이 멈추고, 이야기가 시작된다. 강남 11년차 이머시브 방탈출·머더룸 브랜드 판타스트릭. 테마 예약·후기.",

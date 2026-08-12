@@ -22,6 +22,24 @@ const nextConfig: NextConfig = {
       { source: "/webhook/diag", destination: "/api/bank/diag" },
     ];
   },
+  /* ─── 옛 워드프레스 주소 받아주기 (도메인 이전 준비 · 2026-08-12) ───
+     검색 결과·블로그·즐겨찾기에는 옛 사이트 주소가 남아 있다. 도메인을 옮긴 뒤
+     그 주소로 들어온 손님이 "페이지 없음"을 보지 않도록 새 자리로 넘겨준다.
+     옛 주소는 실제 옛 사이트를 긁어서 확인한 것들이다.
+     · /rooms/{id} 는 옛/새 구조가 같아서 넘길 필요가 없다(운 좋게 그대로 이어진다).
+     · 301(영구이동)이라 검색엔진도 새 주소로 옮겨 배운다. */
+  async redirects() {
+    return [
+      { source: "/booking", destination: "/reserve", permanent: true },   // 예약하기
+      { source: "/faqs", destination: "/faq", permanent: true },          // 자주 묻는 질문
+      { source: "/policy", destination: "/privacy", permanent: true },    // 개인정보 취급방침
+      { source: "/contacts", destination: "/business", permanent: true }, // 컨설팅 문의 → B2B
+      // 워드프레스 시스템 주소들 — 새 사이트엔 없는 개념이라 홈으로.
+      { source: "/wp-admin/:path*", destination: "/", permanent: true },
+      { source: "/wp-login.php", destination: "/", permanent: true },
+      { source: "/feed", destination: "/", permanent: true },
+    ];
+  },
   // 모든 경로에 기본 보안 헤더 적용 (클릭재킹·MIME 스니핑·정보 유출 1차 방어)
   async headers() {
     return [
