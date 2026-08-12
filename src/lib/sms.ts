@@ -110,11 +110,20 @@ async function nhnSendAlimtalk(
       resendSendNo: normalizePhone(from),
     };
   }
-  return nhnPost(`${ALIMTALK_HOST}/alimtalk/v2.1/appkeys/${appKey}/messages`, secret, {
-    senderKey,
-    templateCode,
-    recipientList: [recipient],
-  });
+  const url = `${ALIMTALK_HOST}/alimtalk/v2.1/appkeys/${appKey}/messages`;
+  const r = await nhnPost(url, secret, { senderKey, templateCode, recipientList: [recipient] });
+  if (r.ok || !recipient.resendParameter) return r;
+
+  /* ⚠️ 발신번호 승인 전에는 "문자 대체발송" 정보가 알림톡 자체를 막을 수 있다.
+     대체발송은 문자망을 쓰는데, 그 번호가 아직 등록 전이면 요청 전체가 거절될 수 있기 때문이다.
+     그런데 **알림톡은 카카오 채널로 나가므로 발신번호 없이도 갈 수 있다.**
+     → 대체발송 때문에 막힌 것 같으면, 대체발송을 빼고 한 번 더 보낸다.
+       카톡 되는 손님에게라도 안내가 가는 편이, 아무에게도 안 가는 것보다 낫다.
+     발신번호가 승인되면 첫 시도가 그냥 성공하므로 이 두 번째 시도는 다시는 실행되지 않는다. */
+  if (!/2312|sendno|발신번호/i.test(r.error ?? "")) return r;
+  const { resendParameter: _drop, ...noResend } = recipient;
+  const r2 = await nhnPost(url, secret, { senderKey, templateCode, recipientList: [noResend] });
+  return r2.ok ? { ok: true, error: "문자 대체발송 없이 발송됨(발신번호 승인 대기)" } : r;
 }
 
 // ─── 테스트 데이터 문자 차단 ────────────────────────────────────────────
@@ -303,6 +312,21 @@ export async function sendTestSms(phone: string, body: string): Promise<{ ok: bo
     status: r.ok ? "sent" : "failed", error: r.ok ? null : `[${vendor}] ${r.error}`,
   });
   return { ok: r.ok, vendor, error: r.error };
+}
+
+/** 시험용 알림톡 한 통 — 승인된 확정 템플릿으로 실제 카카오톡을 보낸다.
+ *  손님에게 나가는 길(sendAlimtalk)의 게이트를 건드리지 않으려고 여기 따로 둔다. 관리자만 부른다. */
+export async function sendTestAlimtalk(phone: string): Promise<{ ok: boolean; error?: string }> {
+  const tpl = process.env.NHN_TPL_CONFIRM;
+  if (!kakaoConfigured() || !tpl) return { ok: false, error: "알림톡 열쇠 또는 템플릿 코드 미설정" };
+  const vars = { 이름: "판타스트릭", 테마: "락다운시티", 날짜: "8월 12일(화)", 시간: "19:00" };
+  const body = "[판타스트릭] 알림톡 연결 시험입니다.";
+  const r = await nhnSendAlimtalk(normalizePhone(phone), tpl, vars, body);
+  await writeLog({
+    phone: normalizePhone(phone), body, type: "test", channel: "alimtalk",
+    status: r.ok ? "sent" : "failed", error: r.error ?? null,
+  });
+  return r;
 }
 
 // 타입 → 카카오 알림톡 템플릿코드. 입금확인/확정=확정 템플릿, 취소=취소 템플릿.

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin } from "@/lib/admin";
 import { gabiaCheck } from "@/lib/sms-gabia";
-import { sendTestSms } from "@/lib/sms";
+import { sendTestSms, sendTestAlimtalk } from "@/lib/sms";
 import { normalizePhone, isValidPhone } from "@/lib/util";
 
 /* 가비아 연결 시험 — **문자는 한 통도 나가지 않는다.**
@@ -39,9 +39,15 @@ const TEST_BODY = "[판타스트릭] 새 홈페이지 문자 시험입니다. �
 export async function POST(req: NextRequest) {
   if (!(await authorized(req))) return NextResponse.json({ error: "권한이 없습니다." }, { status: 401 });
 
-  const body = (await req.json().catch(() => ({}))) as { phone?: string };
+  const body = (await req.json().catch(() => ({}))) as { phone?: string; kind?: string };
   const phone = normalizePhone(String(body.phone ?? ""));
   if (!isValidPhone(phone)) return NextResponse.json({ error: "받는 번호를 확인해 주세요." }, { status: 400 });
+
+  // kind:"alimtalk" 이면 카카오톡으로 — 승인된 확정 템플릿을 그대로 쓴다.
+  if (body.kind === "alimtalk") {
+    const a = await sendTestAlimtalk(phone);
+    return NextResponse.json({ ok: a.ok, channel: "알림톡", note: a.error });
+  }
 
   // 지금 켜져 있는 업체로 보낸다 — 어느 쪽으로 나갔는지 응답에 적어준다.
   const r = await sendTestSms(phone, TEST_BODY);
