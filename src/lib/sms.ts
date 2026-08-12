@@ -120,10 +120,16 @@ async function nhnSendAlimtalk(
      → 대체발송 때문에 막힌 것 같으면, 대체발송을 빼고 한 번 더 보낸다.
        카톡 되는 손님에게라도 안내가 가는 편이, 아무에게도 안 가는 것보다 낫다.
      발신번호가 승인되면 첫 시도가 그냥 성공하므로 이 두 번째 시도는 다시는 실행되지 않는다. */
-  if (!/2312|sendno|발신번호/i.test(r.error ?? "")) return r;
+  /* -1031(수신자 전원 실패)도 여기 포함한다. 미승인 발신번호가 딸려가면 카카오 쪽이 아니라
+     **수신자 단위 실패**로 떨어지기 때문이다(실제로 그렇게 나왔다).
+     대체발송 없이 다시 보내 성공하면 원인이 발신번호였다는 뜻이고,
+     그래도 실패하면 그 번호가 카카오톡을 안 쓴다는 뜻이다 — 두 경우가 이 재시도로 갈린다. */
+  if (!/2312|1031|sendno|발신번호/i.test(r.error ?? "")) return r;
   const { resendParameter: _drop, ...noResend } = recipient;
   const r2 = await nhnPost(url, secret, { senderKey, templateCode, recipientList: [noResend] });
-  return r2.ok ? { ok: true, error: "문자 대체발송 없이 발송됨(발신번호 승인 대기)" } : r;
+  if (r2.ok) return { ok: true, error: "문자 대체발송 없이 발송됨(발신번호 승인 대기)" };
+  // 두 번 다 실패했으면 무엇을 시도했는지 남긴다 — 원인을 가리는 단서가 된다.
+  return { ok: false, error: `${r.error} / 대체발송 빼고도 실패: ${r2.error}` };
 }
 
 // ─── 테스트 데이터 문자 차단 ────────────────────────────────────────────
