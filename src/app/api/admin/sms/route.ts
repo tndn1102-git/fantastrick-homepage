@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
   // 발송 내역 — 이름·전화로 검색 가능("저 문자 못 받았어요" 전화 응대용), 실패만 보기
   const q = (req.nextUrl.searchParams.get("q") || "").trim();
   const only = req.nextUrl.searchParams.get("only"); // "failed" → 실패·미발송만
-  let logQ = db.from("sms_log").select("id, phone, body, type, status, error, channel, created_at")
+  let logQ = db.from("sms_log").select("id, phone, body, type, status, error, channel, created_at, handled_at")
     .order("created_at", { ascending: false }).limit(100);
   if (q) {
     const qPhone = normalizePhone(q);
@@ -69,10 +69,25 @@ export async function GET(req: NextRequest) {
   if (only === "failed") logQ = logQ.neq("status", "sent");
   const { data: log } = await logQ;
 
+  /* ─── 카톡 못 받은 손님 (2026-08-12) ────────────────────────────────
+     문자 발신번호 심사가 끝날 때까지는 알림톡으로만 안내가 나간다.
+     카카오톡을 안 쓰는 손님은 **아무 안내도 못 받으므로** 사장님이 직접 연락해야 한다.
+     그 명단을 따로 뽑아준다 — 위 "실패만 보기" 는 차단·미설정까지 섞여 있어 이 용도에 안 맞는다.
+     ⚠️ handled_at 칸이 아직 없으면(SQL 미적용) 조용히 빈 목록을 준다. 화면이 깨지면 안 된다. */
+  let missed: Record<string, unknown>[] = [];
+  try {
+    const { data, error } = await db.from("sms_log")
+      .select("id, phone, body, type, error, created_at")
+      .eq("channel", "alimtalk").eq("status", "failed").is("handled_at", null)
+      .neq("type", "test")   // 연결 시험 발송은 손님이 아니다
+      .order("created_at", { ascending: false }).limit(200);
+    if (!error) missed = data ?? [];
+  } catch { /* 칸 없음 — 빈 목록 */ }
+
   const aligoReady = !!(process.env.ALIGO_API_KEY && process.env.ALIGO_USER_ID && process.env.ALIGO_SENDER);
   const kakaoReady = kakaoConfigured();
   const kakaoTemplates = { confirm: kakaoConfigured("confirm"), cancel: kakaoConfigured("cancel") };
-  return NextResponse.json({ ok: true, templates, log: log || [], aligoReady, kakaoReady, kakaoTemplates });
+  return NextResponse.json({ ok: true, templates, log: log || [], missed, aligoReady, kakaoReady, kakaoTemplates });
 }
 
 // 실패한 문자 다시 보내기 — 그때 나갔어야 할 문구 그대로 재발송
@@ -86,6 +101,17 @@ export async function POST(req: NextRequest) {
 
   const id = String(body.id || "");
   if (!id) return NextResponse.json({ error: "발송 id가 필요합니다." }, { status: 400 });
+
+  /* [연락함] / [되돌리기] — 사장님이 직접 연락한 건을 명단에서 내린다.
+     기록을 지우지 않고 표시만 남긴다. 나중에 "이 손님 연락했었나?" 를 되짚을 수 있어야 한다. */
+  if (body.action === "handled" || body.action === "unhandled") {
+    const { error } = await db.from("sms_log")
+      .update({ handled_at: body.action === "handled" ? new Date().toISOString() : null }).eq("id", id);
+    if (error) {
+      return NextResponse.json({ error: "표에 handled_at 칸이 없습니다. supabase/migration_sms_handled_APPLY_ME.sql 을 실행해 주세요." }, { status: 503 });
+    }
+    return NextResponse.json({ ok: true });
+  }
   const { data: row } = await db.from("sms_log").select("phone, body, type, status, error").eq("id", id).single();
   if (!row) return NextResponse.json({ error: "발송 내역을 찾을 수 없습니다." }, { status: 404 });
   if (row.status === "sent") return NextResponse.json({ error: "이미 발송된 문자예요. 다시 보낼 필요가 없습니다." }, { status: 400 });

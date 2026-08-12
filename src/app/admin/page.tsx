@@ -2347,6 +2347,23 @@ function StoreSlotsEditor({ storeSlots, setStoreSlots, fallback }: { storeSlots:
 
 /* ============ 문자 탭 ============ */
 type SmsLog = { id: string; phone: string; body: string; type: string; status: string; error: string | null; channel?: string | null; created_at: string };
+
+/* 카톡 못 받은 손님 — 알림톡이 실패했고 아직 직접 연락 안 한 건.
+   문자 발신번호 심사가 끝나면 이 명단은 저절로 비게 된다(NHN 이 문자로 대신 보내준다). */
+type MissedRow = { id: string; phone: string; body: string; type: string; error: string | null; created_at: string };
+
+/* 문자 본문에서 손님 정보를 뽑는다.
+   확정문자 문구가 "예약자명: 홍길동님 / 예약시간: … / 테마명: …" 형태라 그대로 읽어낸다.
+   ⚠️ 예약 표를 다시 조회하지 않는 이유 — 그 사이 예약이 취소·수정돼도
+      **그때 보내려던 안내 그대로** 를 보여줘야 손님과 말이 맞는다. */
+function readBody(body: string) {
+  const g = (re: RegExp) => re.exec(body)?.[1]?.trim() ?? "";
+  return {
+    name: g(/예약자명\s*:\s*(.+?)님/),
+    when: g(/예약시간\s*:\s*(.+)/),
+    theme: g(/테마명\s*:\s*(.+)/),
+  };
+}
 type TplTheme = { id: string; name: string; body: string; saved: boolean };
 type TplGroup = { type: string; label: string; perTheme: boolean; common: { body: string; saved: boolean } | null; themes: TplTheme[] };
 
@@ -2358,6 +2375,7 @@ function SmsTab() {
   const [pickTheme, setPickTheme] = useState<Record<string, string>>({});
   const [logQ, setLogQ] = useState(""); const [onlyFailed, setOnlyFailed] = useState(false);
   const [resend, setResend] = useState<string | null>(null);
+  const [missed, setMissed] = useState<MissedRow[]>([]);   // 카톡 못 받은 손님
 
   const load = useCallback(() => {
     const p = new URLSearchParams();
@@ -2365,9 +2383,20 @@ function SmsTab() {
     if (onlyFailed) p.set("only", "failed");
     fetch("/api/admin/sms?" + p.toString()).then((r) => r.json()).then((j) => {
       if (j.error) { setErr(j.error); setLoaded(true); return; }
-      setGroups(j.templates || []); setLog(j.log || []); setAligo(j.aligoReady); setKakao(!!j.kakaoReady); setLoaded(true);
+      setGroups(j.templates || []); setLog(j.log || []); setMissed(j.missed || []);
+      setAligo(j.aligoReady); setKakao(!!j.kakaoReady); setLoaded(true);
     }).catch(() => setLoaded(true));
   }, [logQ, onlyFailed]);
+
+  // 직접 연락한 건을 명단에서 내린다(기록은 지우지 않고 표시만 남긴다)
+  async function markHandled(id: string, on: boolean) {
+    const res = await fetch("/api/admin/sms", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, action: on ? "handled" : "unhandled" }),
+    });
+    if (res.ok) { setMsg(on ? "연락함으로 표시했어요 ✅" : "되돌렸어요"); load(); }
+    else { const j = await res.json(); setMsg("⚠️ " + (j.error || "실패")); }
+  }
 
   // 실패한 문자 다시 보내기 — 그때 나갔어야 할 문구 그대로
   async function resendSms(id: string) {
@@ -2414,11 +2443,53 @@ function SmsTab() {
     <div>
       <div className={"notice " + (kakao ? "ok" : aligo ? "ok" : "warn")} style={{ marginBottom: 16 }}>
         {kakao
-          ? "✅ 카카오 알림톡 연동됨 — 확정/취소 안내가 카톡으로 발송됩니다. (카톡 실패 시 문자로 자동 대체)"
+          ? "✅ 카카오 알림톡 연동됨 — 확정 안내가 카톡으로 발송됩니다. 카톡을 안 쓰는 손님은 아래 명단에서 직접 연락해 주세요. (문자 발신번호 승인되면 자동 문자 대체로 바뀝니다)"
           : aligo
           ? "✅ NHN Cloud 문자 연동됨 — 확정/취소 시 자동 발송됩니다. (알림톡 키 등록 시 카톡 우선 발송)"
           : "⚠️ NHN Cloud 문자/알림톡 키가 아직 없어요. 지금은 발송 내역만 기록되고 실제 발송은 안 나가요. (가입·키 등록 시 자동 발송)"}
       </div>
+
+      {/* 카톡 못 받은 손님 — 문자 발신번호 심사가 끝날 때까지만 쓰는 화면.
+          승인되면 NHN 이 알아서 문자로 대신 보내주므로 이 명단은 저절로 비게 된다.
+          비어 있으면 아무것도 그리지 않는다 — 평소에 눈에 걸리적거릴 이유가 없다. */}
+      {missed.length > 0 && (
+        <div className="admin-card" style={{ marginBottom: 16, borderColor: "#d9a441" }}>
+          <b style={{ color: "#b06f00" }}>📵 카톡 못 받은 손님 {missed.length}명 — 직접 연락해 주세요</b>
+          <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 6, lineHeight: 1.6 }}>
+            카카오톡을 쓰지 않는 분들이라 알림톡이 도착하지 못했습니다.
+            문자 발신번호 심사가 끝나면 <b>자동으로 문자가 나가서 이 목록은 사라집니다.</b> 그때까지만 손이 필요합니다.
+          </div>
+          {missed.map((m) => {
+            const v = readBody(m.body);
+            return (
+              <div key={m.id} style={{ marginTop: 10, padding: "10px 12px", background: "var(--bg2)", border: "1px solid var(--line)", borderRadius: 9 }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "baseline" }}>
+                  <b style={{ fontSize: 15 }}>{v.name || "이름 확인 필요"}</b>
+                  <a href={`tel:${m.phone}`} style={{ fontWeight: 700, color: "var(--cyan)" }}>{formatPhone(m.phone)}</a>
+                  <span style={{ fontSize: 12.5, color: "var(--muted)" }}>{v.theme}{v.when ? ` · ${v.when}` : ""}</span>
+                </div>
+                <div style={{ fontSize: 11.5, color: "var(--faint)", marginTop: 3 }}>
+                  {new Date(m.created_at).toLocaleString("ko-KR")} 실패{m.error ? ` · ${m.error}` : ""}
+                </div>
+                <div className="admin-tools" style={{ marginTop: 8 }}>
+                  {/* 보낼 문구를 통째로 복사 — 사장님이 폰 문자앱에 붙여넣기만 하면 된다 */}
+                  <button className="btn sm ghost" onClick={() => {
+                    navigator.clipboard?.writeText(m.body).then(
+                      () => setMsg("문구를 복사했어요 — 문자앱에 붙여넣으세요 📋"),
+                      () => setMsg("⚠️ 복사가 안 됐어요. 아래 문구를 직접 긁어 복사해 주세요."),
+                    );
+                  }}>안내 문구 복사</button>
+                  <button className="btn primary sm" onClick={() => markHandled(m.id, true)}>연락함</button>
+                </div>
+                <details style={{ marginTop: 8 }}>
+                  <summary style={{ cursor: "pointer", fontSize: 12.5, color: "var(--muted)" }}>보낼 문구 보기</summary>
+                  <div style={{ whiteSpace: "pre-wrap", fontSize: 13, marginTop: 6, lineHeight: 1.7 }}>{m.body}</div>
+                </details>
+              </div>
+            );
+          })}
+        </div>
+      )}
       <div className="notice info" style={{ marginBottom: 14 }}>
         <b>테마별</b> 딱지가 붙은 문자는 <b>테마마다 문구가 따로</b>예요(기존 사이트와 동일).
         예약대기는 테마마다 예약금이 다르고(3만·2.5만·12만·6.3만), 입금확정은 사자의 서만 인스타·길안내가 더 붙어요.
