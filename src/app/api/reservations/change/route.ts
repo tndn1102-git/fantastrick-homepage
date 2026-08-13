@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase, DB_NOT_CONFIGURED } from "@/lib/supabase";
 import { normalizePhone, isValidPhone, reservationDateState, sanitizeText } from "@/lib/util";
-import { slotsForThemeDate, isTooSoon } from "@/lib/data";
+import { slotsForThemeDate, isPastSlot } from "@/lib/data";
 import { getConfig } from "@/lib/settings";
 import { refundRateFor, hasStarted } from "@/lib/money";
 import { rateLimit, getClientIp } from "@/lib/ratelimit";
@@ -110,12 +110,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "선택하신 요일에는 그 시간이 없어요. 다른 시간을 선택해 주세요." }, { status: 400 });
   }
 
-  // 임박(시작 직전)·지난 시간으로는 옮길 수 없음
-  if (isTooSoon(date, time, config.minLeadMinutes)) {
-    const msg = config.minLeadMinutes > 0
-      ? `시작 ${config.minLeadMinutes}분 전부터는 예약할 수 없어요. 매장으로 전화 주세요.`
-      : "이미 지난 시간이에요.";
-    return NextResponse.json({ error: msg }, { status: 400 });
+  // 이미 시작된 시간으로는 옮길 수 없음
+  if (isPastSlot(date, time)) {
+    return NextResponse.json({ error: "이미 시작된 시간이에요." }, { status: 400 });
   }
 
   // 사장님이 닫은(휴무·마감) 시간인지

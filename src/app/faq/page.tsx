@@ -19,7 +19,6 @@ const won = (n: number) => n.toLocaleString() + "원";
 
 export default async function FaqPage() {
   const cfg = await getConfig();
-  const lead = cfg.minLeadMinutes;
 
   return (
     <div className="formwrap" style={{ maxWidth: 760 }}>
@@ -94,7 +93,6 @@ export default async function FaqPage() {
         <summary>예약은 언제부터 할 수 있나요?</summary>
         <div className="faq-b">
           <p>예약은 <b>이용일 일주일 전 저녁 9시</b>에 열립니다. 그 전에는 달력에 자물쇠(<IconLock aria-hidden="true" />)로 표시돼요.</p>
-          {lead > 0 && <p>또한 <b>시작 {lead}분 전부터는</b> 온라인 예약이 닫힙니다. 임박한 시간은 매장으로 전화 주세요.</p>}
         </div>
       </details>
 

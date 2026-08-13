@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
-import { THEMES, TIME_SLOTS, THEME_SLOTS, STORES, slotsForThemeDate, isTooSoon, type StoreSlots, type SlotSchedule, type Theme } from "@/lib/data";
+import { THEMES, TIME_SLOTS, THEME_SLOTS, STORES, slotsForThemeDate, isPastSlot, type StoreSlots, type SlotSchedule, type Theme } from "@/lib/data";
 import { formatDate, formatPhone, isValidPhone, reservationDateState } from "@/lib/util";
 import { depositOf } from "@/lib/settings";
 import { THEME_CONTENT } from "@/lib/theme-content";
@@ -19,7 +19,7 @@ const PAY_HOLDER = "승현수";
 const tossSendLink = (amount: number) =>
   `supertoss://send?bank=${encodeURIComponent(PAY_BANK)}&accountNo=${PAY_ACCT_NO}&amount=${amount}&origin=link`;
 
-type Cfg = { timeSlots: string[]; storeSlots?: Record<string, StoreSlots>; themeSlots?: Record<string, SlotSchedule>; minLeadMinutes?: number;
+type Cfg = { timeSlots: string[]; storeSlots?: Record<string, StoreSlots>; themeSlots?: Record<string, SlotSchedule>;
   // 사장님이 관리자에서 바꾼 테마별 예약금. 이걸 안 쓰면 화면만 옛 금액이 남아
   // 손님이 틀린 금액을 입금하고 자동매칭(금액 정확일치)이 실패해 30분 뒤 자동취소된다.
   themeDeposits?: Record<string, number> };
@@ -144,14 +144,13 @@ export default function ReserveClient({ preset }: { preset: string }) {
     setTime("");
   }
 
-  // 예약 임박 차단 — 시간이 흐르면 임박한 칸이 실제로 잠기도록 30초마다 현재시각 갱신
-  const leadMin = cfg.minLeadMinutes ?? 10;
+  // 시간이 흐르면 시작된 칸이 실제로 잠기도록 30초마다 현재시각 갱신
   const [nowMs, setNowMs] = useState(() => Date.now());
   useEffect(() => { const t = setInterval(() => setNowMs(Date.now()), 30000); return () => clearInterval(t); }, []);
-  // 골라둔 시간이 그 사이 임박해지면 선택을 풀어준다 (모르고 신청하는 것 방지)
+  // 골라둔 시간이 그 사이 시작돼 버리면 선택을 풀어준다 (모르고 신청하는 것 방지)
   useEffect(() => {
-    if (time && date && isTooSoon(date, time, leadMin, nowMs)) setTime("");
-  }, [nowMs, time, date, leadMin]);
+    if (time && date && isPastSlot(date, time, nowMs)) setTime("");
+  }, [nowMs, time, date]);
 
   useEffect(() => {
     const pt = preset ? THEMES.find((t) => t.id === preset) : undefined;
@@ -413,9 +412,11 @@ export default function ReserveClient({ preset }: { preset: string }) {
                     ))}
                   </span>
                 </div>
+                {/* 환불 규정은 예약을 넣는 마지막 단계에서 동의와 함께 보여준다.
+                    여기(테마 요약 줄)에도 적어두면 같은 말이 두 번 나오고, 규정이 바뀔 때
+                    한쪽만 고쳐져 서로 어긋난다. (2026-08-14 사장님 지시로 삭제) */}
                 <div className="rv-b-dep">
                   예약금 <b>{deposit.toLocaleString()}원</b>
-                  <span> · 시작 24시간 전까지 취소 시 100% 환불</span>
                 </div>
               </div>
               <button type="button" className="btn ghost sm rv-b-swap" onClick={resetTheme}>← 다른 테마</button>
@@ -452,8 +453,8 @@ export default function ReserveClient({ preset }: { preset: string }) {
                         // 같은 "못 고름"이라도 이유를 나눠서 말한다 — 예약이 찬 것 vs 우리가 닫은 것
                         const isTaken = isBlocked && taken.includes(tm);
                         const blockedLabel = isTaken ? "예약있음" : "마감";
-                        // 시작 직전(기본 10분 전)이거나 이미 지난 칸은 예약 불가
-                        const soon = !isBlocked && isTooSoon(date, tm, leadMin, nowMs);
+                        // 이미 시작된 칸은 예약 불가 (시작 시각이 되는 순간부터 잠긴다)
+                        const soon = !isBlocked && isPastSlot(date, tm, nowMs);
                         // 아직 확실하지 않은 동안에는 전부 못 누르게 한다.
                         //   slotsLoading — 어느 칸이 찼는지 모름 / !cfgLoaded — 사장님이 시간표를 바꿨는지 모름
                         // 모르는 상태에서 누르게 두면 "이미 찬 칸"이나 "없는 시간"을 고른 채로 끝까지 입력하게 된다.
@@ -473,13 +474,13 @@ export default function ReserveClient({ preset }: { preset: string }) {
                             aria-pressed={time === tm}
                             disabled={off}
                             onClick={() => { if (!off) setTime(tm); }}
-                            title={waiting ? "확인 중" : isBlocked ? blockedLabel : soon ? (leadMin > 0 ? `시작 ${leadMin}분 전부터는 예약할 수 없어요` : "지난 시간") : ""}
+                            title={waiting ? "확인 중" : isBlocked ? blockedLabel : soon ? "이미 시작된 시간" : ""}
                           >
                             <b>{tm}</b>
                             {!waiting && (isBlocked
                               ? <em><IconBan /> {blockedLabel}</em>
                               : soon
-                              ? <em><IconClock /> {leadMin > 0 ? "곧 시작" : "지난 시간"}</em>
+                              ? <em><IconClock /> 지난 시간</em>
                               : null)}
                           </button>
                         );
@@ -491,7 +492,6 @@ export default function ReserveClient({ preset }: { preset: string }) {
                         {/* 범례도 화면과 같은 말을 써야 한다 — 칸엔 "예약있음"이라 적혀 있는데
                             여기서만 "마감"이라고 하면 손님이 다른 뜻으로 읽는다. */}
                         ※ <IconBan /> 는 <b>예약있음</b>(이미 다른 분이 예약) 또는 <b>마감</b>된 시간입니다.
-                        {leadMin > 0 && <> <IconClock /> 는 시작이 임박해(<b>{leadMin}분 전</b>) 온라인 예약이 닫힌 시간이에요. 매장으로 전화 주시면 도와드립니다.</>}
                       </div>
                     )}
                   </>

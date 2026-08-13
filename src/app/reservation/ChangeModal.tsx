@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { slotsForThemeDate, isTooSoon, TIME_SLOTS, THEME_SLOTS, type StoreSlots, type SlotSchedule } from "@/lib/data";
+import { slotsForThemeDate, isPastSlot, TIME_SLOTS, THEME_SLOTS, type StoreSlots, type SlotSchedule } from "@/lib/data";
 import { formatDate, reservationDateState } from "@/lib/util";
 import { ReserveCalendar, openDateLabel } from "@/components/ReserveCalendar";
 import { IconClose, IconWarn, IconBan, IconClock } from "@/components/Icon";
@@ -9,7 +9,6 @@ type Cfg = {
   timeSlots: string[];
   storeSlots?: Record<string, StoreSlots>;
   themeSlots?: Record<string, SlotSchedule>;
-  minLeadMinutes?: number;
 };
 
 type Target = {
@@ -46,7 +45,6 @@ export default function ChangeModal({
   const [err, setErr] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const leadMin = cfg.minLeadMinutes ?? 10;
   const [nowMs, setNowMs] = useState(() => Date.now());
   useEffect(() => { const t = setInterval(() => setNowMs(Date.now()), 30000); return () => clearInterval(t); }, []);
 
@@ -87,10 +85,10 @@ export default function ChangeModal({
     return () => { alive = false; };
   }, [date, target.theme_id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 골라둔 시간이 그 사이 임박해지면 선택 풀기
+  // 골라둔 시간이 그 사이 시작돼 버리면 선택 풀기
   useEffect(() => {
-    if (time && date && isTooSoon(date, time, leadMin, nowMs)) setTime("");
-  }, [nowMs, time, date, leadMin]);
+    if (time && date && isPastSlot(date, time, nowMs)) setTime("");
+  }, [nowMs, time, date]);
 
   async function submit() {
     setErr("");
@@ -148,7 +146,7 @@ export default function ChangeModal({
               <div className="optrow">
                 {activeSlots.map((tm) => {
                   const isBlocked = blocked.includes(tm);
-                  const soon = !isBlocked && isTooSoon(date, tm, leadMin, nowMs);
+                  const soon = !isBlocked && isPastSlot(date, tm, nowMs);
                   const isNow = tm === target.time && date === target.date; // 지금 예약과 같은 칸
                   const off = isBlocked || soon || slotsLoading || !cfgLoaded || isNow;
                   return (
@@ -170,7 +168,7 @@ export default function ChangeModal({
             )}
             {(slotsLoading || !cfgLoaded) && <div className="hint">예약 가능한 시간을 확인하는 중이에요…</div>}
             {!slotsLoading && cfgLoaded && !(dayClosed || noSlotsDay) && (
-              <div className="hint">※ <IconBan /> 마감 · <IconClock /> 임박(예약 불가)</div>
+              <div className="hint">※ <IconBan /> 마감 · <IconClock /> 이미 시작된 시간</div>
             )}
           </div>
         )}

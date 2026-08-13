@@ -2342,7 +2342,6 @@ function SettingsTab() {
   const [slots, setSlots] = useState<string[]>([]);
   const [slotInput, setSlotInput] = useState(""); const [msg, setMsg] = useState(""); const [loaded, setLoaded] = useState(false);
   const [storeSlots, setStoreSlots] = useState<Record<string, StoreSlots>>({});
-  const [leadMin, setLeadMin] = useState("10");
   const [deposits, setDeposits] = useState<Record<string, string>>({}); // 테마id → 예약금(문자열, 입력칸용)
   // 자동 백업 목록/실행
   const [backups, setBackups] = useState<{ name: string; size: number | null; created_at: string | null; url: string | null }[]>([]);
@@ -2362,7 +2361,6 @@ function SettingsTab() {
   useEffect(() => { fetch("/api/admin/settings").then((r) => r.json()).then((c) => {
     setSlots(c.timeSlots);
     setStoreSlots(c.storeSlots && typeof c.storeSlots === "object" ? c.storeSlots : {});
-    setLeadMin(String(c.minLeadMinutes ?? 10));
     // 저장된 값이 있으면 그것, 없으면 코드 기본값
     const d: Record<string, string> = {};
     THEMES.forEach((t) => { d[t.id] = String(c.themeDeposits?.[t.id] ?? t.deposit); });
@@ -2378,7 +2376,7 @@ function SettingsTab() {
       if (Number.isFinite(n) && n >= 0 && n !== t.deposit) themeDeposits[t.id] = Math.floor(n);
     }
     const res = await fetch("/api/admin/settings", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
-      timeSlots: slots, storeSlots, minLeadMinutes: Number(leadMin) || 0, themeDeposits,
+      timeSlots: slots, storeSlots, themeDeposits,
     }) });
     if (res.ok) setMsg("저장되었습니다 ✅"); else { const j = await res.json(); setMsg(j.error || "저장 실패"); }
   }
@@ -2387,17 +2385,9 @@ function SettingsTab() {
     <div className="set-grid">
       <div className="admin-card">
       <h3 className="card-h">예약 규칙</h3>
-      <div className="field">
-        <label>예약 임박 차단</label>
-        <select value={leadMin} onChange={(e) => setLeadMin(e.target.value)}>
-          <option value="0">제한 없음 (지난 시간만 막음)</option>
-          <option value="10">시작 10분 전부터 예약 불가</option>
-          <option value="30">시작 30분 전부터 예약 불가</option>
-          <option value="60">시작 1시간 전부터 예약 불가</option>
-          <option value="120">시작 2시간 전부터 예약 불가</option>
-        </select>
-        <p className="hint">시작이 코앞인 방을 손님이 덜컥 예약하는 걸 막아요. <b>전화로 받는 예약(관리자 등록)은 이 제한을 받지 않습니다.</b></p>
-      </div>
+      {/* 🔴 2026-08-14 — '예약 임박 차단' 항목을 없앴다(사장님 지시).
+          이제 예약은 **시작 시각이 되어야만** 막힌다. 되살릴 일이 생기면 git 이력에서 꺼낼 것. */}
+      <p className="hint">온라인 예약은 <b>시작 시각이 되면</b> 자동으로 닫힙니다. 전화로 받는 예약(관리자 등록)은 제한이 없습니다.</p>
       <div className="field">
         <label>테마별 예약금</label>
         <div style={{ border: "1px solid var(--line)", borderRadius: 9, overflow: "hidden" }}>

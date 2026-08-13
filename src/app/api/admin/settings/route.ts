@@ -87,11 +87,8 @@ export async function PUT(req: NextRequest) {
     }
     rows.push({ key: "theme_deposits", value: out, updated_at: now });
   }
-  if (body.minLeadMinutes != null) {
-    const n = Number(body.minLeadMinutes);
-    if (!Number.isFinite(n) || n < 0 || n > 1440) return NextResponse.json({ error: "임박 차단은 0~1440분 사이여야 합니다." }, { status: 400 });
-    rows.push({ key: "min_lead_minutes", value: Math.floor(n), updated_at: now });
-  }
+  /* 🔴 2026-08-14 — '예약 임박 차단(min_lead_minutes)' 저장을 없앴다(사장님 지시).
+     이제 예약은 **시작 시각이 되어야만** 막힌다. 옛 값이 표에 남아 있어도 아무도 읽지 않는다. */
   if (body.themeSlots != null) {
     rows.push({ key: "theme_slots", value: sanitizeSlots(body.themeSlots, THEME_IDS), updated_at: now });
   }

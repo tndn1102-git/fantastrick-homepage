@@ -253,15 +253,21 @@ export function isSlotTime(s: unknown): s is string {
   return typeof s === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(s);
 }
 
-// 예약 임박 차단 — 그 칸이 "너무 임박했거나 이미 지났는지" 판정 (한국시간 기준).
-//   leadMinutes 만큼 남지 않았으면 true (손님 예약 불가). 0 이면 지난 시간만 막는다.
+// 이미 시작된 시간인가 (한국시간 기준). true 면 손님이 온라인으로 예약할 수 없다.
+//
+// 🔴 2026-08-14 — **"시작 N분 전 차단"을 통째로 없앴다**(사장님 지시).
+//   전에는 시작 10분 전부터 잠갔는데, 그러면 아직 시작도 안 한 방을 손님이 못 잡는다.
+//   이제 **시작 시각이 되는 순간부터** 막힌다. 그 전까지는 1분 전이라도 예약된다.
+//   ⚠️ 관리자 설정의 '예약 임박 차단' 항목도 함께 삭제했다. 되살릴 일이 생기면
+//      git 이력(2026-08-14 이전)의 isTooSoon·minLeadMinutes 를 통째로 꺼내 쓸 것.
+//
 //   서버(UTC)에서도 브라우저(KST)에서도 같은 답이 나오도록 KST 로 통일해 계산한다.
-export function isTooSoon(date: string, time: string, leadMinutes: number, nowMs: number = Date.now()): boolean {
+export function isPastSlot(date: string, time: string, nowMs: number = Date.now()): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !isSlotTime(time)) return false;
   // 그 슬롯의 시작시각을 KST 로 해석 → UTC 기준 밀리초
   const startMs = Date.parse(`${date}T${time}:00+09:00`);
   if (Number.isNaN(startMs)) return false;
-  return startMs - nowMs < leadMinutes * 60 * 1000;
+  return startMs <= nowMs;
 }
 
 // 스케줄(default/byDow)에서 그 날짜의 시간대를 꺼낸다.
