@@ -706,11 +706,12 @@ header.over-hero .btn.ghost:hover{background:rgba(255,255,255,.12)}
 /* 후기 카드: 3열, 큰 따옴표·본문 2줄 클램프·이니셜 아바타 */
 .rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 @media(max-width:860px){.rev-grid{grid-template-columns:1fr;gap:14px}}
-.rev-quote{position:relative;border:1px solid var(--line);border-left:4px solid var(--th,var(--cyan));
-  border-radius:var(--r);background:color-mix(in srgb,var(--th,transparent) 7%,var(--surface));
+.rev-quote{position:relative;border:1px solid color-mix(in srgb,var(--th,transparent) 30%,var(--line));
+  border-radius:var(--r);background:color-mix(in srgb,var(--th,transparent) 11%,transparent);
   padding:26px 24px 20px;transition:.25s}
-.rev-quote:hover{border-color:color-mix(in srgb,var(--th,var(--cyan)) 50%,transparent);
-  border-left-color:var(--th,var(--cyan));transform:translateY(-3px);box-shadow:0 16px 40px rgba(4,12,32,.28)}
+.rev-quote:hover{border-color:color-mix(in srgb,var(--th,var(--cyan)) 55%,transparent);
+  background:color-mix(in srgb,var(--th,transparent) 17%,transparent);
+  transform:translateY(-3px);box-shadow:0 16px 40px rgba(4,12,32,.28)}
 .rev-quote .rq-mark{font-family:"Bodoni Moda",serif;font-size:44px;line-height:0;color:rgba(47,111,224,.22);height:16px}
 .rev-quote .rq-body{font-size:14.5px;color:var(--text);line-height:1.7;margin:10px 0 16px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .rev-quote .rq-foot{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--line)}
@@ -972,44 +973,57 @@ footer ul li{padding:3px 0}
    화면을 다 먹어서, 여러 건이 쌓이면 뭐가 있는지 한눈에 안 보였다.
    → 명함 크기 카드로 늘어놓고(4줄까지만), 누르면 전문을 팝업으로 띄운다. */
 .rev-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-top:8px}
+/* 카드 = 테마색 반투명 유리 + 제목줄 색띠 (C안, 2026-08-13 사장님 선택)
+   ⚠️ 배경을 --surface 와 섞지 않고 **transparent 와 섞는다.** 그래야 뒤 배경 그러데이션이
+      그대로 비쳐서 "색유리" 로 보인다. --surface 와 섞으면 불투명한 색판이 된다.
+   ⚠️ 패딩이 카드가 아니라 **각 줄에 붙는다.** 제목 색띠가 카드 좌우 끝까지 닿아야 해서,
+      카드 자체는 좌우 여백 0 이고 본문·바닥이 각자 여백을 갖는다. 여기 손대면 띠가 떠 보인다. */
 .rev-card{display:flex;flex-direction:column;gap:8px;text-align:left;width:100%;cursor:pointer;
-  border:1px solid var(--line);border-left:4px solid var(--th,var(--cyan));border-radius:var(--r);
-  background:color-mix(in srgb,var(--th,transparent) 7%,var(--surface));padding:15px 16px 15px 15px;
-  font-family:inherit;color:inherit;transition:border-color .18s,transform .18s,box-shadow .18s}
+  border:1px solid color-mix(in srgb,var(--th,transparent) 32%,var(--line));border-radius:var(--r);
+  background:color-mix(in srgb,var(--th,transparent) 11%,transparent);
+  padding:0 0 15px;overflow:hidden;
+  font-family:inherit;color:inherit;transition:border-color .18s,background .18s,transform .18s,box-shadow .18s}
 .rev-card:hover{border-color:color-mix(in srgb,var(--th,var(--cyan)) 55%,transparent);
-  border-left-color:var(--th,var(--cyan));
-  background:color-mix(in srgb,var(--th,transparent) 13%,var(--surface));
+  background:color-mix(in srgb,var(--th,transparent) 17%,transparent);
   transform:translateY(-3px);box-shadow:0 14px 32px rgba(4,12,32,.3)}
-.rev-card:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
-.rev-card .rc-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.rev-card:focus-visible{outline:2px solid var(--th,var(--cyan));outline-offset:2px}
+/* 제목줄 — 한 단계 진한 색을 깔아 머리띠처럼. 카드 좌우 끝까지 닿는다. */
+.rev-card .rc-top{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:color-mix(in srgb,var(--th,transparent) 24%,transparent);padding:11px 16px;
+  border-bottom:1px solid color-mix(in srgb,var(--th,transparent) 26%,transparent)}
 .rev-card .rc-theme{font-size:12px;color:var(--th,var(--cyan));font-weight:800;letter-spacing:.01em}
 .rev-card .rc-src{font-size:10.5px;font-weight:700;color:var(--faint);
-  border:1px solid color-mix(in srgb,var(--th,transparent) 30%,var(--line));
+  border:1px solid color-mix(in srgb,var(--th,transparent) 34%,var(--line));
   border-radius:999px;padding:2px 8px;white-space:nowrap}
 /* 미리보기는 4줄까지. 카드 높이를 서로 맞춰야 격자가 들쭉날쭉하지 않다. */
-.rev-card .rc-body{margin:0;font-size:13.5px;color:var(--muted);line-height:1.65;white-space:pre-line;
+.rev-card .rc-body{margin:0 16px;font-size:13.5px;color:var(--muted);line-height:1.65;white-space:pre-line;
   display:-webkit-box;-webkit-line-clamp:4;line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .rev-card .rc-foot{display:flex;align-items:baseline;justify-content:space-between;gap:8px;
-  margin-top:auto;padding-top:9px;border-top:1px solid var(--line)}
+  margin:auto 16px 0;padding-top:9px;border-top:1px solid var(--line)}
 .rev-card .rc-who{font-size:13px;font-weight:700;color:var(--text)}
 .rev-card .rc-date{font-size:11.5px;color:var(--faint)}
-.rev-card .rc-more{font-size:11.5px;font-weight:700;color:var(--th,var(--cyan));opacity:.72}
+.rev-card .rc-more{margin:0 16px;font-size:11.5px;font-weight:700;color:var(--th,var(--cyan));opacity:.72}
 .rev-card:hover .rc-more{opacity:1}
 @media(max-width:520px){.rev-cards{grid-template-columns:1fr}}
 
 /* ── 후기 전문 팝업 ── */
-.rev-modal{max-width:600px;border-top:4px solid var(--th,var(--cyan))}
-.rev-modal .rm-theme{font-size:12.5px;color:var(--th,var(--cyan));font-weight:800;margin-bottom:4px}
-.rev-modal .rm-who{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;font-size:16px;font-weight:800;
-  margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+/* 팝업도 카드와 같은 결 — 제목·이름 묶음에 색띠를 깐다(C안).
+   패딩을 0 으로 내리고 각 줄이 여백을 갖는다(카드와 같은 이유: 띠가 좌우 끝까지 닿아야 함). */
+.rev-modal{max-width:600px;border-top:4px solid var(--th,var(--cyan));padding:0 0 20px;overflow:hidden}
+.rev-modal .close-x{margin:10px 14px 0}
+.rev-modal .rm-head{background:color-mix(in srgb,var(--th,transparent) 22%,transparent);
+  padding:14px 24px 13px;margin-bottom:16px;
+  border-bottom:1px solid color-mix(in srgb,var(--th,transparent) 26%,transparent)}
+.rev-modal .rm-theme{font-size:12.5px;color:var(--th,var(--cyan));font-weight:800;margin-bottom:3px}
+.rev-modal .rm-who{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;font-size:16px;font-weight:800;margin:0}
 .rev-modal .rm-phone{font-size:12px;font-weight:400;color:var(--faint)}
 .rev-modal .rm-date{font-size:12px;font-weight:400;color:var(--faint);margin-left:auto}
 /* pre-line — 원문의 줄바꿈을 살린다. 블로그에서 옮겨온 후기는 문단이 나뉘어 있는데,
    그냥 두면 전부 한 덩어리로 붙어 읽기 어렵다(연속 공백은 접어서 들여쓰기 사고는 막는다). */
-.rev-modal .rm-body{font-size:14.5px;color:var(--text);line-height:1.8;white-space:pre-line;
+.rev-modal .rm-body{margin:0 24px;font-size:14.5px;color:var(--text);line-height:1.8;white-space:pre-line;
   max-height:52vh;overflow:auto;padding-right:4px}
 .rev-modal .rm-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;
-  margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+  margin:18px 24px 0;padding-top:14px;border-top:1px solid var(--line)}
 /* 출처 링크 — 눌러서 원문으로 간다. 글을 써주신 분께 방문이 돌아가야 인용이지, 가져오기가 아니다. */
 .rev-src{font-size:12px;font-weight:700;color:var(--faint);
   text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}

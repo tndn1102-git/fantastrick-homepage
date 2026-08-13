@@ -110,11 +110,14 @@ function ReviewModal({ r, onClose }: { r: Review; onClose: () => void }) {
     <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="modal rev-modal" role="dialog" aria-modal="true" style={{ "--th": themeColor(r.theme_id) } as CSSProperties} aria-label={`${r.name}님의 후기`}>
         <button className="close-x" onClick={onClose} aria-label="닫기">×</button>
-        <div className="rm-theme">{r.theme_name}</div>
-        <div className="rm-who">
-          {r.name}
-          {r.phone && <span className="rm-phone">{r.phone}</span>}
-          <span className="rm-date">{formatDate(r.created_at.slice(0, 10))}</span>
+        {/* 제목 묶음 — 카드와 같은 테마색 띠를 깐다(C안). rm-head 로 감싸야 띠가 좌우 끝까지 닿는다. */}
+        <div className="rm-head">
+          <div className="rm-theme">{r.theme_name}</div>
+          <div className="rm-who">
+            {r.name}
+            {r.phone && <span className="rm-phone">{r.phone}</span>}
+            <span className="rm-date">{formatDate(r.created_at.slice(0, 10))}</span>
+          </div>
         </div>
         {/* 본문은 줄바꿈을 살린다 — 블로그에서 옮겨온 글은 문단이 나뉘어 있는데
             그냥 두면 한 덩어리로 붙어 읽기 어렵다. */}
