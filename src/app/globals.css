@@ -224,7 +224,10 @@ header.over-hero .btn.ghost:hover{background:rgba(255,255,255,.12)}
 /* (2026-07-23) cantor8.io 참고 재설계 — 대담한 브랜드 파랑 단색 채움 + 성좌 단서망 라인아트 + 여백.
    밋밋한 흰 배경(옛 세 겹 조명) 대신 화면을 파랑 한 색으로 꽉 채워 자신감·프리미엄을 준다.
    가운데는 살짝 밝게(워드마크 자리 무대조명), 가장자리는 딥(비네트). */
-.hero-t{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;isolation:isolate;
+/* 높이는 100svh(작은 뷰포트) 우선 — 폰에서 주소창이 숨었다 나타날 때마다 100vh 는 값이 바뀌어
+   히어로가 늘었다 줄었다 하고, 그때마다 아래 내용이 통째로 밀린다(= 스크롤이 "뚝" 하고 튄다).
+   svh 는 주소창이 보이는 상태 기준으로 고정이라 안 흔들린다. 모르는 브라우저는 위 100vh 를 쓴다. */
+.hero-t{position:relative;min-height:100vh;min-height:100svh;display:flex;align-items:center;justify-content:center;overflow:hidden;isolation:isolate;
   background:radial-gradient(96% 76% at 50% 32%,#0a4bd0 0%,#063aad 44%,#04277e 100%)}
 /* 배경 = 세 겹을 각각 "기준치보다 옅게" 깔고 겹친 것 (2026-07-16 확정, 샘플 10안 중 10번).
    조사에서 나온 안전 수치: 패턴 8~20% · 격자 16~24px · 선 1px · 그레인 4~6%.
@@ -518,7 +521,14 @@ header.over-hero .btn.ghost:hover{background:rgba(255,255,255,.12)}
    ⚠️ 이 방식은 스크롤 연동 CSS와 달리 모든 브라우저에서 동작하므로, 등장 연출은 계속 이걸 쓴다.
    기본은 '아래서 위로'. 섹션마다 결을 달리하려고 변주를 둠 — 한 페이지에서 전부 같은 방향이면 리듬이 없다. */
 /* 저사양 최적화: filter:blur 제거(스크롤 중 GPU 무거움) → translate·opacity·scale 만(충분히 우아) */
-.js .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i,0)*.1s)}
+/* 🔴 2026-08-13 — 스크롤이 끊겨 보이던 진짜 이유 중 하나. 줄줄이 늘어선 카드에 --i 가 0,1,2,3…
+   으로 붙어 **0.1초씩 밀렸다.** 네 번째 카드는 0.4초 뒤에야 움직이기 시작해서, 스크롤을 멈춘
+   뒤에도 한참 동안 화면이 따라 올라온다 → "뚝뚝 끊긴다"로 느껴진다.
+   간격을 0.06초로 줄이고 min() 으로 **최대 0.18초까지만** 밀리게 상한을 뒀다(리듬은 남기되 안 늘어지게).
+   연출 시간도 .7s → .55s. 짧을수록 스크롤을 따라오는 느낌이 붙는다. */
+.js .reveal{opacity:0;transform:translateY(28px);
+  transition:opacity .55s cubic-bezier(.2,.7,.2,1),transform .55s cubic-bezier(.2,.7,.2,1);
+  transition-delay:min(calc(var(--i,0)*.06s),.18s)}
 .js .reveal.in{opacity:1;transform:none}
 /* 살짝 확대에서 제자리 — 포스터·지도처럼 '보는' 것에 */
 .js .reveal.rv-focus{transform:scale(.965)}
@@ -1851,3 +1861,28 @@ form.cform{border:1px solid rgba(122,59,184,.28);border-radius:var(--r-lg);paddi
 }
 @media(prefers-reduced-motion:reduce){.cw-fab{transition:none}}
 .cw-btnrow{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 6px}
+
+/* ── 관리자 › 문의 탭 (손님 1:1, 2026-08-13) ──
+   손님이 쓴 글은 왼쪽 굵은 선으로 "인용"처럼 두어, 사장님이 쓴 답변칸과 눈으로 구분되게. */
+.ask-q{white-space:pre-line;font-size:14px;line-height:1.7;background:var(--bg2);
+  border-left:3px solid var(--line2);border-radius:0 8px 8px 0;padding:10px 13px;margin-bottom:12px}
+.ask-reply{display:flex;flex-direction:column;gap:6px}
+.ask-reply>label{font-size:12px;font-weight:800;color:var(--muted)}
+.ask-reply textarea{width:100%;border:1px solid var(--line2);border-radius:9px;padding:9px 11px;
+  font-size:13.5px;font-family:inherit;line-height:1.6;resize:vertical;background:var(--surface);color:var(--text)}
+.ask-reply textarea:focus{outline:none;border-color:var(--cyan)}
+
+/* ── 1:1 문의 폼 (챗봇 말풍선 안, 2026-08-13) ──
+   말풍선 폭이 좁아 한 줄에 하나씩 세로로 쌓는다. 폰에서 한 손으로 채우는 순서 그대로. */
+.cw-form{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+.cw-form label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:var(--muted)}
+.cw-form input,.cw-form textarea{border:1px solid var(--line2);border-radius:9px;padding:8px 10px;
+  font-size:13.5px;font-family:inherit;background:var(--surface);color:var(--text);width:100%}
+.cw-form textarea{resize:vertical;min-height:62px;line-height:1.55}
+.cw-form input:focus,.cw-form textarea:focus{outline:none;border-color:var(--cyan)}
+.cw-send{border:none;border-radius:9px;background:var(--brand,#2a63c9);color:#fff;
+  padding:10px 14px;font-size:13.5px;font-weight:700;cursor:pointer}
+.cw-send:disabled{opacity:.6;cursor:default}
+.cw-err{margin:0;font-size:12.5px;color:#b4322a;font-weight:700}
+.cw-note{font-size:11px;color:var(--faint)}
+.cw-ok{line-height:1.7}

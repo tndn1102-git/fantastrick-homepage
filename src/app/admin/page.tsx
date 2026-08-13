@@ -46,6 +46,7 @@ function Phone({ v }: { v: string }) {
 // 예약 탭이 기본 화면(사장님 지시 2026-07-30) — 로그인하면 바로 예약 목록부터.
 const TABS = [
   { k: "res", label: "예약" }, { k: "money", label: "입금·환불" },
+  { k: "ask", label: "문의" },
   { k: "biz", label: "도입 문의" },
   { k: "talk", label: "알림톡" },
   { k: "cont", label: "리뷰·공지" }, { k: "set", label: "설정" },
@@ -89,6 +90,19 @@ export default function AdminPage() {
     return () => clearInterval(t);
   }, [phase]);
 
+  // 손님 1:1 문의 뱃지 — 답을 기다리는 사람이 있다는 뜻이라 숫자로 보이게 둔다.
+  const [askNew, setAskNew] = useState(0);
+  useEffect(() => {
+    if (phase !== "in") return;
+    const f = () => fetch("/api/admin/customer-inquiries?status=new")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => { if (j) setAskNew(j.newCount || 0); })
+      .catch(() => {});
+    f();
+    const t = setInterval(f, 60000);
+    return () => clearInterval(t);
+  }, [phase]);
+
   async function doLogin() {
     setLoginErr("");
     const res = await fetch("/api/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: pw }) });
@@ -126,11 +140,13 @@ export default function AdminPage() {
             {t.label}
             {t.k === "money" && todo > 0 && <span className="vt-badge">{todo}</span>}
             {t.k === "biz" && bizNew > 0 && <span className="vt-badge">{bizNew}</span>}
+            {t.k === "ask" && askNew > 0 && <span className="vt-badge">{askNew}</span>}
           </a>
         ))}
       </div>
       {tab === "res" && <ReservationsTab />}
       {tab === "money" && <MoneyTab />}
+      {tab === "ask" && <AskTab />}
       {tab === "biz" && <InquiriesTab />}
       {tab === "talk" && <AlimtalkTab />}
       {tab === "cont" && <ContentTab />}
@@ -154,6 +170,143 @@ function ReservationsTab() {
       </div>
       {view === "day" ? <DayView /> : <ListView />}
     </>
+  );
+}
+
+/* ============ 문의 탭 (손님 1:1) ============
+   오른쪽 아래 챗봇의 [1:1 문의 남기기] 로 들어온 글이 여기 쌓인다.
+
+   [왜 만들었나 — 2026-08-13 사장님 지시]
+     전에는 카카오톡·문자로 내보냈다. 그러면 사장님이 카톡·문자·전화를 돌아다니며
+     확인해야 하고, **답을 했는지 안 했는지가 아무 데도 안 남는다.** 한 곳에 모은다.
+
+   [답변은 어떻게 손님에게 가나]
+     발신번호 심사가 끝나기 전까지는 자동 발송이 막혀 있다. 그래서
+     [문자 문구 복사] 로 문구를 만들어 드리고, 사장님이 문자앱에 붙여넣어 보낸다.
+     승인이 나면 여기서 바로 보내도록 바꾸면 된다(문구는 그대로 쓰면 됨).  */
+type Ask = {
+  id: string; name: string; phone: string; message: string;
+  status: string; reply: string | null; replied_at: string | null;
+  admin_note: string | null; created_at: string;
+};
+const ASK_ST: Record<string, { label: string; cls: string }> = {
+  new: { label: "답변 대기", cls: "pending" },
+  answered: { label: "답변함", cls: "confirmed" },
+  done: { label: "끝", cls: "confirmed" },
+};
+
+function AskTab() {
+  const [status, setStatus] = useState("all");
+  const [list, setList] = useState<Ask[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const [err, setErr] = useState("");
+  const [msg, setMsg] = useState("");
+
+  const load = useCallback(async () => {
+    setLoaded(false); setErr("");
+    const res = await fetch(`/api/admin/customer-inquiries?status=${status}`);
+    if (res.ok) { const j = await res.json(); setList(j.inquiries || []); }
+    else { const j = await res.json().catch(() => ({})); setErr(j.error || "문의를 불러오지 못했습니다."); }
+    setLoaded(true);
+  }, [status]);
+  useEffect(() => { load(); }, [load]);
+
+  async function patch(id: string, body: Record<string, unknown>) {
+    const res = await fetch("/api/admin/customer-inquiries", {
+      method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, ...body }),
+    });
+    if (res.ok) load(); else { const j = await res.json().catch(() => ({})); alert(j.error || "처리 실패"); }
+  }
+  async function remove(id: string) {
+    if (!confirm("이 문의를 지울까요? 되돌릴 수 없습니다.")) return;
+    const res = await fetch(`/api/admin/customer-inquiries?id=${id}`, { method: "DELETE" });
+    if (res.ok) load(); else alert("삭제 실패");
+  }
+
+  return (
+    <>
+      <div className="admin-tools">
+        <select value={status} onChange={(e) => setStatus(e.target.value)}>
+          <option value="all">전체</option>
+          <option value="new">답변 대기</option>
+          <option value="answered">답변함</option>
+          <option value="done">끝</option>
+        </select>
+        <button className="btn sm" onClick={load}>새로고침</button>
+      </div>
+      {err && <div className="notice info" style={{ marginBottom: 12 }}>{err}</div>}
+      {msg && <div className="notice info" style={{ marginBottom: 12 }}>{msg}</div>}
+      <div style={{ marginBottom: 10, fontSize: 13, color: "var(--muted)" }}>총 {list.length}건</div>
+      {!loaded ? <p style={{ color: "var(--muted)" }}>불러오는 중…</p> :
+        list.length === 0 && !err ? <div className="notice info">아직 들어온 문의가 없습니다.</div> :
+        list.map((q) => {
+          const st = ASK_ST[q.status] || { label: q.status, cls: "pending" };
+          return (
+            <div key={q.id} className="rrow open">
+              <div className="head" style={{ cursor: "default" }}>
+                <span className="tname">{q.name}</span>
+                <span className="who"><Phone v={q.phone} /></span>
+                <span className={`badge-st st-${st.cls}`}>{st.label}</span>
+              </div>
+              <div className="detail">
+                <div style={{ fontSize: 12, color: "var(--faint)", marginBottom: 8 }}>
+                  받은 때 {formatStamp(q.created_at)}
+                  {q.replied_at && ` · 답변한 때 ${formatStamp(q.replied_at)}`}
+                </div>
+                {/* 손님이 쓴 글은 줄바꿈 그대로. 요약하거나 자르지 않는다 — 사장님이 원문을 봐야 한다. */}
+                <div className="ask-q">{q.message}</div>
+                <ReplyBox
+                  ask={q}
+                  onSave={(text) => patch(q.id, { reply: text })}
+                  onCopied={() => { setMsg("문자 문구를 복사했어요 — 문자앱에 붙여넣으세요 📋"); setTimeout(() => setMsg(""), 4000); }}
+                />
+                <div className="act-row" style={{ marginTop: 10 }}>
+                  <a className="btn sm" href={`tel:${q.phone}`}>전화 걸기</a>
+                  {q.status !== "done" && <button className="btn sm" onClick={() => patch(q.id, { status: "done" })}>끝으로</button>}
+                  {q.status === "done" && <button className="btn sm ghost" onClick={() => patch(q.id, { status: "answered" })}>되돌리기</button>}
+                  <button className="btn sm danger" onClick={() => remove(q.id)}>지우기</button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+    </>
+  );
+}
+
+/* 답변 입력칸 — 쓰고 저장하면 상태가 자동으로 "답변함"이 된다(두 번 누르게 하지 않는다).
+   [문자 문구 복사] 는 손님 이름·질문 요약을 붙여 그대로 보낼 수 있는 문장을 만든다. */
+function ReplyBox({ ask, onSave, onCopied }: { ask: Ask; onSave: (t: string) => void; onCopied: () => void }) {
+  const [text, setText] = useState(ask.reply || "");
+  const dirty = text !== (ask.reply || "");
+
+  function smsBody() {
+    return `[판타스트릭] ${ask.name}님, 남겨주신 문의에 답변드립니다.\n\n${text.trim()}\n\n추가로 궁금하신 점은 편하게 답장 주세요. 감사합니다!`;
+  }
+
+  return (
+    <div className="ask-reply">
+      <label>답변</label>
+      <textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        rows={3}
+        maxLength={1000}
+        placeholder="손님께 보낼 답변을 적어주세요."
+      />
+      <div className="act-row">
+        <button className="btn sm primary" disabled={!dirty} onClick={() => onSave(text)}>
+          {dirty ? "답변 저장" : "저장됨"}
+        </button>
+        <button
+          className="btn sm"
+          disabled={!text.trim()}
+          onClick={() => navigator.clipboard?.writeText(smsBody()).then(onCopied, () => alert("복사가 안 됐어요."))}
+        >
+          문자 문구 복사
+        </button>
+      </div>
+    </div>
   );
 }
 

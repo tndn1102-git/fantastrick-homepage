@@ -50,11 +50,22 @@ export default function CircuitFlow({ flip = false }: { flip?: boolean }) {
         if (pa) pa.style.strokeDashoffset = String(-(1000 * (1 - prog)) - i * 120);
       });
     };
-    const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(apply); } };
-    apply();
+    // 🔴 2026-08-13 — 화면 밖에 있을 때는 아예 계산하지 않는다.
+    //   전에는 페이지 어디를 굴리든 스크롤 프레임마다 getBoundingClientRect() 를 부르고
+    //   SVG 선(stroke-dashoffset)을 다시 그렸다. 이 그림은 페이지 한참 아래에 있어서
+    //   **대부분의 스크롤 구간에서는 보이지도 않는데 계속 일했다.**
+    //   느린 PC·폰일수록 이 낭비가 그대로 끊김으로 나온다.
+    let visible = false;
+    const onScroll = () => { if (visible && !ticking) { ticking = true; requestAnimationFrame(apply); } };
+    const io = new IntersectionObserver(
+      ([e]) => { visible = !!e?.isIntersecting; if (visible) apply(); },
+      { rootMargin: "120px 0px" }, // 화면에 들어오기 조금 전부터 켠다(들어오는 순간 툭 튀지 않게)
+    );
+    io.observe(svg);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
+      io.disconnect();
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };

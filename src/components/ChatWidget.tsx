@@ -15,11 +15,11 @@ import { BOOKING_INFO } from "@/lib/theme-content";
  *   여기 하드코딩된 안내(예약 오픈 저녁 9시 등)를 고칠 일이 생기면 팝업 공지와 함께 고칠 것.
  */
 
-/* 카카오톡 채널 1:1 채팅 주소 (2026-08-13 연결).
-   /chat 을 붙이면 채널 홈이 아니라 **바로 대화창**이 열린다 — 손님이 한 번 덜 누른다.
-   ⚠️ 채널 관리자센터에서 1:1 채팅을 끄면 이 버튼은 살아 있는데 대화가 안 열린다.
-      채팅을 중단할 일이 생기면 이 값을 "" 로 비우면 버튼도 함께 사라진다. */
-const KAKAO_CHAT_URL = "https://pf.kakao.com/_UVhfX/chat";
+/* 🔴 2026-08-13 — 카카오톡·문자 문의 버튼을 **없앴다**(사장님 지시).
+   밖으로 내보내면 사장님이 카톡·문자·전화를 돌아다니며 확인해야 하고,
+   **답을 했는지 안 했는지가 아무 데도 안 남는다.**
+   대신 여기서 바로 [1:1 문의 남기기] 로 받아 관리자 › 문의 탭에 쌓는다.
+   ⚠️ 카톡 버튼을 다시 넣고 싶어지면, 답변 기록이 사라지는 문제부터 해결할 것. */
 
 type Msg = { who: "bot" | "me"; text?: string; jsx?: React.ReactNode };
 
@@ -30,7 +30,7 @@ const TOPICS = [
   { id: "themes", label: "테마 안내" },
   { id: "way", label: "오시는 길·주차" },
   { id: "manage", label: "예약 확인·취소" },
-  { id: "human", label: "직접 문의할래요" },
+  { id: "human", label: "1:1 문의 남기기" },
 ] as const;
 type TopicId = (typeof TOPICS)[number]["id"];
 
@@ -118,27 +118,104 @@ function answer(id: TopicId): Msg[] {
           jsx: (
             <div>
               게임 진행 중에는 전화를 못 받을 때가 있어요.
-              그럴 땐 <b>카카오톡이나 문자로 남겨주시면 확인하는 대로 답드립니다.</b>
+              <b> 아래에 남겨주시면 확인하는 대로 문자로 답드립니다.</b>
               <ul className="cw-ul">
                 <li>1호점 <a className="cw-a" href="tel:01045470481">010-4547-0481</a></li>
                 <li>2호점 <a className="cw-a" href="tel:01049950482">010-4995-0482</a></li>
                 <li>TGC <a className="cw-a" href="tel:01055360483">010-5536-0483</a></li>
               </ul>
-              {/* sms: 는 폰에서 문자앱을 번호 채워서 연다. PC 브라우저에선 반응이 없을 수 있어
-                  버튼 하나로만 두고, 전화번호(tel:)를 위에 항상 함께 보여준다. */}
-              <div className="cw-btnrow">
-                {/* 카톡을 앞에 둔다 — 손님이 제일 편해하고, 사장님도 폰 알림으로 바로 받는다. */}
-                {KAKAO_CHAT_URL && (
-                  <a className="cw-link" href={KAKAO_CHAT_URL} target="_blank" rel="noopener noreferrer">💬 카카오톡으로 문의</a>
-                )}
-                <a className="cw-link" href="sms:01045470481">📩 문자로 문의</a>
-              </div>
               방탈출 제작·장치 문의는 <a className="cw-a" href="/business">비즈니스</a>에서 남겨주세요.
             </div>
           ),
         },
+        { who: "bot", jsx: <InquiryForm /> },
       ];
   }
+}
+
+/* [1:1 문의 남기기] 폼 — 말풍선 안에 그대로 들어간다.
+   보낸 뒤에는 폼을 지우고 "받았습니다"만 남긴다(두 번 보내는 걸 막는다). */
+function InquiryForm() {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [message, setMessage] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
+  const [err, setErr] = useState("");
+
+  if (done) {
+    return (
+      <div className="cw-ok">
+        <b>문의를 받았습니다 ✅</b>
+        <br />확인하는 대로 <b>{phone ? formatPhoneLoose(phone) : "남겨주신 번호"}</b> 로 답드릴게요.
+        <br />급하시면 1호점 <a className="cw-a" href="tel:01045470481">010-4547-0481</a> 로 전화 주세요.
+      </div>
+    );
+  }
+
+  async function submit() {
+    setErr("");
+    if (!name.trim()) return setErr("이름을 입력해 주세요.");
+    if (phone.replace(/[^0-9]/g, "").length < 10) return setErr("연락처를 정확히 입력해 주세요.");
+    if (message.trim().length < 5) return setErr("문의 내용을 조금만 더 적어주세요.");
+    setBusy(true);
+    try {
+      const res = await fetch("/api/inquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, phone, message }),
+      });
+      const j = (await res.json()) as { ok?: boolean; error?: string };
+      if (!res.ok || !j.ok) { setErr(j.error || "잠시 후 다시 시도해 주세요."); return; }
+      setDone(true);
+    } catch {
+      setErr("연결이 불안정합니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="cw-form">
+      <label>
+        이름
+        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="홍길동" maxLength={30} />
+      </label>
+      <label>
+        연락처
+        <input
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="010-0000-0000"
+          inputMode="numeric"
+          maxLength={13}
+        />
+      </label>
+      <label>
+        문의 내용
+        <textarea
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="예) 8월 20일 4명인데 예약이 가능할까요?"
+          rows={3}
+          maxLength={1000}
+        />
+      </label>
+      {err && <p className="cw-err">{err}</p>}
+      <button className="cw-send" onClick={submit} disabled={busy}>
+        {busy ? "보내는 중…" : "문의 남기기"}
+      </button>
+      <span className="cw-note">남겨주신 번호는 답변에만 사용하고 그 뒤 지웁니다.</span>
+    </div>
+  );
+}
+
+/* 입력 중인 번호를 보기 좋게. util 의 formatPhone 은 서버 저장용(숫자만)이라 여기선 가볍게 처리. */
+function formatPhoneLoose(v: string): string {
+  const d = v.replace(/[^0-9]/g, "");
+  if (d.length === 11) return `${d.slice(0, 3)}-${d.slice(3, 7)}-${d.slice(7)}`;
+  if (d.length === 10) return `${d.slice(0, 3)}-${d.slice(3, 6)}-${d.slice(6)}`;
+  return v;
 }
 
 export default function ChatWidget() {

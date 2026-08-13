@@ -226,6 +226,12 @@ export default function Home() {
   //    홈에 빈 카드 3장이 뜬다. (2026-07-17 2차 RPA 점검에서 발견 — 잠복 상태로 잡음)
   //    reviews 가 바뀌면 다시 훑어서 새로 생긴 카드도 관찰한다(이미 .in 인 건 건드릴 게 없음).
   useEffect(() => {
+    // 🔴 2026-08-13 — 스크롤이 "뚝뚝 끊긴다"는 지적으로 등장 시점을 앞당김.
+    //   프레임은 안 떨어진다(측정: CPU 6배 느리게 해도 60fps 유지). 끊겨 보인 건 **연출 타이밍**이었다.
+    //   전에는 threshold 0.14 — 요소가 14% 보일 때까지 기다렸다가 0.7초 연출을 시작했다.
+    //   큰 카드는 14%가 화면 절반쯤 올라온 뒤라, 스크롤을 멈춘 뒤에야 내용이 따라 올라온다
+    //   → 눈에는 "화면이 뭉텅뭉텅 따라온다"로 보인다.
+    //   이제 아래에서 살짝(6%) 들어오면 바로 시작 → 눈에 들어올 때 이미 제자리에 있다.
     const io = new IntersectionObserver(
       (es) =>
         es.forEach((e) => {
@@ -234,7 +240,7 @@ export default function Home() {
             io.unobserve(e.target);
           }
         }),
-      { threshold: 0.14 }
+      { threshold: 0.01, rootMargin: "0px 0px -6% 0px" }
     );
     document.querySelectorAll(".reveal:not(.in)").forEach((el) => io.observe(el));
     return () => io.disconnect();
