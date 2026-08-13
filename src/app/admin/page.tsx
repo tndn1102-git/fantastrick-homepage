@@ -544,6 +544,7 @@ function DayView() {
   const [activeTheme, setActiveTheme] = useState(THEMES[0].id);
   const [detail, setDetail] = useState<Reservation | null>(null);
   const [add, setAdd] = useState<{ themeId: string; date: string; time: string } | null>(null);
+  const [freshening, setFreshening] = useState(false); // 날짜 눌러 다시 불러오는 중
 
   const loadMonth = useCallback(async () => {
     const mm = String(ym.m + 1).padStart(2, "0");
@@ -569,6 +570,19 @@ function DayView() {
      달력이 길어 클릭해도 아래가 안 보였다 — 눌렀는데 화면이 그대로면 "안 눌렸나?" 싶다.
      ⚠️ 상태가 바뀌고 화면이 다시 그려진 뒤에 움직여야 위치가 맞는다(그래서 다음 프레임에).
      ⚠️ 화면 멀미를 줄이려면 "부드럽게"가 좋지만, 그 설정을 끈 분에겐 즉시 이동한다. */
+  /* 날짜를 누르면 그 날 예약을 다시 받아온다 (2026-08-13 사장님 요청).
+     ⚠️ **화면을 비우지 않는다.** 이미 있는 내역을 그대로 보여준 채 뒤에서 새로 받아
+        도착하면 조용히 갈아끼운다(stale-while-revalidate). 그래서 체감 로딩이 0 이다.
+        "불러오는 중…" 으로 비웠다면 날짜를 누를 때마다 화면이 깜빡여서 더 느리게 느껴진다.
+     ⚠️ 겹쳐 부르지 않는다 — 날짜를 빠르게 여러 번 눌러도 요청이 쌓이지 않게 막는다. */
+  const freshRef = useRef(false);
+  function refreshDay() {
+    if (freshRef.current) return;
+    freshRef.current = true;
+    setFreshening(true);
+    loadMonth().finally(() => { freshRef.current = false; setFreshening(false); });
+  }
+
   function scrollToDayList() {
     requestAnimationFrame(() => {
       const el = document.getElementById("day-list");
@@ -617,7 +631,7 @@ function DayView() {
         {DOW_LABELS.map((w) => <div key={w} className="cal-dow">{w}</div>)}
         {cells.map((d, i) => d === null ? <div key={i} /> : (
           <div key={i} className={"cal-cell" + (pick === dstr(d) ? " pick" : "") + (dstr(d) === t0 ? " today" : "")}
-            onClick={() => { setPick(dstr(d)); scrollToDayList(); }}>
+            onClick={() => { setPick(dstr(d)); scrollToDayList(); refreshDay(); }}>
             <span className="cal-d">{d}</span>
             {/* 테마별 건수를 색으로, **오른쪽 위에 세로로** (2026-08-13 시안 7안 채택).
                 가로 나열은 네 숫자가 한 수(1096)처럼 붙어 읽혀 지저분했다.
@@ -655,6 +669,7 @@ function DayView() {
       <div className="admin-card" style={{ marginTop: 0 }}>
         <div className="day-head">
           <b>{theme.name}</b> <span style={{ color: "var(--muted)" }}>{formatDate(pick)} 예약</span>
+          {freshening && <span style={{ fontSize: 11.5, color: "var(--faint)", marginLeft: 8 }}>새로고침 중…</span>}
           <span className="sp" />
           <span style={{ fontSize: 12.5, color: "var(--faint)" }}>{theme.storeTag} · {theme.minutes}분</span>
         </div>
