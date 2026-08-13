@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase, DB_NOT_CONFIGURED } from "@/lib/supabase";
-import { normalizePhone, isValidPhone, sanitizeText, maskPhone } from "@/lib/util";
-import { themeById } from "@/lib/data";
-import { rateLimit, getClientIp } from "@/lib/ratelimit";
+import { maskPhone } from "@/lib/util";
 
 type ReviewRow = { phone: string | null; [k: string]: unknown };
 
@@ -30,61 +28,8 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ ok: true, reviews });
 }
 
-// 리뷰 작성 (해당 전화번호로 예약 이력이 있어야 작성 가능)
-export async function POST(req: NextRequest) {
-  // 레이트 리밋: IP당 5회/분
-  if (!rateLimit(`review-post:${getClientIp(req)}`, 5, 60_000)) {
-    return NextResponse.json({ error: "요청이 너무 잦습니다. 잠시 후 다시 시도해 주세요." }, { status: 429 });
-  }
-
-  const db = getSupabase();
-  if (!db) return NextResponse.json(DB_NOT_CONFIGURED, { status: 503 });
-
-  let body: Record<string, unknown>;
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "잘못된 요청입니다." }, { status: 400 });
-  }
-
-  const themeId = String(body.themeId || "");
-  const name = sanitizeText(String(body.name || ""));
-  const phone = normalizePhone(String(body.phone || ""));
-  const text = sanitizeText(String(body.body || ""));
-
-  const theme = themeById(themeId);
-  if (!theme) return NextResponse.json({ error: "테마를 선택해 주세요." }, { status: 400 });
-  if (!name) return NextResponse.json({ error: "이름(닉네임)을 입력해 주세요." }, { status: 400 });
-  if (name.length > 40) return NextResponse.json({ error: "이름이 너무 깁니다." }, { status: 400 });
-  if (!isValidPhone(phone)) return NextResponse.json({ error: "전화번호 형식을 확인해 주세요." }, { status: 400 });
-  if (text.length < 5) return NextResponse.json({ error: "후기를 5자 이상 입력해 주세요." }, { status: 400 });
-  if (text.length > 1000) return NextResponse.json({ error: "후기는 1000자 이내로 입력해 주세요." }, { status: 400 });
-
-  // 예약 이력 확인 (해당 전화번호로 그 테마를 예약한 적이 있는지)
-  const { count } = await db
-    .from("reservations")
-    .select("id", { count: "exact", head: true })
-    .eq("phone", phone)
-    .eq("theme_id", themeId);
-
-  if (!count || count < 1) {
-    return NextResponse.json(
-      { error: "해당 전화번호로 이 테마를 예약한 기록이 있어야 후기를 남길 수 있어요." },
-      { status: 403 }
-    );
-  }
-
-  const { error } = await db.from("reviews").insert({
-    theme_id: theme.id,
-    theme_name: theme.name,
-    name,
-    phone,
-    // 🔴 별점 폐지(2026-08-13) — rating 은 안 넣는다. 칸은 옛 자료 때문에 남아 있을 뿐.
-    body: text,
-    status: "pending", // 작성 즉시 대기 — 관리자 승인 후 공개
-    source: "자체",
-  });
-
-  if (error) return NextResponse.json({ error: "리뷰 저장 중 오류가 발생했습니다." }, { status: 500 });
-  return NextResponse.json({ ok: true, pending: true, message: "후기가 접수되었어요. 관리자 확인 후 게시됩니다." });
-}
+/* 🔴 2026-08-13 — 손님이 직접 후기를 쓰는 통로(POST)를 **닫았다**(사장님 지시).
+   이 페이지의 후기는 전부 관리자가 동의를 받아 옮겨온 글이다.
+   화면에서 폼만 지우면 통로는 열린 채로 남아, 주소만 알면 아무나 후기를 넣을 수 있다.
+   ⚠️ 다시 열 일이 생기면 git 이력(2026-08-13 이전)에서 통째로 되살릴 것 —
+      예약 이력 확인·중복 방지·1분 5회 제한이 함께 들어 있었다. */

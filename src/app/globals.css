@@ -953,20 +953,48 @@ footer ul li{padding:3px 0}
 .notice.warn{background:rgba(198,40,52,.07);border:1px solid rgba(198,40,52,.28);color:#9a1f28}
 .notice.ok{background:rgba(31,157,99,.08);border:1px solid rgba(31,157,99,.3);color:#146c46}
 .msg-err{color:var(--danger);font-size:13px;margin-top:10px}
-.rev-list{display:grid;gap:14px;margin-top:8px}
-.rev{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:16px 18px}
-.rev .rev-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
-.rev .rev-h .who{font-weight:700;font-size:14px}
-.rev .rev-h .date{font-size:12px;color:var(--faint)}
-.rev .rev-theme{font-size:12px;color:var(--cyan);font-weight:600;margin-bottom:4px}
-/* 출처 링크 — 눌러서 원문으로 간다. 밑줄로 "눌리는 것"임을 알리되,
-   테마명보다 조용하게 둔다. 주인공은 후기 내용이지 출처가 아니다. */
-.rev .rev-src{margin-left:8px;font-size:11px;font-weight:600;color:var(--faint);
-  text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
-.rev .rev-src:hover{color:var(--cyan)}
+/* ── 후기 명함 카드 (2026-08-13) ──
+   전에는 후기 하나가 화면 폭을 다 쓰고 본문도 통째로 펼쳐졌다. 긴 블로그 후기 한 건이
+   화면을 다 먹어서, 여러 건이 쌓이면 뭐가 있는지 한눈에 안 보였다.
+   → 명함 크기 카드로 늘어놓고(4줄까지만), 누르면 전문을 팝업으로 띄운다. */
+.rev-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-top:8px}
+.rev-card{display:flex;flex-direction:column;gap:8px;text-align:left;width:100%;cursor:pointer;
+  border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:15px 16px;
+  font-family:inherit;color:inherit;transition:border-color .18s,transform .18s,box-shadow .18s}
+.rev-card:hover{border-color:rgba(47,111,224,.45);transform:translateY(-3px);box-shadow:0 14px 32px rgba(20,22,42,.13)}
+.rev-card:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.rev-card .rc-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.rev-card .rc-theme{font-size:12px;color:var(--cyan);font-weight:700}
+.rev-card .rc-src{font-size:10.5px;font-weight:700;color:var(--faint);border:1px solid var(--line);
+  border-radius:999px;padding:2px 8px;white-space:nowrap}
+/* 미리보기는 4줄까지. 카드 높이를 서로 맞춰야 격자가 들쭉날쭉하지 않다. */
+.rev-card .rc-body{margin:0;font-size:13.5px;color:var(--muted);line-height:1.65;white-space:pre-line;
+  display:-webkit-box;-webkit-line-clamp:4;line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.rev-card .rc-foot{display:flex;align-items:baseline;justify-content:space-between;gap:8px;
+  margin-top:auto;padding-top:9px;border-top:1px solid var(--line)}
+.rev-card .rc-who{font-size:13px;font-weight:700;color:var(--text)}
+.rev-card .rc-date{font-size:11.5px;color:var(--faint)}
+.rev-card .rc-more{font-size:11.5px;font-weight:700;color:var(--cyan);opacity:.75}
+.rev-card:hover .rc-more{opacity:1}
+@media(max-width:520px){.rev-cards{grid-template-columns:1fr}}
+
+/* ── 후기 전문 팝업 ── */
+.rev-modal{max-width:600px}
+.rev-modal .rm-theme{font-size:12.5px;color:var(--cyan);font-weight:700;margin-bottom:4px}
+.rev-modal .rm-who{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;font-size:16px;font-weight:800;
+  margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.rev-modal .rm-phone{font-size:12px;font-weight:400;color:var(--faint)}
+.rev-modal .rm-date{font-size:12px;font-weight:400;color:var(--faint);margin-left:auto}
 /* pre-line — 원문의 줄바꿈을 살린다. 블로그에서 옮겨온 후기는 문단이 나뉘어 있는데,
    그냥 두면 전부 한 덩어리로 붙어 읽기 어렵다(연속 공백은 접어서 들여쓰기 사고는 막는다). */
-.rev .rev-body{font-size:14px;color:var(--muted);line-height:1.6;white-space:pre-line}
+.rev-modal .rm-body{font-size:14.5px;color:var(--text);line-height:1.8;white-space:pre-line;
+  max-height:52vh;overflow:auto;padding-right:4px}
+.rev-modal .rm-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+/* 출처 링크 — 눌러서 원문으로 간다. 글을 써주신 분께 방문이 돌아가야 인용이지, 가져오기가 아니다. */
+.rev-src{font-size:12px;font-weight:700;color:var(--faint);
+  text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+.rev-src:hover{color:var(--cyan)}
 .subtab{display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid var(--line)}
 .subtab a{padding:10px 4px;font-size:14px;font-weight:700;color:var(--muted);border-bottom:2px solid transparent;margin-right:14px}
 .subtab a.on{color:var(--cyan);border-bottom-color:var(--cyan)}
