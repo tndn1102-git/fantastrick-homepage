@@ -2164,8 +2164,8 @@ function AlimtalkTab() {
       {/* 카톡 못 받은 손님 — 알림톡이 실패한 분들. 발신번호 승인 전까지는 사장님이 직접 연락.
           비어 있으면 아예 안 그린다. */}
       {missed.length > 0 && (
-        <div className="admin-card" style={{ marginBottom: 16, borderColor: "#d9a441" }}>
-          <b style={{ color: "#b06f00" }}>📵 카톡 못 받은 손님 {missed.length}명 — 직접 연락해 주세요</b>
+        <div className="admin-card" style={{ marginBottom: 16, borderColor: "#c0392b", borderWidth: 2 }}>
+          <b style={{ color: "#b4322a" }}>📵 카톡 못 받은 손님 {missed.length}명 — 직접 연락해 주세요</b>
           {missed.map((m) => {
             const v = readBody(m.body);
             return (
