@@ -1328,9 +1328,22 @@ function PayQueue({ onDone }: { onDone: () => void }) {
 
   // 남은 시간 — 자정 이후 접수 건은 그날 오전 10시 30분까지 봐주므로(expire.ts) 그 기준으로 센다.
   // 안 그러면 새벽 예약이 "0분 남음"으로 보이는데 실제로는 안 취소돼 화면이 거짓말을 한다.
-  function remainInfo(createdAt: string): { min: number; grace: boolean } {
+  //
+  // 🔴 2026-08-13 — 기한이 지나면 **"○분 지남"으로 계속 올라간다**(사장님 지시).
+  //   자동취소를 꺼둔 뒤로 지난 예약이 "0분 남음"에서 멈춰 있었다. 30분이 지났는지 3시간이
+  //   지났는지 화면만 봐서는 알 수가 없어, 접수 시각을 보고 사장님이 직접 빼야 했다.
+  //   over > 0 이면 지난 것이고, 그 값이 곧 "몇 분 지났나"다.
+  function remainInfo(createdAt: string): { min: number; over: number; grace: boolean } {
     const { at, grace } = payDeadline(createdAt); // 규칙은 한 곳(payDeadline)에만 둔다
-    return { min: Math.max(0, Math.ceil((at - Date.now()) / 60000)), grace };
+    const passedMin = Math.floor((Date.now() - at) / 60000);
+    // 기한 직후 1분 동안은 "0분 지남"이라는 이상한 말이 되므로 그때까지는 남음으로 둔다.
+    if (passedMin >= 1) return { min: 0, over: passedMin, grace };
+    return { min: Math.max(0, Math.ceil((at - Date.now()) / 60000)), over: 0, grace };
+  }
+
+  /** 분 → "1시간 20분" / "45분". 남은 시간·지난 시간 둘 다 같은 규칙으로 읽히게 한 곳에 둔다. */
+  function hm(min: number): string {
+    return min >= 60 ? `${Math.floor(min / 60)}시간 ${min % 60}분` : `${min}분`;
   }
 
   /* 입금 대기 건 취소 — 자동취소를 껐으므로 사장님이 직접 내리는 수단이 필요하다.
@@ -1409,7 +1422,7 @@ ${r.theme_name} ${r.date} ${r.time}
       {list.length === 0 ? (
         <div className="notice ok">입금 대기 없음 — 다 처리하셨어요.</div>
       ) : list.map((r) => {
-        const { min: m, grace } = remainInfo(r.created_at);
+        const { min: m, over, grace } = remainInfo(r.created_at);
         return (
           <div key={r.id} className="rrow">
             <div className="head" style={{ cursor: "default" }}>
@@ -1417,8 +1430,8 @@ ${r.theme_name} ${r.date} ${r.time}
                   접수 시각을 왼쪽에 같이 둔다 — 카운트다운의 기준점이 보여야 말이 된다.
                   (오른쪽 tname 의 날짜·시간은 '이용' 날짜라 서로 다른 값이다) */}
               <span className="taken-at">{formatStampShort(r.created_at)} 접수</span>
-              <span className={"when" + (m <= 5 ? " urgent" : "")}>
-                {m >= 60 ? `${Math.floor(m / 60)}시간 ${m % 60}분` : `${m}분`} 남음
+              <span className={"when" + (over ? " over" : m <= 5 ? " urgent" : "")}>
+                {over ? `${hm(over)} 지남` : `${hm(m)} 남음`}
                 {grace && <span className="src-tag" style={{ marginLeft: 6 }}>새벽 예약</span>}
               </span>
               {/* 이름 = 은행앱 입금자명과 맞추는 키라 굵게 */}
