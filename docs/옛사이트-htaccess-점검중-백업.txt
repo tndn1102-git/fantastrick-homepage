@@ -1,0 +1,27 @@
+# ── 홈페이지 이전 점검 안내 (2026-08-13) ─────────────────────────────
+# 모든 방문을 점검 페이지로 보낸다(503 = "잠시 점검 중" 표시라 검색 점수에 안전).
+# wp-admin / wp-login 은 열어둔다 — 이전 뒤에도 관리자는 들어올 수 있어야 한다.
+# 되돌리기: 이 블록을 지우고 아래 WordPress 블록만 남기면 원상복구.
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{REQUEST_URI} !^/maintenance\.html$
+RewriteCond %{REQUEST_URI} !^/hint-phone
+RewriteCond %{REQUEST_URI} !^/wp-admin
+RewriteCond %{REQUEST_URI} !^/wp-login\.php
+RewriteCond %{REQUEST_URI} !^/wp-content
+RewriteCond %{REQUEST_URI} !^/wp-includes
+RewriteRule .* - [R=503,L]
+</IfModule>
+ErrorDocument 503 /maintenance.html
+# ── 점검 안내 끝 ────────────────────────────────────────────────────
+
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+# END WordPress
