@@ -63,9 +63,13 @@ export async function POST(req: NextRequest) {
 
   // 저장까지 끝났으면 사장님 폰으로 알림 한 통. 관리자 화면을 열어봐야만 알 수 있으면 놓친다.
   // ⚠️ 여기서 실패해도 문의는 이미 저장됐으므로 손님에게는 성공으로 답한다.
+  // 문의 **전문**을 넣는다(300자까지). 90바이트를 넘으면 sms.ts 가 알아서 LMS(장문)로 보낸다.
+  //   짧게 자르면 사장님이 결국 관리자 화면을 열어봐야 해서, 알림을 받는 의미가 없다.
+  //   → 폰 문자만 보고도 "지금 답해야 할 일인지" 판단되게.
   try {
+    const cut = message.length > 300 ? `${message.slice(0, 300)}…(관리자에서 전문 확인)` : message;
     await notifyOwner(
-      `[판타스트릭] 1:1 문의가 들어왔습니다.\n${name} ${formatPhone(phone)}\n${message.slice(0, 60)}${message.length > 60 ? "…" : ""}\n관리자 › 문의에서 답변해 주세요.`,
+      `[판타스트릭] 1:1 문의\n${name} ${formatPhone(phone)}\n\n${cut}\n\n답변 → fantastrick.co.kr/admin 문의 탭`,
       "ask",
     );
   } catch (e) {

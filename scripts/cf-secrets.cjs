@@ -34,6 +34,9 @@ const KEYS = [
   // 직원용 안내문자 앱(reservation-sms)이 오늘 예약을 읽을 때 쓰는 열쇠.
   // 관리자 비밀번호와 **별개** — 새면 이 값만 바꾸면 된다. (api/staff/today)
   "STAFF_TOKEN",
+  // 사장님 개인폰 — 1:1 문의·B2B 문의가 들어오면 여기로 알림 문자가 간다(lib/sms.ts notifyOwner).
+  // 비워두면 알림이 **조용히 안 나간다**(에러도 안 남음). 번호를 바꿀 땐 이 값만 고치면 된다.
+  "ALERT_PHONE",
 ];
 
 const p = path.join(__dirname, "..", ".env.local");
