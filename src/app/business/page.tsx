@@ -24,14 +24,14 @@ const onlyNum = (s: string) => Number(String(s).replace(/[^0-9]/g, "")) || 0;
    본이름을 그대로 쓰면 길잡이가 168px 이 넘어 본문을 가린다(1440 화면에서 56px 겹침 실측). */
 const SCOPES = [
   { id: "turnkey", label: "통째로 만들기", short: "통째로", sub: "이야기부터 공사까지 전부" },
-  { id: "device", label: "방 안 장치와 기계", short: "장치", sub: "자물쇠와 센서, 조명을 돌리는 것" },
+  { id: "device", label: "테마 안 장치와 기계", short: "장치", sub: "자물쇠와 센서, 조명을 돌리는 것" },
   { id: "software", label: "매장 운영 프로그램", short: "프로그램", sub: "근무표와 급여, 예약을 하는 것" },
 ];
 
-const KINDS = ["방 통째로 맡기기", "장치와 기계만", "운영 프로그램만", "그 밖에"];
+const KINDS = ["테마 통째로 맡기기", "장치와 기계만", "운영 프로그램만", "그 밖에"];
 // 보고 있는 화면에 맞춰 문의 유형을 미리 골라 둔다
 const KIND_BY_SCOPE: Record<string, string> = {
-  turnkey: "방 통째로 맡기기", device: "장치와 기계만", software: "운영 프로그램만",
+  turnkey: "테마 통째로 맡기기", device: "장치와 기계만", software: "운영 프로그램만",
 };
 
 /* 근무표 도해용 데이터.
@@ -231,9 +231,9 @@ export default function BusinessPage() {
               "턴키 시공사 소개"로 규정됐다. 그러면 아래 선택은 셋 중 고르는 자리가 아니라
               "턴키를 보는 방법 세 가지"로 읽힌다. 그 문장은 턴키 표제로 옮겼다. */}
           <div className="kicker">방탈출 인테리어 제작, 장치, 매장 운영 프로그램까지 모든 것</div>
-          <h1>방을 만드는 일부터<br />방을 운영하는 일까지.</h1>
+          <h1>테마를 만드는 일부터<br />테마를 운영하는 일까지.</h1>
           <p className="sub">
-            방탈출을 통째로 짓는 일, 방 안 장치를 움직이는 기계, 매장을 굴리는 프로그램.
+            방탈출을 통째로 짓는 일, 테마 안 장치를 움직이는 기계, 매장을 굴리는 프로그램.
             2012년부터 강남에서 3곳을 직접 운영하면서 하나씩 만든 것들입니다.
           </p>
           <div className="bz-cta">
@@ -392,7 +392,7 @@ export default function BusinessPage() {
           {/* 공정 5단계 */}
           <h3 className="reveal pn-h3">진행 순서</h3>
           <div className="rail reveal" style={{ marginTop: 18 }}>
-            <div><b>현장 방문</b><span>현장 보고 방 개수와 장치 세기</span><i>자체 인력</i></div>
+            <div><b>현장 방문</b><span>현장 보고 테마 개수와 장치 세기</span><i>자체 인력</i></div>
             <div><b>기획과 시나리오</b><span>스토리와 문제 설계</span><i>자체 인력</i></div>
             <div><b>설계와 인테리어</b><span>도면, 세트, 마감</span><i>자체 인력</i></div>
             <div><b>전기와 장치</b><span>배선, 장치 제작, 기계</span><i>자체 인력</i></div>
@@ -422,7 +422,7 @@ export default function BusinessPage() {
               </div>
             ))}
           </div>
-          <p className="note reveal">값은 방 크기랑 하시려는 연출에 따라 달라서 보고 나서 말씀드립니다.</p>
+          <p className="note reveal">값은 테마 크기랑 하시려는 연출에 따라 달라서 보고 나서 말씀드립니다.</p>
         </section>
         {/* 비교 */}
         <section className="bz-sec">
@@ -435,7 +435,7 @@ export default function BusinessPage() {
             <div><span className="mk n">&times;</span><span className="t mut">따로따로 맡김</span></div>
             <div className="usc"><span className="mk y">&#10003;</span><span className="t">한 팀이 끝까지</span></div>
 
-            <div className="rowlab">방을 늘리고 싶을 때</div>
+            <div className="rowlab">테마를 늘리고 싶을 때</div>
             <div><span className="mk n">&times;</span><span className="t mut">기계를 통째로 다시</span></div>
             <div className="usc"><span className="mk y">&#10003;</span><span className="t">판 하나만 더</span></div>
 
@@ -475,7 +475,7 @@ export default function BusinessPage() {
             <div className="kicker" style={{ justifyContent: "center" }}>CONTACT</div>
             <h2>한번 보러 가겠습니다.</h2>
             <p className="lead center">지금 쓰시는 게 있어도 괜찮습니다. 안 뜯고 볼 수 있는 것부터 봅니다.
-              방 몇 개인지, 장치가 몇 개 붙어 있는지, 고장 나면 지금 어떻게 하시는지. 그 정도만 보면 됩니다.</p>
+              테마 몇 개인지, 장치가 몇 개 붙어 있는지, 고장 나면 지금 어떻게 하시는지. 그 정도만 보면 됩니다.</p>
             {sent ? (
               <div className="bzdone">
                 <b>문의 잘 받았습니다.</b>
@@ -500,7 +500,7 @@ export default function BusinessPage() {
                       value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
                   </div>
                   <div>
-                    <label htmlFor="bz-rooms">방 개수</label>
+                    <label htmlFor="bz-rooms">테마 개수</label>
                     <input id="bz-rooms" inputMode="numeric" maxLength={4} placeholder="3"
                       value={form.rooms} onChange={(e) => setForm({ ...form, rooms: e.target.value })} />
                   </div>
@@ -534,15 +534,15 @@ export default function BusinessPage() {
         <div className="wrap">
         <header className="pn-head">
           <i>02</i>
-          <h2>방 안 장치를 움직이는 기계</h2>
+          <h2>테마 안 장치를 움직이는 기계</h2>
           <p>자물쇠와 센서, 조명을 한 대가 다 맡습니다</p>
         </header>
         <section className="bz-sec" id="device">
           <div className="kicker reveal">장치값보다 큰 돈</div>
-          <h2 className="reveal">장치 하나가 작동을 안 하면<br /><strong>그 방은 그날 못 씁니다.</strong></h2>
+          <h2 className="reveal">장치 하나가 작동을 안 하면<br /><strong>그 테마는 그날 못 씁니다.</strong></h2>
           <p className="lead reveal">
             2시 타임 한 번 비면 그날 매출에서 그냥 빠져요. 내일 두 팀 받는다고 메워지는 것도 아니고요.
-            주말에 타임이 다 차는 방일수록 손해가 큽니다.
+            주말에 타임이 다 차는 테마일수록 손해가 큽니다.
           </p>
 
           <figure className="reveal">
@@ -584,7 +584,7 @@ export default function BusinessPage() {
           <div className="kicker reveal">새로 만든 것</div>
           <h2 className="reveal">저희가 만든 기계, <strong>마스터와 슬레이브</strong></h2>
           <p className="lead reveal">
-            방 안에 붙는 자물쇠, 전자석, 센서, 연출 조명을 한 대가 다 맡아서 움직이는 기계입니다.
+            테마 안에 붙는 자물쇠, 전자석, 센서, 연출 조명을 한 대가 다 맡아서 움직이는 기계입니다.
             본체(마스터) 한 대가 장치 32개를 맡고, 모자라면 옆에 판(슬레이브)을 하나 더 답니다.
             저희가 만들어 저희 매장에 넣고 쓰는 물건입니다.
           </p>
@@ -716,10 +716,10 @@ export default function BusinessPage() {
 
           {/* 방 늘릴 때 드는 돈 — 금액을 쓰지 않는다. 기울기 차이로만 읽게 한다. */}
           <figure className="reveal" style={{ marginTop: 14 }}>
-            <p className="ftitle">방을 늘려갈 때</p>
+            <p className="ftitle">테마를 늘려갈 때</p>
             <div className="step-chart">
               <svg viewBox="0 0 620 200" role="img"
-                aria-label="방을 늘릴 때 드는 돈 비교. 기계를 통째로 다시 사는 방식은 늘릴 때마다 처음 금액이 또 들어 가파르게 올라가고, 판만 더하는 방식은 완만하게 올라갑니다.">
+                aria-label="테마를 늘릴 때 드는 돈 비교. 기계를 통째로 다시 사는 방식은 늘릴 때마다 처음 금액이 또 들어 가파르게 올라가고, 판만 더하는 방식은 완만하게 올라갑니다.">
                 <line className="gl" x1="46" y1="20" x2="600" y2="20" />
                 <line className="gl" x1="46" y1="95" x2="600" y2="95" />
                 <line className="gl" x1="46" y1="170" x2="600" y2="170" />
@@ -742,12 +742,12 @@ export default function BusinessPage() {
                 <text className="axl" x="450" y="190" textAnchor="middle">128개</text>
               </svg>
             </div>
-            <figcaption>기계를 통째로 다시 사야 하는 방식이면, 방을 늘릴 때마다 처음 냈던 돈이 또 나갑니다.
+            <figcaption>기계를 통째로 다시 사야 하는 방식이면, 테마를 늘릴 때마다 처음 냈던 돈이 또 나갑니다.
               판만 더하면 되는 방식은 처음 한 번으로 끝납니다.</figcaption>
           </figure>
 
           {/* 구성 — 금액 없음 */}
-          <h3 className="reveal" style={{ margin: "44px 0 0", fontSize: 17, fontWeight: 800 }}>방 몇 개짜리세요?</h3>
+          <h3 className="reveal" style={{ margin: "44px 0 0", fontSize: 17, fontWeight: 800 }}>테마 몇 개짜리세요?</h3>
           {/* ⚠️ gridTemplateColumns 를 인라인으로 두면 미디어쿼리를 이겨서 360px 폰에서도 2열로 남는다
                  (카드 폭 111px → "장치 23개까지"가 세 줄로 접힘). CSS 로 옮겼다. */}
           <div className="tiers" style={{ marginTop: 16 }}>
@@ -755,7 +755,7 @@ export default function BusinessPage() {
               <h3>소형</h3>
               <div className="devbar"><i style={{ width: "18%" }} /></div>
               <div className="devn">장치 <b>23개</b>까지</div>
-              <p>방 한 칸으로 시작하시는 분들. 23개에서 더는 안 늘어납니다. 나중에 표준으로 올리실 때
+              <p>테마 하나로 시작하시는 분들. 23개에서 더는 안 늘어납니다. 나중에 표준으로 올리실 때
                 쓰시던 기계는 값을 쳐드려요.</p>
             </div>
             <div className="tier hot reveal">
@@ -765,7 +765,7 @@ export default function BusinessPage() {
               <p>새로 여는 매장은 대부분 이걸로 갑니다. 판만 더 달면 계속 붙습니다. 위로 끝이 없어요.</p>
             </div>
           </div>
-          <p className="note reveal">설치는 3일 기준입니다. 금액은 방 개수와 장치 수에 따라 달라서 보러 가서 말씀드립니다.</p>
+          <p className="note reveal">설치는 3일 기준입니다. 금액은 테마 개수와 장치 수에 따라 달라서 보러 가서 말씀드립니다.</p>
         </section>
 
         {/* 누가 먼저 아느냐 */}
@@ -795,7 +795,7 @@ export default function BusinessPage() {
             </div>
             <figcaption>
               <p>기계가 장치 상태를 스스로 살핍니다. 대답이 없는 게 생기면 사장님 폰으로 알림이 갑니다.
-                &quot;3번 방 전자석 응답 없음&quot; 이런 식으로요.</p>
+                &quot;3번 테마 전자석 응답 없음&quot; 이런 식으로요.</p>
               <p>다 잡히지는 않습니다. 손님이 뜯어버린 소품, 끊어진 배선, 정전은 이걸로 안 걸려요.
                 그건 여전히 사람이 봐야 합니다.</p>
             </figcaption>
@@ -826,7 +826,7 @@ export default function BusinessPage() {
             </details>
             <details>
               <summary>공사하는 동안 매장 닫아야 하나요?</summary>
-              <div className="b">3일 기준입니다. 방 한 칸씩 나눠 하면 매장 전체를 닫지 않아도 됩니다.
+              <div className="b">3일 기준입니다. 테마 하나씩 나눠 하면 매장 전체를 닫지 않아도 됩니다.
                 예약 적은 요일에 맞춰 잡습니다.</div>
             </details>
             <details>
@@ -835,8 +835,8 @@ export default function BusinessPage() {
                 멀리서 되는 건 방문 없이 처리하고요. 그리고 전화 받는 사람이 그 기계를 만든 사람입니다.</div>
             </details>
             <details>
-              <summary>방 하나만 새로 만들 수도 있나요?</summary>
-              <div className="b">됩니다. 방 한 칸만 하시는 분들도 있고, 매장 전체를 맡기시는 분들도 있습니다.
+              <summary>테마 하나만 새로 만들 수도 있나요?</summary>
+              <div className="b">됩니다. 테마 하나만 하시는 분들도 있고, 매장 전체를 맡기시는 분들도 있습니다.
                 지금 쓰시는 것 중 살릴 게 있으면 살립니다.</div>
             </details>
             <details>
@@ -856,7 +856,7 @@ export default function BusinessPage() {
             <div className="kicker" style={{ justifyContent: "center" }}>CONTACT</div>
             <h2>한번 보러 가겠습니다.</h2>
             <p className="lead center">지금 쓰시는 게 있어도 괜찮습니다. 안 뜯고 볼 수 있는 것부터 봅니다.
-              방 몇 개인지, 장치가 몇 개 붙어 있는지, 고장 나면 지금 어떻게 하시는지. 그 정도만 보면 됩니다.</p>
+              테마 몇 개인지, 장치가 몇 개 붙어 있는지, 고장 나면 지금 어떻게 하시는지. 그 정도만 보면 됩니다.</p>
             {sent ? (
               <div className="bzdone">
                 <b>문의 잘 받았습니다.</b>
@@ -881,7 +881,7 @@ export default function BusinessPage() {
                       value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
                   </div>
                   <div>
-                    <label htmlFor="bz-rooms">방 개수</label>
+                    <label htmlFor="bz-rooms">테마 개수</label>
                     <input id="bz-rooms" inputMode="numeric" maxLength={4} placeholder="3"
                       value={form.rooms} onChange={(e) => setForm({ ...form, rooms: e.target.value })} />
                   </div>
@@ -920,7 +920,7 @@ export default function BusinessPage() {
         </header>
         <section className="bz-sec" id="software">
           <h2 className="reveal">사장님이 <em>엑셀로</em><br />하고 계신 것들</h2>
-          <p className="lead reveal">방 안 장치를 움직이는 게 기계라면, 이건 사무실에서 하는 일입니다.
+          <p className="lead reveal">테마 안 장치를 움직이는 게 기계라면, 이건 사무실에서 하는 일입니다.
             근무표 짜고, 시급 계산하고, 예약 받고, 쿠폰 챙기는 것.</p>
 
           <div className="swtable reveal">
@@ -1001,9 +1001,9 @@ export default function BusinessPage() {
           {/* 힌트폰 — 저희가 실제로 만들어 쓰는 것. 락다운시티(태블릿 카드 태그식)와
               태초의 신부(코드 입력식) 두 가지를 매장에서 돌리고 있다.
               ⚠️ 없는 실적을 쓰지 않는다. 여기 적힌 것은 전부 지금 돌아가는 기능이다. */}
-          <h3 className="reveal" style={{ margin: "48px 0 0", fontSize: 17, fontWeight: 800 }}>방 안에서 손님이 보는 화면도 만듭니다</h3>
+          <h3 className="reveal" style={{ margin: "48px 0 0", fontSize: 17, fontWeight: 800 }}>테마 안에서 손님이 보는 화면도 만듭니다</h3>
           <p className="lead reveal" style={{ margin: "10px 0 18px" }}>
-            힌트를 종이로 주거나 직원이 문을 열고 들어가는 대신, 방 안 태블릿으로 줍니다.
+            힌트를 종이로 주거나 직원이 문을 열고 들어가는 대신, 테마 안 태블릿으로 줍니다.
             손님이 보는 화면과 직원이 보는 화면이 따로 있고, 둘이 실시간으로 붙어 있습니다.
             저희 매장에서 지금 그렇게 돌리고 있습니다.
           </p>
@@ -1036,10 +1036,10 @@ export default function BusinessPage() {
           </figure>
 
           <div className="ops" style={{ marginTop: 18 }}>
-            <div className="op reveal"><b>방 성격에 맞춰 만듭니다</b><span>카드를 대면 다음 할 일이 뜨는 방식, 코드를 넣으면 이야기가 오는 방식. 둘 다 저희 매장에서 돌리고 있습니다.</span></div>
+            <div className="op reveal"><b>테마 성격에 맞춰 만듭니다</b><span>카드를 대면 다음 할 일이 뜨는 방식, 코드를 넣으면 이야기가 오는 방식. 둘 다 저희 매장에서 돌리고 있습니다.</span></div>
             <div className="op reveal"><b>힌트는 미리 넣어 둡니다</b><span>문제마다 1차 힌트와 정답을 적어두고, 직원이 눌러서 보냅니다. 말로 설명하다 김 새는 일이 없습니다.</span></div>
             <div className="op reveal"><b>끊겨도 이어집니다</b><span>태블릿이 꺼졌다 켜져도 어디까지 왔는지와 남은 시간이 그대로 따라옵니다.</span></div>
-            <div className="op reveal"><b>직원이 멀리서 봅니다</b><span>어느 방이 어디까지 왔는지 한 화면에서 보고, 필요하면 그 자리에서 힌트를 보냅니다.</span></div>
+            <div className="op reveal"><b>직원이 멀리서 봅니다</b><span>어느 테마가 어디까지 왔는지 한 화면에서 보고, 필요하면 그 자리에서 힌트를 보냅니다.</span></div>
           </div>
 
           <p className="note reveal">장치와 기계를 넣으시면 운영 프로그램이 함께 들어갑니다.
@@ -1054,7 +1054,7 @@ export default function BusinessPage() {
             <div className="kicker" style={{ justifyContent: "center" }}>CONTACT</div>
             <h2>한번 보러 가겠습니다.</h2>
             <p className="lead center">지금 쓰시는 게 있어도 괜찮습니다. 안 뜯고 볼 수 있는 것부터 봅니다.
-              방 몇 개인지, 장치가 몇 개 붙어 있는지, 고장 나면 지금 어떻게 하시는지. 그 정도만 보면 됩니다.</p>
+              테마 몇 개인지, 장치가 몇 개 붙어 있는지, 고장 나면 지금 어떻게 하시는지. 그 정도만 보면 됩니다.</p>
             {sent ? (
               <div className="bzdone">
                 <b>문의 잘 받았습니다.</b>
@@ -1079,7 +1079,7 @@ export default function BusinessPage() {
                       value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
                   </div>
                   <div>
-                    <label htmlFor="bz-rooms">방 개수</label>
+                    <label htmlFor="bz-rooms">테마 개수</label>
                     <input id="bz-rooms" inputMode="numeric" maxLength={4} placeholder="3"
                       value={form.rooms} onChange={(e) => setForm({ ...form, rooms: e.target.value })} />
                   </div>
