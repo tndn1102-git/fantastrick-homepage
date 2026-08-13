@@ -18,7 +18,10 @@ const KEYS = [
   "ADMIN_ID",
   "CRON_SECRET",
   "BANK_WEBHOOK_SECRET",
-  "BANK_DRY_RUN",
+  // ⚠️ BANK_DRY_RUN 은 여기 넣지 않는다 — 로컬(.env.local)은 안전을 위해 true, 라이브는 false 로
+  // 값이 서로 달라야 하는데, bulk 로 올리면 라이브가 연습모드로 되돌아간다.
+  // (2026-08-13 실사고: 7/30 에 false 로 전환했던 게 bulk 재등록 때 true 로 덮여
+  //  실전 입금이 dry_run 으로 빠짐) 바꿀 땐 단건으로:  printf 'false' | npx wrangler secret put BANK_DRY_RUN
   // 문자·알림톡 (NHN Cloud)
   "NHN_SMS_APPKEY",
   "NHN_SMS_SECRET",

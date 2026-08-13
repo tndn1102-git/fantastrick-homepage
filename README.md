@@ -2,6 +2,17 @@
 
 > 무엇을 바꿨는지 시간 순으로 적는 곳이에요. (최신이 위)
 
+## 2026-08-13 — 입금 자동승인 실전 재전환 (연습모드로 되돌아가 있던 사고 수리)
+
+- **증상**: 박근영님 실전 입금(12만원, 13:46)이 자동매칭까진 성공했는데 `dry_run`(연습모드)으로만 기록되고 실제 입금확인이 안 눌림. 사장님이 수동으로 처리.
+- **원인**: 7/30에 `BANK_DRY_RUN=false`로 전환했었는데, 이후 알림톡 키 등을 `cf-secrets.cjs` bulk로 재등록할 때 `.env.local`의 `true`가 같이 올라가 라이브가 연습모드로 **되돌아가** 있었다.
+- **조치**:
+  1. `printf 'false' | npx wrangler secret put BANK_DRY_RUN` — 라이브 실전 전환 (단건 등록)
+  2. **재발 방지**: `cf-secrets.cjs`의 bulk 목록(KEYS)에서 `BANK_DRY_RUN` 제거 — 앞으로 bulk를 몇 번을 돌려도 이 값은 안 건드림. `.env.local`은 로컬 안전용 `true` 유지.
+  3. 박근영님 건: 예약(8/19 21:00 락다운시티) `confirmed`·수동 입금확인·**예약확정 알림톡 발송 성공(sent)** 전부 확인. deposits 기록만 `dry_run→approved`로 정리(관리자 화면 연습모드 표시 제거).
+  4. **라이브 E2E 재검증**: 연습 예약(입금테스트/3만/010-0000-9999) 생성 → 웹훅 POST → `decision:"approved"` → 예약 `confirmed`·`paid_source:auto` 확인 → 연습번호라 알림톡 차단(skipped, 정상) → 테스트 데이터 전부 삭제.
+- 파일: `scripts/cf-secrets.cjs`, `.env.local`(주석), Cloudflare 시크릿.
+
 ## 2026-08-13 — 🎉 도메인 이전 완료: fantastrick.co.kr = 새 홈페이지
 
 ### 타임라인 (전부 한 시간 안에 끝남)
