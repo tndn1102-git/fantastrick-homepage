@@ -1791,3 +1791,42 @@ form.cform{border:1px solid rgba(122,59,184,.28);border-radius:var(--r-lg);paddi
   .js .shead::before{width:46px}
   .scrollcue{animation:none}
 }
+
+/* ─── 상담 챗봇 (오른쪽 아래) ─────────────────────────────────────────
+   색은 전부 변수로 — 밝은/어두운 화면 둘 다 자동으로 맞는다.
+   z-index 120 = 기존 .float 와 같은 층(둘이 같은 화면에 안 보임), 메뉴(200)·모달(300)보다 아래. */
+.cw-fab{position:fixed;right:18px;bottom:18px;z-index:120;width:56px;height:56px;border-radius:50%;
+  border:none;cursor:pointer;background:var(--brand,#2a63c9);color:#fff;display:grid;place-items:center;
+  box-shadow:0 6px 22px rgba(0,0,0,.28);transition:transform .15s}
+.cw-fab:hover{transform:translateY(-2px)}
+.cw-fab.on{background:var(--surface2,#333);color:var(--text)}
+.cw-panel{position:fixed;right:18px;bottom:84px;z-index:120;width:min(360px,calc(100vw - 24px));
+  height:min(540px,calc(100dvh - 120px));display:flex;flex-direction:column;overflow:hidden;
+  background:var(--surface,#fff);color:var(--text);border:1px solid var(--line);border-radius:16px;
+  box-shadow:0 18px 60px rgba(0,0,0,.35)}
+.cw-head{padding:13px 16px;border-bottom:1px solid var(--line);background:var(--surface2)}
+.cw-head b{display:block;font-size:15px}
+.cw-head span{font-size:11.5px;color:var(--muted)}
+.cw-body{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:8px}
+.cw-msg{max-width:86%;padding:9px 12px;border-radius:14px;font-size:13.5px;line-height:1.65}
+.cw-msg.bot{align-self:flex-start;background:var(--bg2);border:1px solid var(--line);border-bottom-left-radius:4px}
+.cw-msg.me{align-self:flex-end;background:var(--brand,#2a63c9);color:#fff;border-bottom-right-radius:4px}
+.cw-ul{margin:8px 0 6px;padding-left:16px}
+.cw-ul li{margin-bottom:4px}
+.cw-a{color:var(--cyan);font-weight:700;text-decoration:underline;text-underline-offset:2px}
+.cw-link{display:inline-block;margin-top:2px;padding:8px 14px;border-radius:9px;font-size:13px;font-weight:700;
+  background:var(--brand,#2a63c9);color:#fff;text-decoration:none}
+.cw-chips{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px;border-top:1px solid var(--line)}
+.cw-chips button{border:1px solid var(--line2);background:var(--surface);color:var(--text);
+  border-radius:999px;padding:6px 11px;font-size:12px;cursor:pointer}
+.cw-chips button:hover{border-color:var(--cyan);color:var(--cyan)}
+.cw-input{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--line);background:var(--surface2)}
+.cw-input input{flex:1;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13.5px;
+  background:var(--surface);color:var(--text);font-family:inherit}
+.cw-input button{width:40px;border:none;border-radius:10px;background:var(--brand,#2a63c9);color:#fff;
+  cursor:pointer;display:grid;place-items:center}
+@media(max-width:560px){
+  .cw-panel{right:10px;left:10px;width:auto;bottom:80px;height:min(66dvh,520px)}
+  .cw-fab{right:14px;bottom:14px}
+}
+@media(prefers-reduced-motion:reduce){.cw-fab{transition:none}}

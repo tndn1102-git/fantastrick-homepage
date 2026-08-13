@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import NoticeModal from "@/components/NoticeModal";
+import ChatWidget from "@/components/ChatWidget";
 import ThemeShell from "@/components/ThemeShell";
 import { SITE_URL } from "@/lib/site";
 
@@ -81,6 +82,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Footer />
         {/* 팝업 공지 — 기존 사이트처럼 모든 페이지에서 뜸(관리자에서 켤 때만) */}
         <NoticeModal />
+        <ChatWidget />
         {/* 전역 필름 그레인 오버레이(1장) — 다크 크래프트 질감 */}
         <div className="grain" aria-hidden="true" />
       </body>
