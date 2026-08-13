@@ -34,7 +34,23 @@ export function kstMidnightIso(nowMs: number = Date.now()): string {
   return new Date(kst.getTime() - KST_OFFSET).toISOString();
 }
 
+/* 🔴 자동취소 잠금 스위치 (2026-08-13 사장님 지시)
+ *
+ * **안내는 그대로, 실행만 멈춘다.**
+ *   화면·문자의 "30분 안에 입금해 주세요" 안내는 그대로 두되(손님을 재촉하는 효과는 유지),
+ *   시간이 지나도 시스템이 예약을 실제로 취소하지는 않는다.
+ *   → 미입금 건은 pending 으로 계속 남고, 취소 여부는 사장님이 관리자에서 직접 정한다.
+ *
+ * 왜: 새 홈페이지로 옮긴 첫 주다. 손님이 입금을 조금 늦게 해도 시스템이 먼저 죽이는 일이
+ *     없어야 한다. (실제로 8/13 첫 손님도 예약→취소→재예약을 오갔다)
+ *
+ * ⚠️ 다시 켤 때는 이 값만 true 로 바꾸면 된다. 단, 켜기 전에
+ *    "그동안 쌓인 오래된 pending" 이 한꺼번에 취소되지 않는지 먼저 확인할 것.
+ */
+export const AUTO_CANCEL_ENABLED = false;
+
 export async function sweepExpiredReservations(db: SupabaseClient): Promise<void> {
+  if (!AUTO_CANCEL_ENABLED) return; // 잠금 — 위 주석 참고
   const now = Date.now();
   const cutoff = new Date(now - EXPIRE_MINUTES * 60 * 1000).toISOString();
 
