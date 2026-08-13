@@ -15,9 +15,11 @@ import { BOOKING_INFO } from "@/lib/theme-content";
  *   여기 하드코딩된 안내(예약 오픈 저녁 9시 등)를 고칠 일이 생기면 팝업 공지와 함께 고칠 것.
  */
 
-// 카카오톡 채널 상담 주소 — 사장님이 채널 링크(pf.kakao.com/_xxxx)를 주면 채운다.
-// 비어 있는 동안은 카톡 버튼이 아예 안 보인다(죽은 버튼을 손님에게 보여주지 않는다).
-const KAKAO_CHAT_URL = "";
+/* 카카오톡 채널 1:1 채팅 주소 (2026-08-13 연결).
+   /chat 을 붙이면 채널 홈이 아니라 **바로 대화창**이 열린다 — 손님이 한 번 덜 누른다.
+   ⚠️ 채널 관리자센터에서 1:1 채팅을 끄면 이 버튼은 살아 있는데 대화가 안 열린다.
+      채팅을 중단할 일이 생기면 이 값을 "" 로 비우면 버튼도 함께 사라진다. */
+const KAKAO_CHAT_URL = "https://pf.kakao.com/_UVhfX/chat";
 
 type Msg = { who: "bot" | "me"; text?: string; jsx?: React.ReactNode };
 
@@ -116,7 +118,7 @@ function answer(id: TopicId): Msg[] {
           jsx: (
             <div>
               게임 진행 중에는 전화를 못 받을 때가 있어요.
-              그럴 땐 <b>문자를 남겨주시면 확인하는 대로 연락드립니다.</b>
+              그럴 땐 <b>카카오톡이나 문자로 남겨주시면 확인하는 대로 답드립니다.</b>
               <ul className="cw-ul">
                 <li>1호점 <a className="cw-a" href="tel:01045470481">010-4547-0481</a></li>
                 <li>2호점 <a className="cw-a" href="tel:01049950482">010-4995-0482</a></li>
@@ -125,10 +127,11 @@ function answer(id: TopicId): Msg[] {
               {/* sms: 는 폰에서 문자앱을 번호 채워서 연다. PC 브라우저에선 반응이 없을 수 있어
                   버튼 하나로만 두고, 전화번호(tel:)를 위에 항상 함께 보여준다. */}
               <div className="cw-btnrow">
-                <a className="cw-link" href="sms:01045470481">📩 문자로 문의하기</a>
+                {/* 카톡을 앞에 둔다 — 손님이 제일 편해하고, 사장님도 폰 알림으로 바로 받는다. */}
                 {KAKAO_CHAT_URL && (
-                  <a className="cw-link" href={KAKAO_CHAT_URL} target="_blank" rel="noopener noreferrer">💬 카카오톡 문의</a>
+                  <a className="cw-link" href={KAKAO_CHAT_URL} target="_blank" rel="noopener noreferrer">💬 카카오톡으로 문의</a>
                 )}
+                <a className="cw-link" href="sms:01045470481">📩 문자로 문의</a>
               </div>
               방탈출 제작·장치 문의는 <a className="cw-a" href="/business">비즈니스</a>에서 남겨주세요.
             </div>
