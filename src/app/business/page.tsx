@@ -361,7 +361,7 @@ export default function BusinessPage() {
             <div className="tri reveal">
               <div className="en">Device</div>
               <h3>장치와 제어</h3>
-              <p>자물쇠와 센서를 만들어 붙이고, 그걸 움직이는 기계까지 저희가 만듭니다.</p>
+              <p>센서와 장치 기계까지 전부다 만듭니다.</p>
               <ul>
                 <li>잠금 장치(전자석과 기계식)</li>
                 <li>센서와 트리거</li>
@@ -374,15 +374,15 @@ export default function BusinessPage() {
           {/* 전화할 곳이 몇 군데냐 — 비교표 한 줄로 묻기엔 아까운 차별점이라 도해로 올렸다 */}
           <div className="who2 reveal" style={{ marginTop: 22 }}>
             <div className="them">
-              <h4>보통은</h4>
-              <div className="cnt">전화할 곳 다섯 군데</div>
+              <h4>일반적으로</h4>
+              <div className="cnt">각각 전문가에게 문의 및 설계 진행</div>
               <ul>
                 <li>시나리오 작가</li><li>인테리어</li><li>전기</li><li>장치 제작</li><li>시공</li>
               </ul>
             </div>
             <div className="us">
               <h4>저희는</h4>
-              <div className="cnt">전화할 곳 한 군데</div>
+              <div className="cnt">전화 한통으로 모두 해결</div>
               <ul>
                 <li>기획</li><li>인테리어</li><li>전기</li><li>장치</li><li>시공</li>
               </ul>
@@ -390,9 +390,9 @@ export default function BusinessPage() {
           </div>
 
           {/* 공정 5단계 */}
-          <h3 className="reveal pn-h3">진행은 이렇게 합니다</h3>
+          <h3 className="reveal pn-h3">진행 순서</h3>
           <div className="rail reveal" style={{ marginTop: 18 }}>
-            <div><b>보러 감</b><span>현장 보고 방 개수와 장치 세기</span><i>자체 인력</i></div>
+            <div><b>현장 방문</b><span>현장 보고 방 개수와 장치 세기</span><i>자체 인력</i></div>
             <div><b>기획과 시나리오</b><span>스토리와 문제 설계</span><i>자체 인력</i></div>
             <div><b>설계와 인테리어</b><span>도면, 세트, 마감</span><i>자체 인력</i></div>
             <div><b>전기와 장치</b><span>배선, 장치 제작, 기계</span><i>자체 인력</i></div>
@@ -400,7 +400,7 @@ export default function BusinessPage() {
           </div>
 
           {/* 우리가 만든 방들 */}
-          <h3 className="reveal pn-h3">저희가 만들어 저희가 돌리고 있는 방들</h3>
+          <h3 className="reveal pn-h3">저희가 만들어 실제 운영중인 매장 및 테마들</h3>
           <p className="lead reveal" style={{ margin: "10px 0 18px" }}>
             남의 매장에 넣어드리기 전에 저희 매장에서 먼저 씁니다. 아래 넷 다 저희 손으로 만들어 지금도 손님을 받고 있습니다.
           </p>
@@ -463,18 +463,8 @@ export default function BusinessPage() {
             특정 업체를 지칭하지 않으며 제품에 따라 사양은 다를 수 있습니다.</p>
         </section>
 
-        {/* 먼저 말씀드립니다 */}
-        <section className="bz-sec">
-          <div className="kicker reveal">먼저 말씀드립니다</div>
-          <h2 className="reveal">경쟁사한테 사는 거 아니냐,<br />하실 겁니다.</h2>
-          <p className="lead reveal">맞습니다. 저희도 강남에서 방탈출을 합니다. 그래서 말로 하지 않고 계약서에 넣습니다.</p>
-          <div className="trust">
-            <div className="reveal"><b>시나리오는 안 가져갑니다</b><span>고객사 시나리오랑 문제 구조는 우리 매장 어디에도 안 씁니다.</span></div>
-            <div className="reveal"><b>매장 이름 안 밝힙니다</b><span>원하시면 납품 사례에서 빼드립니다.</span></div>
-            <div className="reveal"><b>데이터는 따로 둡니다</b><span>매장 예약이랑 매출이 우리 쪽 데이터와 섞이지 않습니다.</span></div>
-            <div className="reveal"><b>기계만 사셔도 됩니다</b><span>운영 프로그램 없이 장치만 가져가셔도 상관없습니다.</span></div>
-          </div>
-        </section>
+        {/* "경쟁사한테 사는 거 아니냐" 구역은 2026-08-13 사장님 지시로 통째로 삭제.
+            (걱정을 먼저 꺼내는 게 오히려 걱정을 심는다는 판단) */}
 
         {/* 이 화면의 마무리 — 다음 범위로 넘기고, 문의로 받는다 */}
         <NextUp here={here} pick={pick} />
