@@ -1551,6 +1551,20 @@ function NeedAcctRow({ r, onSaved }: { r: Reservation; onSaved: () => void }) {
     if (res.ok) onSaved(); else alert((await res.json()).error || "저장 실패");
   }
 
+  /* [취소 완료] — 환불 과정 없이 끝낸다.
+     이미 밖에서 환불을 해줬거나(계좌 받아 직접 이체), 환불이 필요 없는 건.
+     여기 걸려 있던 옛 건들을 내리는 용도다 — 새 관리자 취소는 이제 여기로 안 온다. */
+  async function doneWithoutRefund() {
+    if (!confirm(`${r.name}님 건을 환불 과정 없이 완료 처리할까요?\n(이미 환불했거나 환불이 필요 없는 경우)\n\n입출금 내역에는 환불 ${refundAmount(r).toLocaleString()}원으로 기록됩니다.`)) return;
+    setBusy(true);
+    const res = await fetch("/api/admin/reservations", {
+      method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: r.id, refunded: true }),
+    });
+    setBusy(false);
+    if (res.ok) onSaved(); else alert((await res.json()).error || "처리 실패");
+  }
+
   return (
     <div className="rrow open">
       <div className="head" style={{ cursor: "default" }}>
@@ -1576,6 +1590,9 @@ function NeedAcctRow({ r, onSaved }: { r: Reservation; onSaved: () => void }) {
         <div className="act-row">
           <button className="btn sm primary" disabled={busy} onClick={save}>
             {busy ? "저장 중…" : <>계좌 저장 → 환불 처리로</>}
+          </button>
+          <button className="btn sm ghost" disabled={busy} onClick={doneWithoutRefund} title="이미 환불했거나 환불이 필요 없는 건을 완료로 표시">
+            취소 완료 (환불 과정 생략)
           </button>
         </div>
       </div>

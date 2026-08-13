@@ -242,6 +242,23 @@ export async function PATCH(req: NextRequest) {
   if (nowCancelled && before.deposit_paid && before.refund_rate == null) {
     patch.refund_rate = refundRateFor(before.date, before.time);
   }
+  /* 🔴 관리자 취소는 환불 과정을 타지 않는다 (2026-08-13 사장님 지시).
+   *
+   * 사장님이 취소하는 건 대부분 전화로 이미 얘기가 끝난 경우고, 환불도 그 자리에서
+   * 계좌 받아 직접 보낸다. 그런데 시스템은 "계좌 입력 필요"에 올려놓고 계좌를 내놓으라
+   * 버텨서, 이미 끝난 일이 화면에 영영 남았다(8/13 김민균 건으로 실제 발생).
+   *
+   * → 이 API 는 관리자 전용이므로, 여기서 온 취소는 **환불 완료로 함께 표시**한다.
+   *    · 환불율은 그대로 기록한다(얼마를 돌려줬어야 하는지 근거는 남긴다)
+   *    · refunded=true 라 환불 대기 큐에 안 뜨고, 입출금 내역에는 정상적으로 잡힌다
+   *      (실제로 돈은 나갔으니 장부와 현실이 맞는다)
+   * ⚠️ 손님이 직접 취소하는 길(/api/reservations)은 그대로다 — 그쪽은 계좌를 받아
+   *    환불 큐로 가는 게 맞다(사장님이 아직 안 보낸 돈이니까).
+   * ※ 관리자가 refunded 를 직접 지정해 보냈으면 그 뜻을 존중한다. */
+  if (nowCancelled && before.deposit_paid && patch.refunded === undefined) {
+    patch.refunded = true;
+    patch.refunded_at = now;
+  }
 
   const { error } = await db.from("reservations").update(patch).eq("id", id);
   if (error) return NextResponse.json({ error: "수정 중 오류가 발생했습니다." }, { status: 500 });
@@ -256,9 +273,9 @@ export async function PATCH(req: NextRequest) {
   if (nowCancelled && before.deposit_paid && patch.refund_rate != null) {
     const amt = refundAmount({ deposit: before.deposit, refund_rate: patch.refund_rate as number });
     logs.push({
-      reservation_id: id, action: "환불 필요",
+      reservation_id: id, action: "관리자 취소",
       detail: amt > 0
-        ? `${amt.toLocaleString()}원 (환불율 ${patch.refund_rate}%) · 손님 계좌를 받아 [환불 처리]에서 입력하세요`
+        ? `환불 ${amt.toLocaleString()}원(${patch.refund_rate}%)은 시스템 밖에서 직접 처리 — 환불 과정 생략`
         : `환불 대상 아님 (당일/지난 예약 → 환불율 0%)`,
     });
   }
