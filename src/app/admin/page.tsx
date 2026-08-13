@@ -1384,8 +1384,8 @@ ${r.theme_name} ${r.date} ${r.time}
         });
         if (!stale.length) return null;
         return (
-          <div className="admin-card" style={{ borderColor: "#d9a441", marginBottom: 14 }}>
-            <b style={{ color: "#b06f00" }}>⏰ 1시간 넘게 입금이 없는 예약 {stale.length}건</b>
+          <div className="admin-card" style={{ borderColor: "#c0392b", borderWidth: 2, marginBottom: 14 }}>
+            <b style={{ color: "#b4322a" }}>⏰ 1시간 넘게 입금이 없는 예약 {stale.length}건</b>
             <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 6, lineHeight: 1.6 }}>
               자리를 계속 차지하고 있습니다. 손님께 확인하시거나, 아래 목록에서 <b>[취소]</b> 해주세요.
               <br />시스템이 자동으로 지우지는 않습니다.
@@ -1397,7 +1397,7 @@ ${r.theme_name} ${r.date} ${r.time}
                   <div key={r.id} style={{ fontSize: 13.5 }}>
                     <b>{r.name}</b> <Phone v={r.phone} />
                     <span style={{ color: "var(--muted)" }}> · {r.theme_name} {formatDate(r.date)} {r.time}</span>
-                    <span style={{ color: "#b06f00", fontWeight: 700 }}> · {h >= 1 ? h + "시간" : "1시간"} 경과</span>
+                    <span style={{ color: "#b4322a", fontWeight: 700 }}> · {h >= 1 ? h + "시간" : "1시간"} 경과</span>
                   </div>
                 );
               })}

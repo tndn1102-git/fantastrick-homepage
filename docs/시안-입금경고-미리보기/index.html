@@ -10,7 +10,7 @@
     --text:#131620; --muted:#535a69; --faint:#9aa3b2;
     --line:rgba(20,22,42,.12); --line2:rgba(20,22,42,.20);
     --bg:#f4f6f9; --bg2:#e9ecf1; --surface:#fff; --cyan:#2a63c9; --brand:#2a63c9;
-    --warn:#b06f00; --warnline:#d9a441;
+    --warn:#b4322a; --warnline:#c0392b;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--text);
@@ -33,7 +33,7 @@
 
   /* ── 실제 컴포넌트 재현 ── */
   .admin-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
-  .warnbox{border-color:var(--warnline);margin-bottom:14px}
+  .warnbox{border-color:var(--warnline);border-width:2px;margin-bottom:14px}
   .warnbox > b{color:var(--warn);font-size:15px}
   .warndesc{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.6}
   .warnlist{margin-top:8px;display:flex;flex-direction:column;gap:6px}
