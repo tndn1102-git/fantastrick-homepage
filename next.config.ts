@@ -47,6 +47,19 @@ const nextConfig: NextConfig = {
       { source: "/wp-admin/:path*", destination: "/", permanent: true },
       { source: "/wp-login.php", destination: "/", permanent: true },
       { source: "/feed", destination: "/", permanent: true },
+
+      /* ─── 매장 QR(히든페이지) 살리기 (2026-08-13) ───
+         방 안 소품에 인쇄된 QR 이라 주소를 바꿀 수 없다. 원래는 워드프레스 페이지가
+         받아서 JS 로 다시 넘기는 2단 구조였는데, 그 최종 목적지 파일이 옛 서버에서
+         이미 사라져 있었다(FTP 확인: /210823.html 없음, /Hiddenpage2nd/ 없음).
+           · /05ev17 = "QR 코드 페이지"  → 옛 목적지 /210823.html
+           · /03ev28 = "Hidden2nd"      → 옛 목적지 /Hiddenpage2nd/BookOfDuat.html
+         같은 내용이 fantastrickside 서버에 살아 있으므로 그쪽으로 넘긴다.
+         지점↔테마는 확정: 1호점=태초의 신부, 2호점=사자의 서(=Book of Duat).
+         ⚠️ 302(임시)로 둔다 — 인쇄물이라 나중에 목적지를 또 옮길 수 있는데,
+            301 로 박으면 손님 폰에 옛 목적지가 캐시로 눌러앉는다. */
+      { source: "/05ev17", destination: "https://fantastrickside.gabia.io/hidden-page-first/", permanent: false },
+      { source: "/03ev28", destination: "https://fantastrickside.gabia.io/hidden-page-second/", permanent: false },
     ];
   },
   // 모든 경로에 기본 보안 헤더 적용 (클릭재킹·MIME 스니핑·정보 유출 1차 방어)

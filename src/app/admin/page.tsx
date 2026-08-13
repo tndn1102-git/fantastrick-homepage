@@ -1333,6 +1333,22 @@ function PayQueue({ onDone }: { onDone: () => void }) {
     return { min: Math.max(0, Math.ceil((at - Date.now()) / 60000)), grace };
   }
 
+  /* 입금 대기 건 취소 — 자동취소를 껐으므로 사장님이 직접 내리는 수단이 필요하다.
+     입금 전이라 돌려줄 돈이 없어 환불 과정을 타지 않는다(관리자 취소 규칙과 동일). */
+  async function cancelUnpaid(r: Reservation) {
+    if (!confirm(`${r.name}님 예약을 취소할까요?
+${r.theme_name} ${r.date} ${r.time}
+
+입금 전이라 환불할 금액은 없습니다.`)) return;
+    setBusy(r.id);
+    const res = await fetch("/api/admin/reservations", {
+      method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: r.id, status: "cancelled" }),
+    });
+    setBusy(null);
+    if (res.ok) load(); else alert((await res.json()).error || "취소 실패");
+  }
+
   async function confirmPay(r: Reservation) {
     const p = (payer[r.id] || "").trim();
     const who = p && p !== r.name ? `\n입금자명: ${p} (예약자와 다름)` : "";
@@ -1354,6 +1370,41 @@ function PayQueue({ onDone }: { onDone: () => void }) {
         <div className="sp" />
         <button className="btn ghost sm" onClick={load}>새로고침</button>
       </div>
+
+      {/* 🔴 오래 방치된 입금 대기 (2026-08-13 사장님 지시: 자동취소 대신 경고만)
+          자동취소를 꺼둔 상태라 입금 안 한 예약이 자리를 영영 차지한다.
+          시스템이 함부로 지우지 않되, **눈에 띄게 알려서** 사장님이 판단하게 한다.
+          ⚠️ 접수 1시간이 기준이다. 새벽 예약은 오전 10시 반까지 봐주므로(payDeadline)
+             그 유예 안에 있으면 여기 안 잡는다 — 정상 손님을 재촉하면 안 된다. */}
+      {(() => {
+        const stale = list.filter((r) => {
+          const { grace } = remainInfo(r.created_at);
+          if (grace) return false; // 새벽 유예 중인 건 제외
+          return Date.now() - new Date(r.created_at).getTime() > 60 * 60 * 1000;
+        });
+        if (!stale.length) return null;
+        return (
+          <div className="admin-card" style={{ borderColor: "#d9a441", marginBottom: 14 }}>
+            <b style={{ color: "#b06f00" }}>⏰ 1시간 넘게 입금이 없는 예약 {stale.length}건</b>
+            <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 6, lineHeight: 1.6 }}>
+              자리를 계속 차지하고 있습니다. 손님께 확인하시거나, 아래 목록에서 <b>[취소]</b> 해주세요.
+              <br />시스템이 자동으로 지우지는 않습니다.
+            </div>
+            <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 6 }}>
+              {stale.map((r) => {
+                const h = Math.floor((Date.now() - new Date(r.created_at).getTime()) / 3600000);
+                return (
+                  <div key={r.id} style={{ fontSize: 13.5 }}>
+                    <b>{r.name}</b> <Phone v={r.phone} />
+                    <span style={{ color: "var(--muted)" }}> · {r.theme_name} {formatDate(r.date)} {r.time}</span>
+                    <span style={{ color: "#b06f00", fontWeight: 700 }}> · {h >= 1 ? h + "시간" : "1시간"} 경과</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
 
       {list.length === 0 ? (
         <div className="notice ok">입금 대기 없음 — 다 처리하셨어요.</div>
@@ -1386,6 +1437,8 @@ function PayQueue({ onDone }: { onDone: () => void }) {
                 <button className="btn sm primary" disabled={busy === r.id} onClick={() => confirmPay(r)}>
                   {busy === r.id ? "처리 중…" : "입금 확인"}
                 </button>
+                <button className="btn sm ghost" disabled={busy === r.id} onClick={() => cancelUnpaid(r)}
+                  title="입금하지 않은 예약을 내립니다">취소</button>
               </span>
             </div>
           </div>
