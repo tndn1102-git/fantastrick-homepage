@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>관리자 캘린더 — 심플하게 10안</title>
+<style>
+  :root{
+    --ink:#131620; --dim:#535a69; --faint:#9aa3b2; --line:#d8dce3; --line2:#b8bec9;
+    --bg:#f4f6f9; --card:#fff; --brand:#2a63c9; --sel:#e8f0ff;
+    --t1:#2a63c9; --t2:#12805c; --t3:#c0392b; --t4:#7d3fc9; /* 신부/사자/락다운/시간 */
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Pretendard","Malgun Gothic",system-ui,sans-serif;line-height:1.6}
+  .wrap{max-width:1180px;margin:0 auto;padding:40px 20px 90px}
+  h1{font-size:26px;margin:0 0 6px}
+  .sub{color:var(--dim);font-size:14px;margin-bottom:26px}
+  .diag{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:30px;font-size:14px}
+  .diag b{color:#c0392b}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(520px,1fr));gap:22px}
+  .sample{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 18px 16px}
+  .sample h3{margin:0 0 2px;font-size:16px;display:flex;align-items:center;gap:8px}
+  .pick{font-size:11px;font-weight:800;background:#12805c;color:#fff;border-radius:5px;padding:2px 8px}
+  .why{font-size:12.5px;color:var(--dim);margin:0 0 12px}
+
+  /* 공통 미니 캘린더: 각진 틀 */
+  table.cal{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}
+  .cal th{border:1px solid var(--line2);background:#eef1f6;padding:5px 0;font-size:11.5px;color:var(--dim);font-weight:700}
+  .cal td{border:1px solid var(--line2);height:58px;vertical-align:top;padding:5px 6px;position:relative;background:#fff}
+  .cal td .d{font-weight:800;font-size:12px}
+  .cal td.sel{background:var(--sel);outline:2px solid var(--brand);outline-offset:-2px}
+  .cal td.sun .d{color:#c0392b}.cal td.sat .d{color:var(--brand)}
+  .cal td.zero{background:#fafbfd}
+  .cal td.zero .d{color:var(--faint);font-weight:600}
+
+  .tot{position:absolute;right:6px;bottom:4px;font-size:15px;font-weight:800;color:var(--ink)}
+  .dots{position:absolute;left:6px;bottom:6px;display:flex;gap:3px}
+  .dots i{width:5px;height:5px;border-radius:50%;display:block}
+  .bar{position:absolute;left:0;right:0;bottom:0;height:4px;display:flex}
+  .bar i{display:block;height:100%}
+  .badge{position:absolute;top:4px;right:4px;min-width:20px;height:20px;border-radius:6px;
+    background:var(--brand);color:#fff;font-size:11.5px;font-weight:800;display:grid;place-items:center;padding:0 5px}
+  .chips{position:absolute;left:5px;right:5px;bottom:4px;display:flex;gap:3px;flex-wrap:wrap}
+  .chips b{font-size:10px;font-weight:800;color:#fff;border-radius:4px;padding:0 4px;line-height:15px}
+  .mini{position:absolute;top:4px;right:5px;text-align:right;font-size:10px;line-height:1.35;font-weight:700}
+  .quad{position:absolute;left:6px;right:6px;bottom:4px;display:grid;grid-template-columns:1fr 1fr;gap:0 8px;
+    font-size:10.5px;font-weight:700;font-variant-numeric:tabular-nums}
+  .quad span{text-align:right}
+  .quad .z{color:#d3d8e0;font-weight:400}
+  .eq{position:absolute;left:6px;right:6px;bottom:4px;display:flex;gap:2px;align-items:flex-end;height:14px}
+  .eq i{flex:1;display:block;border-radius:1px 1px 0 0}
+  .mono td .d{font-weight:700}
+  .mono .tot{color:var(--dim);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>관리자 캘린더 — 각진 틀 + 심플 표기 10안</h1>
+  <p class="sub">같은 주간(8/10~16, 13일 선택됨)과 빈 주간(8/17~23)을 모든 안에 동일하게 넣었습니다. 실제 예약 수 그대로.</p>
+
+  <div class="diag">
+    <b>진단</b> — ① 바깥 틀이 없어 칸이 떠 보임 → 전 안에 <b>각진 표 틀</b> 적용
+    ② 하루 4개 숫자 × 31일 = 숫자 124개 → 줄이는 방식이 안마다 다름
+    ③ <b>0까지 전부 표기</b>돼 빈 날이 시끄러움 → 전 안에서 0은 숨기거나 흐리게
+    ④ 날짜를 누르면 아래에 테마별 상세가 이미 나옴 → <b>칸은 "얼마나 바쁜가"만 말해도 충분</b>
+  </div>
+
+  <div class="grid" id="g"></div>
+</div>
+
+<script>
+// 실제 화면 수치 (신부/사자/락다운/시간)
+const W1=[{d:10,v:[5,1,5,2]},{d:11,v:[6,1,5,3]},{d:12,v:[5,0,3,1]},{d:13,v:[5,0,3,1],sel:1},{d:14,v:[6,2,5,3]},{d:15,v:[10,8,6,4]},{d:16,v:[10,7,6,4]}];
+const W2=[{d:17,v:[7,3,4,1]},{d:18,v:[1,0,2,2]},{d:19,v:[1,0,2,1]},{d:20,v:[1,1,1,0]},{d:21,v:[0,0,0,0]},{d:22,v:[0,0,0,0]},{d:23,v:[0,0,0,0]}];
+const C=["var(--t1)","var(--t2)","var(--t3)","var(--t4)"];
+const sum=v=>v.reduce((a,b)=>a+b,0);
+
+function cal(bodyFn, extraClass){
+  let h='<table class="cal '+(extraClass||"")+'"><tr>'+["일","월","화","수","목","금","토"].map(d=>"<th>"+d+"</th>").join("")+"</tr>";
+  for(const week of [W1,W2]){
+    h+="<tr>";
+    week.forEach((c,i)=>{
+      const t=sum(c.v);
+      const cls=[c.sel?"sel":"",i===0?"sun":"",i===6?"sat":"",t===0?"zero":""].join(" ");
+      h+='<td class="'+cls+'"><span class="d">'+c.d+"</span>"+bodyFn(c)+"</td>";
+    });
+    h+="</tr>";
+  }
+  return h+"</table>";
+}
+
+const S=[];
+
+S.push({t:"1안 · 합계 하나만", pick:true,
+ w:"하루의 정보를 숫자 한 개로. 테마 구분은 날짜를 눌러 아래 상세에서 — 지금도 그렇게 쓰고 계신 동선.",
+ h:cal(c=>{const t=sum(c.v);return t?'<span class="tot">'+t+"</span>":"";})});
+
+S.push({t:"2안 · 합계 + 색점", pick:true,
+ w:"합계 옆에 예약 있는 테마만 점으로. 어느 테마가 있는지까지는 칸에서, 몇 건인지는 상세에서.",
+ h:cal(c=>{const t=sum(c.v);if(!t)return "";
+   const dots=c.v.map((n,i)=>n?'<i style="background:'+C[i]+'"></i>':"").join("");
+   return '<span class="dots">'+dots+'</span><span class="tot">'+t+"</span>";})});
+
+S.push({t:"3안 · 합계 + 비율 막대",
+ w:"칸 바닥에 얇은 띠 하나 — 길이 비율이 테마 구성. 숫자는 합계 하나뿐인데 구성까지 보임.",
+ h:cal(c=>{const t=sum(c.v);if(!t)return "";
+   const bar=c.v.map((n,i)=>n?'<i style="width:'+(n/t*100)+'%;background:'+C[i]+'"></i>':"").join("");
+   return '<span class="tot" style="bottom:8px">'+t+'</span><span class="bar">'+bar+"</span>";})});
+
+S.push({t:"4안 · 히트맵(바쁜 날일수록 진하게)",
+ w:"숫자보다 빠른 건 색의 진하기. 한 달의 몰린 날이 스캔 한 번에 보임. 성수기 파악용.",
+ h:cal(c=>{const t=sum(c.v);return t?'<span class="tot">'+t+"</span>":"";},"heat")});
+
+S.push({t:"5안 · 모서리 뱃지",
+ w:"예약 있는 날만 파란 뱃지. 달력은 하얗게 비우고 일감만 튀어나오게 — 알림 딱지 느낌.",
+ h:cal(c=>{const t=sum(c.v);return t?'<span class="badge">'+t+"</span>":"";})});
+
+S.push({t:"6안 · 0 숨긴 테마칩",
+ w:"예약 있는 테마만 색칩으로. 지금과 정보량은 같지만 0이 사라져서 훨씬 조용함.",
+ h:cal(c=>{const chips=c.v.map((n,i)=>n?'<b style="background:'+C[i]+'">'+n+"</b>":"").join("");
+   return chips?'<span class="chips">'+chips+"</span>":"";})});
+
+S.push({t:"7안 · 우측 세로 미니숫자(0 생략)",
+ w:"현재 배치와 가장 비슷하되 0만 안 그림. 바꾼 티는 적고 소음만 줄이는 보수안.",
+ h:cal(c=>{const rows=c.v.map((n,i)=>n?'<div style="color:'+C[i]+'">'+n+"</div>":"").join("");
+   return rows?'<span class="mini">'+rows+"</span>":"";})});
+
+S.push({t:"8안 · 2×2 고정 자리(0은 흐리게)",
+ w:"네 숫자를 항상 같은 자리에 정렬 — 지금처럼 나열하되 자리가 고정돼 훨씬 정돈됨. 0은 연회색.",
+ h:cal(c=>{const q=c.v.map((n,i)=>'<span class="'+(n?"":"z")+'" style="'+(n?"color:"+C[i]:"")+'">'+n+"</span>").join("");
+   return '<span class="quad">'+q+"</span>";})});
+
+S.push({t:"9안 · 미니 이퀄라이저",
+ w:"테마별 건수를 막대 높이로. 숫자 없이도 뭐가 많은 날인지 형태로 보임.",
+ h:cal(c=>{const mx=10;const bars=c.v.map((n,i)=>'<i style="height:'+(n?Math.max(n/mx*100,15):0)+'%;background:'+(n?C[i]:"transparent")+'"></i>').join("");
+   return sum(c.v)?'<span class="eq">'+bars+"</span>":"";})});
+
+S.push({t:"10안 · 모노톤(달력=길잡이 전용)",
+ w:"칸에는 회색 합계뿐, 색·구분 전부 제거. 달력은 어느 날을 볼지 고르는 도구로만 — 가장 과감한 축소.",
+ h:cal(c=>{const t=sum(c.v);return t?'<span class="tot">'+t+"</span>":"";},"mono")});
+
+document.getElementById("g").innerHTML=S.map(s=>
+  '<div class="sample"><h3>'+s.t+(s.pick?'<span class="pick">추천</span>':"")+"</h3>"+
+  '<p class="why">'+s.w+"</p>"+s.h+"</div>").join("");
+
+// 히트맵 칠하기
+document.querySelectorAll(".heat").forEach(tbl=>{
+  const data=[...W1,...W2];
+  tbl.querySelectorAll("td").forEach((td,i)=>{
+    const t=sum(data[i].v);
+    if(t>0){
+      const a=Math.min(t/28,1)*0.55+0.08;
+      td.style.background="rgba(42,99,201,"+a.toFixed(2)+")";
+      if(a>0.35){
+        const d=td.querySelector(".d"); if(d) d.style.color="#fff";
+        const tot=td.querySelector(".tot"); if(tot) tot.style.color="#fff";
+      }
+    }
+  });
+});
+</script>
+</body>
+</html>
