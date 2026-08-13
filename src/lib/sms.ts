@@ -294,14 +294,59 @@ export async function sendSms(phone: string, body: string, type: string): Promis
  *                    번호가 없다고 문의 접수 자체가 실패하면 안 된다.
  */
 export async function notifyOwner(body: string, tag: string): Promise<{ ok: boolean; skipped?: boolean }> {
+  // ── 1순위: 텔레그램 (무료) ─────────────────────────────────────
+  //   문자는 한 통에 돈이 든다(장문 LMS 는 특히). 알림은 사장님 본인이 받는 것이라
+  //   굳이 통신사를 거칠 이유가 없다. 텔레그램은 무료·즉시·글자수 제한도 사실상 없다.
+  //   ⚠️ 다만 폰이 데이터가 없거나 앱 알림을 꺼두면 못 본다 → 실패하면 아래 문자로 넘어간다.
+  const tg = await telegramNotify(body);
+  if (tg.ok) {
+    await writeLog({ phone: "telegram", body, type: `alert_${tag}`, channel: "telegram", status: "sent", error: null });
+    return { ok: true };
+  }
+
+  // ── 2순위: 문자 (돈이 들지만 확실하다) ────────────────────────
   const to = process.env.ALERT_PHONE;
-  if (!to) return { ok: false, skipped: true };
+  if (!to) {
+    // 텔레그램도 문자도 없으면 알림이 통째로 사라진다. 조용히 넘기지 말고 흔적을 남긴다.
+    if (!tg.skipped) console.error("[알림] 텔레그램 실패 + ALERT_PHONE 없음 —", tg.error);
+    return { ok: false, skipped: true };
+  }
   const r = useGabia() ? await gabiaSendSms(to, body, LMS_TITLE) : await nhnSendSms(to, body);
   await writeLog({
     phone: normalizePhone(to), body, type: `alert_${tag}`, channel: "sms",
-    status: r.ok ? "sent" : "failed", error: r.ok ? null : r.error,
+    status: r.ok ? "sent" : "failed",
+    // 왜 문자로 갔는지(=텔레그램이 왜 안 됐는지)를 같은 줄에 남긴다. 나중에 원인 찾기가 쉬워진다.
+    error: r.ok ? (tg.skipped ? null : `텔레그램 실패로 문자 발송: ${tg.error}`) : r.error,
   });
   return { ok: r.ok };
+}
+
+/**
+ * 텔레그램 봇으로 알림 한 통. (env: TELEGRAM_BOT_TOKEN · TELEGRAM_CHAT_ID)
+ *
+ * 둘 중 하나라도 없으면 **조용히 건너뛴다**(skipped) — 설정 안 한 상태에서 에러를 뿜을 이유가 없다.
+ * 받는 곳도 TELEGRAM_CHAT_ID 하나로 못 박는다. notifyOwner 와 같은 이유로, 손님에게는 갈 수 없다.
+ *
+ * 왜 봇인가: 계정 로그인·토큰 갱신이 없다. 봇 토큰 하나로 영구히 동작하고, 요금도 없다.
+ */
+async function telegramNotify(text: string): Promise<{ ok: boolean; skipped?: boolean; error?: string }> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chatId) return { ok: false, skipped: true };
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      // 서식(parse_mode)은 일부러 안 쓴다 — 손님이 쓴 글에 * _ [ 같은 글자가 있으면
+      // 텔레그램이 서식으로 읽다가 발송 자체가 실패한다. 알림은 안 깨지는 게 최우선.
+      body: JSON.stringify({ chat_id: chatId, text, disable_web_page_preview: true }),
+    });
+    const j = (await res.json()) as { ok?: boolean; description?: string };
+    if (j.ok) return { ok: true };
+    return { ok: false, error: j.description || `HTTP ${res.status}` };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "연결 실패" };
+  }
 }
 
 /** 시험 발송 전용 — **지금 쓰는 업체로** 한 통 보낸다(가비아든 NHN 이든).

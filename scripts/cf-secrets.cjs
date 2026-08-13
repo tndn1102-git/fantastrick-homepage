@@ -37,6 +37,10 @@ const KEYS = [
   // 사장님 개인폰 — 1:1 문의·B2B 문의가 들어오면 여기로 알림 문자가 간다(lib/sms.ts notifyOwner).
   // 비워두면 알림이 **조용히 안 나간다**(에러도 안 남음). 번호를 바꿀 땐 이 값만 고치면 된다.
   "ALERT_PHONE",
+  // 텔레그램 알림(무료). 이게 있으면 문의 알림이 문자 대신 텔레그램으로 간다.
+  // 둘 다 없으면 조용히 건너뛰고 문자로만 간다 — 없어도 사이트는 정상 동작.
+  "TELEGRAM_BOT_TOKEN",
+  "TELEGRAM_CHAT_ID",
 ];
 
 const p = path.join(__dirname, "..", ".env.local");
