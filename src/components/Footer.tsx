@@ -17,7 +17,7 @@ export default function Footer() {
             </div>
             <p className="slogan-foot">일상이 멈추고, 이야기가 시작된다</p>
             <p style={{ margin: "8px 0 0" }}>
-              강남 11년차 이머시브 방탈출 &amp; 머더룸 브랜드
+              강남 이머시브 방탈출 &amp; 머더룸 · EST. 2012
               <br />판타스트릭 (Fantasy + Trick)
             </p>
           </div>

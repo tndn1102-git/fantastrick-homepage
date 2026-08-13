@@ -234,14 +234,14 @@ export default function BusinessPage() {
           <h1>방을 만드는 일부터<br />방을 돌리는 일까지.</h1>
           <p className="sub">
             방탈출을 통째로 짓는 일, 방 안 장치를 움직이는 기계, 매장을 굴리는 프로그램.
-            강남에서 3곳, 11년째 직접 운영하면서 하나씩 만든 것들입니다.
+            2012년부터 강남에서 3곳을 직접 운영하면서 하나씩 만든 것들입니다.
           </p>
           <div className="bz-cta">
             <a className="btn primary" href="#cta">한번 보러 오세요</a>
             <a className="btn ghost" href="#turnkey">무엇을 하는지 보기</a>
           </div>
           <div className="strip">
-            <div><b>11년째</b><span>직접 운영 중</span></div>
+            <div><b>EST. 2012</b><span>직접 운영 중</span></div>
             <div><b>강남 3곳</b><span>직영</span></div>
             <div><b>한 팀</b><span>기획부터 장치까지</span></div>
           </div>
@@ -334,7 +334,7 @@ export default function BusinessPage() {
           </svg>
           <p className="lead reveal">
             대부분은 이야기, 인테리어, 장치를 각각 다른 데 맡깁니다. 저희는 세 가지를 다 합니다.
-            방탈출을 11년 하면서 필요해서 하나씩 갖춘 것들입니다.
+            방탈출을 2012년부터 하면서 필요해서 하나씩 갖춘 것들입니다.
           </p>
 
           <div className="trio">
@@ -459,7 +459,7 @@ export default function BusinessPage() {
 
             <div className="rowlab">만든 데가 방탈출을 하는가</div>
             <div><span className="mk n">&times;</span><span className="t mut">아니오</span></div>
-            <div className="usc"><span className="mk y">&#10003;</span><span className="t">강남 3곳, 11년째</span></div>
+            <div className="usc"><span className="mk y">&#10003;</span><span className="t">강남 3곳 · EST. 2012</span></div>
           </div>
           <p className="disc reveal">업계에서 일반적으로 쓰이는 방식과의 구조 차이를 정리한 것입니다.
             특정 업체를 지칭하지 않으며 제품에 따라 사양은 다를 수 있습니다.</p>

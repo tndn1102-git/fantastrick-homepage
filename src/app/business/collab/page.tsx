@@ -10,7 +10,7 @@ import "../business.css";
      · 브랜드 담당자: 품의를 올려야 한다. 범위·기간·회사 실체를 먼저 본다.
    두 사람의 불안이 정반대라 한 페이지로는 둘 다 못 잡는다(2026-08-06 분석).
 
-   ⚠️ 없는 실적을 쓰지 않는다. 우리가 댈 수 있는 것은 "직영 3곳을 11년 굴려온 것"뿐이다.
+   ⚠️ 없는 실적을 쓰지 않는다. 우리가 댈 수 있는 것은 "2012년부터 직영 3곳을 굴려온 것"뿐이다. (연차 표기는 해마다 낡아서 EST. 2012 로 통일 — 2026-08-13 사장님 결정)
       대기업 로고를 흉내 내면 빈자리가 그대로 보인다. 카피 규칙은 /business 와 같다. */
 
 const KINDS = ["브랜드 팝업", "기업 교육", "공공과 전시", "그 밖에"];
@@ -63,14 +63,14 @@ export default function CollabPage() {
           <h1>방탈출을 팝업에,<br />교육에, 전시에.</h1>
           <p className="sub">
             사람을 앉혀 놓고 설명하는 대신, 직접 움직이고 풀게 만드는 방식입니다.
-            강남에서 방탈출 3곳을 11년째 직접 만들고 운영하면서 다듬어 온 것입니다.
+            2012년부터 강남에서 방탈출 3곳을 직접 만들고 운영하면서 다듬어 온 것입니다.
           </p>
           <div className="bz-cta">
             <a className="btn primary" href="#cta">협업 문의하기</a>
             <a className="btn ghost" href="#what">무엇을 하는지 보기</a>
           </div>
           <div className="strip">
-            <div><b>11년째</b><span>직접 운영 중</span></div>
+            <div><b>EST. 2012</b><span>직접 운영 중</span></div>
             <div><b>강남 3곳</b><span>직영</span></div>
             <div><b>한 팀</b><span>기획부터 장치까지</span></div>
           </div>
@@ -174,7 +174,7 @@ export default function CollabPage() {
           <div className="kicker reveal">왜 저희인가</div>
           <h2 className="reveal">만들어만 보고 끝난<br />회사가 아닙니다.</h2>
           <div className="trust">
-            <div className="reveal"><b>매일 운영합니다</b><span>강남 3곳에서 11년째 직접 손님을 받습니다. 주소도 공개돼 있습니다.</span></div>
+            <div className="reveal"><b>매일 운영합니다</b><span>강남 3곳에서 2012년부터 직접 손님을 받습니다. 주소도 공개돼 있습니다.</span></div>
             <div className="reveal"><b>하청을 안 씁니다</b><span>기획과 시공, 장치가 한 회사 안에 있어 중간에 말이 새지 않습니다.</span></div>
             <div className="reveal"><b>고장 나는 걸 압니다</b><span>어디가 먼저 닳는지 겪어봐서 처음부터 그걸 감안해 만듭니다.</span></div>
             <div className="reveal"><b>끝나고도 받습니다</b><span>설치하고 사라지지 않습니다. 전화 받는 사람이 만든 사람입니다.</span></div>
