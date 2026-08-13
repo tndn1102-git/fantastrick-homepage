@@ -1405,10 +1405,15 @@ form.cform{border:1px solid rgba(122,59,184,.28);border-radius:var(--r-lg);paddi
 /* 0 은 자리만 지킨다 — 지우면 네 자리가 밀려 몇 번째 테마인지 헷갈리고,
    진하게 두면 예약이 있는 날과 없는 날이 똑같아 보인다. */
 .tn.zero{color:var(--faint);font-weight:600}
-.tn.t0{color:#043cb2}  /* 태초의 신부 */
-.tn.t1{color:#8a5300}  /* 사자의 서 */
-.tn.t2{color:#b3261e}  /* 락다운시티 */
-.tn.t3{color:#622698}  /* 시간의 영속성 */
+/* 테마색 — **리뷰 카드의 테마색이 기준이다**(data.ts 의 THEMES[].color, 2026-08-13 사장님 지시).
+   ⚠️ 다만 그 값(#93B4FF 같은 파스텔)은 어두운 배경용이라 **관리자 흰 배경에서는 안 읽힌다.**
+      그래서 여기서는 **색상은 그대로 두고 명도만 낮춘 짝**을 쓴다 — 색상 차이 3도 이내라
+      손님 화면과 관리자 화면이 같은 색으로 읽힌다. 흰 배경 대비는 넷 다 4.8:1 이상.
+   ⚠️ data.ts 의 색을 바꾸면 **여기도 같이 바꿔야 한다.** 한쪽만 고치면 두 화면이 어긋난다. */
+.tn.t0{color:#1E50C9}  /* 태초의 신부 */
+.tn.t1{color:#6D2FBD}  /* 사자의 서 */
+.tn.t2{color:#A8560E}  /* 락다운시티 */
+.tn.t3{color:#0E7A82}  /* 시간의 영속성 */
 /* 0 은 자리만 지킨다 — 지우면 네 자리가 밀려 몇 번째 테마인지 헷갈리고,
    진하게 두면 예약 있는 날과 없는 날이 똑같아 보인다.
    ⚠️ 색 규칙(.tn.t0~t3)과 우선순위가 같으므로 **반드시 그 뒤에** 있어야 이긴다. */
@@ -1417,10 +1422,10 @@ form.cform{border:1px solid rgba(122,59,184,.28);border-radius:var(--r-lg);paddi
 .cal-legend span{display:inline-flex;align-items:center;gap:5px}
 /* 안내의 색 표시는 글자가 아니라 점이므로 배경색이 필요하다 */
 .cal-legend i.tn{width:9px;height:9px;border-radius:50%;display:inline-block}
-.cal-legend i.t0{background:#043cb2}
-.cal-legend i.t1{background:#8a5300}
-.cal-legend i.t2{background:#b3261e}
-.cal-legend i.t3{background:#622698}
+.cal-legend i.t0{background:#1E50C9}
+.cal-legend i.t1{background:#6D2FBD}
+.cal-legend i.t2{background:#A8560E}
+.cal-legend i.t3{background:#0E7A82}
 
 /* ---------- 🚦 입금 감시 신호등 (입금·환불 탭 맨 위) ----------
    26시간 동안 태블릿이 멈춘 걸 아무도 몰랐던 사고(2026-08-03) 대응.
