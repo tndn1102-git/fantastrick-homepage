@@ -32,3 +32,6 @@ cloudflare-env.d.ts
 .dev.vars
 wp-sync.log
 wp-sync-hidden.vbs
+
+# 손님 개인정보가 든 백업 — 절대 올리지 않음
+backups/
