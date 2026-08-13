@@ -10,7 +10,9 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export function middleware(req: NextRequest) {
   const host = req.headers.get("host") ?? "";
-  if (host === "www.fantastrick.co.kr") {
+  // tgc = 안 쓰기로 확정된 옛 TGC 예약 사이트 주소(2026-08-13 사장님 결정).
+  // 옛 링크·즐겨찾기로 들어온 손님을 대표 주소로 데려온다.
+  if (host === "www.fantastrick.co.kr" || host === "tgc.fantastrick.co.kr") {
     const url = new URL(req.url);
     url.host = "fantastrick.co.kr";
     return NextResponse.redirect(url, 301);
