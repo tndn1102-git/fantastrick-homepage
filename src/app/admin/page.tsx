@@ -47,6 +47,7 @@ function Phone({ v }: { v: string }) {
 const TABS = [
   { k: "res", label: "예약" }, { k: "money", label: "입금·환불" },
   { k: "biz", label: "도입 문의" },
+  { k: "talk", label: "알림톡" },
   { k: "cont", label: "리뷰·공지" }, { k: "set", label: "설정" },
 ];
 
@@ -131,6 +132,7 @@ export default function AdminPage() {
       {tab === "res" && <ReservationsTab />}
       {tab === "money" && <MoneyTab />}
       {tab === "biz" && <InquiriesTab />}
+      {tab === "talk" && <AlimtalkTab />}
       {tab === "cont" && <ContentTab />}
       {tab === "set" && <SettingsHub />}
     </div>
@@ -2010,6 +2012,72 @@ function ReviewsAdminTab() {
           </div>
         ))}
     </>
+  );
+}
+
+/* ============ 알림톡 도착 확인 탭 ============
+   보낸 알림톡이 손님 카카오톡에 "도착"했는지를 NHN 조회로 보여준다.
+   ⚠️ "읽음(열람)"은 카카오가 어느 업체에도 안 알려준다 — 도착까지가 확인 가능한 전부다.
+      화면에도 그렇게만 적는다. 읽음으로 오해시키면 손님 응대에서 역효과가 난다. */
+type TalkRow = {
+  requestDate: string; receiveDate: string | null; phone: string; name: string | null;
+  templateCode: string; content: string; state: "delivered" | "failed" | "processing"; detail: string;
+};
+function AlimtalkTab() {
+  const [rows, setRows] = useState<TalkRow[]>([]);
+  const [days, setDays] = useState(7);
+  const [loaded, setLoaded] = useState(false); const [err, setErr] = useState("");
+
+  const load = useCallback(() => {
+    setLoaded(false);
+    fetch("/api/admin/alimtalk?days=" + days).then((r) => r.json()).then((j) => {
+      if (j.error) { setErr(j.error); setLoaded(true); return; }
+      setErr(""); setRows(j.items || []); setLoaded(true);
+    }).catch(() => { setErr("불러오기 실패"); setLoaded(true); });
+  }, [days]);
+  useEffect(() => { load(); }, [load]);
+
+  const delivered = rows.filter((r) => r.state === "delivered").length;
+  const failed = rows.filter((r) => r.state === "failed").length;
+
+  return (
+    <div>
+      <div className="notice ok" style={{ marginBottom: 14 }}>
+        발송한 알림톡이 손님 <b>카카오톡에 도착했는지</b>를 보여줍니다.
+        <span style={{ display: "block", fontSize: 12.5, color: "var(--muted)", marginTop: 4 }}>
+          ⚠️ &ldquo;읽었는지&rdquo;는 카카오가 어느 업체에도 제공하지 않아 확인이 불가능합니다 — <b>도착 확인이 가능한 전부</b>입니다.
+        </span>
+      </div>
+      <div className="admin-tools" style={{ marginBottom: 12 }}>
+        <select value={days} onChange={(e) => setDays(Number(e.target.value))}>
+          <option value={1}>오늘</option><option value={7}>최근 7일</option><option value={30}>최근 30일</option>
+        </select>
+        <button className="btn sm ghost" onClick={load}>새로고침</button>
+        {loaded && <span style={{ fontSize: 13, color: "var(--muted)" }}>
+          총 {rows.length}건 · 도착 {delivered} · 실패 {failed}
+        </span>}
+      </div>
+      {err && <div className="msg-err">{err}</div>}
+      {!loaded && <p style={{ color: "var(--muted)" }}>NHN 에 조회 중…</p>}
+      {loaded && !err && rows.length === 0 && <p style={{ color: "var(--muted)" }}>이 기간에 보낸 알림톡이 없습니다.</p>}
+      {rows.map((r, i) => (
+        <div key={i} className="admin-card" style={{ marginBottom: 10 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "baseline" }}>
+            {r.state === "delivered" && <span className="src-tag" style={{ background: "#e6f4ee", color: "#12805c" }}>✅ 도착</span>}
+            {r.state === "failed" && <span className="src-tag" style={{ background: "#fdeceb", color: "#b4322a" }}>❌ 실패</span>}
+            {r.state === "processing" && <span className="src-tag">⏳ 처리중</span>}
+            <b>{r.name ?? "(예약 기록 없음)"}</b>
+            <span style={{ color: "var(--muted)" }}>{formatPhone(r.phone)}</span>
+            <span style={{ fontSize: 12, color: "var(--faint)" }}>보냄 {r.requestDate.slice(5, 16)}{r.receiveDate ? ` · 도착 ${r.receiveDate.slice(5, 16)}` : ""}</span>
+          </div>
+          {r.state === "failed" && <div style={{ fontSize: 13, color: "#b4322a", marginTop: 4 }}>{r.detail} — 이 손님에게는 직접 연락이 필요할 수 있습니다</div>}
+          <details style={{ marginTop: 6 }}>
+            <summary style={{ cursor: "pointer", fontSize: 12.5, color: "var(--muted)" }}>보낸 내용 보기</summary>
+            <div style={{ whiteSpace: "pre-wrap", fontSize: 13, marginTop: 6, lineHeight: 1.7 }}>{r.content}</div>
+          </details>
+        </div>
+      ))}
+    </div>
   );
 }
 
