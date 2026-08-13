@@ -230,20 +230,20 @@ export default function BusinessPage() {
               전에는 "방을 통째로 만듭니다"였는데, 그건 ①턴키만의 문장이라 페이지 전체가
               "턴키 시공사 소개"로 규정됐다. 그러면 아래 선택은 셋 중 고르는 자리가 아니라
               "턴키를 보는 방법 세 가지"로 읽힌다. 그 문장은 턴키 표제로 옮겼다. */}
-          <div className="kicker">방탈출 제작, 장치, 매장 운영</div>
-          <h1>방을 만드는 일부터<br />방을 돌리는 일까지.</h1>
+          <div className="kicker">방탈출 인테리어 제작, 장치, 매장 운영 프로그램까지 모든 것</div>
+          <h1>방을 만드는 일부터<br />방을 운영하는 일까지.</h1>
           <p className="sub">
             방탈출을 통째로 짓는 일, 방 안 장치를 움직이는 기계, 매장을 굴리는 프로그램.
             2012년부터 강남에서 3곳을 직접 운영하면서 하나씩 만든 것들입니다.
           </p>
           <div className="bz-cta">
-            <a className="btn primary" href="#cta">한번 보러 오세요</a>
-            <a className="btn ghost" href="#turnkey">무엇을 하는지 보기</a>
+            <a className="btn primary" href="#cta">문의하기</a>
+            <a className="btn ghost" href="#turnkey">제작 설계</a>
           </div>
           <div className="strip">
-            <div><b>EST. 2012</b><span>직접 운영 중</span></div>
-            <div><b>강남 3곳</b><span>직영</span></div>
-            <div><b>한 팀</b><span>기획부터 장치까지</span></div>
+            <div><b>EST. 2012</b></div>
+            <div><b>강남 3곳</b></div>
+            <div><b>기획부터 장치 프로그램까지 모든 것</b></div>
           </div>
         </div>
       </section>
@@ -251,13 +251,12 @@ export default function BusinessPage() {
       {/* 고민 질문 — 범위와 상관없이 항상. 금액이나 스펙을 먼저 들이대면 방어가 걸린다 */}
       <div className="wrap">
         <section className="bz-sec">
-          <div className="kicker reveal">이런 걸 물어보십니다</div>
-          <h2 className="reveal">혹시 이런 적 있으십니까.</h2>
+                    <h2 className="reveal">사장님들이 한번 쯤 고민해본 것</h2>
           <div className="asks">
-            <div className="ask reveal">방 하나 새로 여는데 어디부터 맡겨야 할지 모르겠다</div>
-            <div className="ask reveal">장치가 작동을 안 하는데 어디로 전화해야 할지 헷갈린다</div>
-            <div className="ask reveal">방을 하나 더 만들려면 기계부터 새로 사야 한다고 들었다</div>
-            <div className="ask reveal">예약이랑 근무표를 아직 엑셀이랑 단톡으로 하고 있다</div>
+            <div className="ask reveal">매장을 새로 오픈하고 싶은데 어디서부터 문의를 해야할지 모르겠다.</div>
+            <div className="ask reveal">장치가 작동을 안 하는데 어디로 문의해야 할지 모르겠다.</div>
+            <div className="ask reveal">테마를 하나 더 만들거나 인테리어를 어디에서 상담해야할까?</div>
+            <div className="ask reveal">출퇴근 프로그램, 대타스케줄관리, 급여 계산, 홈페이지 등등 운영 프로그램을 도입하고 싶다.</div>
           </div>
         </section>
       </div>
@@ -275,8 +274,7 @@ export default function BusinessPage() {
       <div className={`scopepick on-${here}`} id="scopebar">
         <div className="wrap">
           <div className="sp-head">
-            <div className="kicker">어디까지</div>
-            <h2 id="scope-q">맡기시겠습니까</h2>
+            <h2 id="scope-q">어떤 것이 필요하십니까?</h2>
           </div>
           <div className="sp-cards" aria-labelledby="scope-q">
             {SCOPES.map((s, i) => (
@@ -303,11 +301,11 @@ export default function BusinessPage() {
         {/* 범위 표제 — 여기서부터 이 화면이 시작한다는 선언. 히어로에 있던 문장을 이리로 옮겼다. */}
         <header className="pn-head">
           <i>01</i>
-          <h2>방을 통째로 만듭니다.</h2>
+          <h2>테마 전체 설계</h2>
           <p>기획부터 시공까지</p>
         </header>
         <section className="bz-sec" id="turnkey">
-          <h2 className="reveal">이야기부터 배선까지<br />한 팀이 합니다.</h2>
+          <h2 className="reveal">스토리부터 인테리어 문제까지<br />한 팀이 맡아서 전부 만들어드립니다.</h2>
           {/* 도면 모티프 — 장식이다. 읽을 정보가 아니라 "이 회사는 도면을 그린다"는 신호.
               스크린리더에서는 완전히 뺀다(정보가 아니라 신호라 읽으면 소음이 된다). */}
           <svg className="pn-plan" viewBox="0 0 320 240" aria-hidden="true" focusable="false">
@@ -340,8 +338,8 @@ export default function BusinessPage() {
           <div className="trio">
             <div className="tri reveal">
               <div className="en">Contents</div>
-              <h3>이야기와 문제</h3>
-              <p>세계관을 짜고 방 안에서 손님이 무엇을 하게 할지 설계합니다.</p>
+              <h3>스토리와 문제</h3>
+              <p>세계관을 구성하고 퀄리티 높은 문제 구성</p>
               <ul>
                 <li>시나리오와 세계관</li>
                 <li>문제와 장치 게임 설계</li>
@@ -395,7 +393,7 @@ export default function BusinessPage() {
           <h3 className="reveal pn-h3">진행은 이렇게 합니다</h3>
           <div className="rail reveal" style={{ marginTop: 18 }}>
             <div><b>보러 감</b><span>현장 보고 방 개수와 장치 세기</span><i>자체 인력</i></div>
-            <div><b>기획과 시나리오</b><span>이야기와 문제 설계</span><i>자체 인력</i></div>
+            <div><b>기획과 시나리오</b><span>스토리와 문제 설계</span><i>자체 인력</i></div>
             <div><b>설계와 인테리어</b><span>도면, 세트, 마감</span><i>자체 인력</i></div>
             <div><b>전기와 장치</b><span>배선, 장치 제작, 기계</span><i>자체 인력</i></div>
             <div><b>공사와 오픈</b><span>현장 준비, 진행 담당 교육</span><i>자체 인력</i></div>
