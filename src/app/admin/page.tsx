@@ -564,6 +564,20 @@ function DayView() {
   const dayRows = byDay[pick] || [];
 
   const theme = THEMES.find((t) => t.id === activeTheme) || THEMES[0];
+
+  /* 날짜를 누르면 아래 예약창으로 데려간다 (2026-08-13 사장님 요청).
+     달력이 길어 클릭해도 아래가 안 보였다 — 눌렀는데 화면이 그대로면 "안 눌렸나?" 싶다.
+     ⚠️ 상태가 바뀌고 화면이 다시 그려진 뒤에 움직여야 위치가 맞는다(그래서 다음 프레임에).
+     ⚠️ 화면 멀미를 줄이려면 "부드럽게"가 좋지만, 그 설정을 끈 분에겐 즉시 이동한다. */
+  function scrollToDayList() {
+    requestAnimationFrame(() => {
+      const el = document.getElementById("day-list");
+      if (!el) return;
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const y = el.getBoundingClientRect().top + window.scrollY - 12;
+      window.scrollTo({ top: Math.max(0, y), behavior: reduce ? "auto" : "smooth" });
+    });
+  }
   const slots = cfg ? slotsForThemeDate(cfg.themeSlots, cfg.storeSlots, cfg.timeSlots, theme.id, theme.store, pick) : [];
   const themeRows = dayRows.filter((r) => r.theme_id === theme.id);
   // 시간표에 없는 시간에 잡힌 예약(옛 시간대·수동 등록)도 빠뜨리지 않고 함께 보여줌
@@ -603,7 +617,7 @@ function DayView() {
         {DOW_LABELS.map((w) => <div key={w} className="cal-dow">{w}</div>)}
         {cells.map((d, i) => d === null ? <div key={i} /> : (
           <div key={i} className={"cal-cell" + (pick === dstr(d) ? " pick" : "") + (dstr(d) === t0 ? " today" : "")}
-            onClick={() => setPick(dstr(d))}>
+            onClick={() => { setPick(dstr(d)); scrollToDayList(); }}>
             <span className="cal-d">{d}</span>
             {/* 테마별 건수를 색으로, **오른쪽 위에 세로로** (2026-08-13 시안 7안 채택).
                 가로 나열은 네 숫자가 한 수(1096)처럼 붙어 읽혀 지저분했다.
@@ -627,7 +641,7 @@ function DayView() {
         ))}
       </div>
 
-      <div className="theme-tabs">
+      <div className="theme-tabs" id="day-list">
         {THEMES.map((t) => {
           const n = dayRows.filter((r) => r.theme_id === t.id).length;
           return (
