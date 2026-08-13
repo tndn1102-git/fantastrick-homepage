@@ -605,10 +605,9 @@ function DayView() {
           <div key={i} className={"cal-cell" + (pick === dstr(d) ? " pick" : "") + (dstr(d) === t0 ? " today" : "")}
             onClick={() => setPick(dstr(d))}>
             <span className="cal-d">{d}</span>
-            {/* 총 건수 대신 **테마별 건수를 색으로** 보여준다(2026-08-01 사장님 요청).
-                합계만 있으면 "8건"이 한 테마에 몰린 건지 골고루인지 알 수 없어서,
-                달력을 열어 날짜를 눌러봐야 했다. 0건인 테마는 칸이 좁아 생략하고
-                색으로 어느 테마인지 알린다(아래 색 안내 참고). */}
+            {/* 테마별 건수를 색으로, **오른쪽 위에 세로로** (2026-08-13 시안 7안 채택).
+                가로 나열은 네 숫자가 한 수(1096)처럼 붙어 읽혀 지저분했다.
+                0도 자리를 지킨다(사장님 지시) — 흐리게 그려서 예약 있는 숫자가 먼저 보인다. */}
             <span className="cal-tn">
               {CAL_THEMES.map((t, ti) => {
                 const n = (byDay[dstr(d)] || []).filter((r) => r.theme_id === t.id).length;
