@@ -115,15 +115,21 @@ function answer(id: TopicId): Msg[] {
           who: "bot",
           jsx: (
             <div>
-              전화 주시면 바로 도와드려요.
+              게임 진행 중에는 전화를 못 받을 때가 있어요.
+              그럴 땐 <b>문자를 남겨주시면 확인하는 대로 연락드립니다.</b>
               <ul className="cw-ul">
                 <li>1호점 <a className="cw-a" href="tel:01045470481">010-4547-0481</a></li>
                 <li>2호점 <a className="cw-a" href="tel:01049950482">010-4995-0482</a></li>
                 <li>TGC <a className="cw-a" href="tel:01055360483">010-5536-0483</a></li>
               </ul>
-              {KAKAO_CHAT_URL && (
-                <a className="cw-link" href={KAKAO_CHAT_URL} target="_blank" rel="noopener noreferrer">카카오톡으로 문의하기 →</a>
-              )}
+              {/* sms: 는 폰에서 문자앱을 번호 채워서 연다. PC 브라우저에선 반응이 없을 수 있어
+                  버튼 하나로만 두고, 전화번호(tel:)를 위에 항상 함께 보여준다. */}
+              <div className="cw-btnrow">
+                <a className="cw-link" href="sms:01045470481">📩 문자로 문의하기</a>
+                {KAKAO_CHAT_URL && (
+                  <a className="cw-link" href={KAKAO_CHAT_URL} target="_blank" rel="noopener noreferrer">💬 카카오톡 문의</a>
+                )}
+              </div>
               방탈출 제작·장치 문의는 <a className="cw-a" href="/business">비즈니스</a>에서 남겨주세요.
             </div>
           ),

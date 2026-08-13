@@ -1830,3 +1830,4 @@ form.cform{border:1px solid rgba(122,59,184,.28);border-radius:var(--r-lg);paddi
   .cw-fab{right:14px;bottom:14px}
 }
 @media(prefers-reduced-motion:reduce){.cw-fab{transition:none}}
+.cw-btnrow{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 6px}
