@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import type { Notice } from "@/lib/settings";
 import { IconClose } from "@/components/Icon";
 
@@ -16,10 +17,15 @@ function todayKst() {
 export default function NoticeModal() {
   const [notice, setNotice] = useState<Notice | null>(null);
   const [open, setOpen] = useState(false);
+  /* 관리자 화면에서는 안 띄운다 (2026-08-13 사장님 지시).
+     손님용 안내인데 사장님이 매일 보는 화면을 가리고, 로그인 버튼까지 덮었다.
+     ⚠️ 훅 순서 규칙 때문에 여기서 바로 return 하지 않고, 아래 useEffect 안에서 거른다. */
+  const isAdminPage = usePathname()?.startsWith("/admin") ?? false;
 
   const close = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
+    if (isAdminPage) return; // 관리자에서는 공지를 아예 안 불러온다
     let alive = true;
     fetch("/api/config")
       .then((r) => r.json())
@@ -44,7 +50,7 @@ export default function NoticeModal() {
       })
       .catch(() => {});
     return () => { alive = false; };
-  }, []);
+  }, [isAdminPage]);
 
   // ESC 로 닫기 + 열려있는 동안 배경 스크롤 잠금
   useEffect(() => {
