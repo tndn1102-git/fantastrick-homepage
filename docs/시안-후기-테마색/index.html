@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>후기 카드 테마색 — 4개 나란히 보기</title>
+<style>
+  /* 실제 사이트와 같은 배경·색 토큰 (globals.css .site-dark 기준) */
+  :root{
+    --text:#eaf0ff; --muted:#b9c8ea; --faint:#8296c4;
+    --line:rgba(143,178,255,.16); --surface:rgba(255,255,255,.05);
+    --cyan:#8fb2ff; --r:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#062a80 0%,#05236c 45%,#041d57 100%);
+    color:var(--text);font-family:"Pretendard","Malgun Gothic",system-ui,sans-serif;line-height:1.6;min-height:100vh}
+  .wrap{max-width:1000px;margin:0 auto;padding:40px 20px 90px}
+  h1{font-size:26px;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:26px}
+
+  .note{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;margin-bottom:26px;font-size:13.5px;color:var(--muted)}
+  .note b{color:var(--text)}
+
+  /* ── 필터 칩 (실제와 동일) ── */
+  .filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+  .chip{min-height:40px;padding:9px 14px;border:1px solid var(--line);border-radius:999px;
+    background:rgba(255,255,255,.055);color:var(--text);font-size:13.5px;font-family:inherit;
+    display:inline-flex;align-items:center;gap:7px}
+  .chip::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--th);flex:none}
+  .chip.on{background:color-mix(in srgb,var(--th) 20%,transparent);
+    border-color:color-mix(in srgb,var(--th) 65%,transparent);color:var(--th);font-weight:700}
+
+  /* ── 후기 카드 (실제와 동일) ── */
+  .rev-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+  .rev-card{display:flex;flex-direction:column;gap:8px;text-align:left;
+    border:1px solid var(--line);border-left:4px solid var(--th);border-radius:var(--r);
+    background:color-mix(in srgb,var(--th) 7%,var(--surface));padding:15px 16px 15px 15px}
+  .rc-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .rc-theme{font-size:12px;color:var(--th);font-weight:800}
+  .rc-src{font-size:10.5px;font-weight:700;color:var(--faint);
+    border:1px solid color-mix(in srgb,var(--th) 30%,var(--line));border-radius:999px;padding:2px 8px;white-space:nowrap}
+  .rc-body{margin:0;font-size:13.5px;color:var(--muted);line-height:1.65;
+    display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+  .rc-foot{display:flex;align-items:baseline;justify-content:space-between;gap:8px;
+    margin-top:auto;padding-top:9px;border-top:1px solid var(--line)}
+  .rc-who{font-size:13px;font-weight:700;color:var(--text)}
+  .rc-date{font-size:11.5px;color:var(--faint)}
+  .rc-more{font-size:11.5px;font-weight:700;color:var(--th);opacity:.72}
+
+  /* ── 색값 표 ── */
+  table{width:100%;border-collapse:collapse;margin-top:34px;font-size:13.5px}
+  th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left}
+  th{color:var(--faint);font-size:12px;font-weight:700}
+  .sw{display:inline-block;width:16px;height:16px;border-radius:4px;vertical-align:-3px;margin-right:8px}
+  .ok{color:#7fe0a8;font-weight:700}
+
+  h2{font-size:17px;margin:38px 0 12px}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:560px}
+  @media(max-width:600px){.pair,.rev-cards{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>후기 카드 — 테마별 색</h1>
+  <p class="sub">실제 사이트와 같은 배경·크기로 그렸습니다. 지금 배포된 화면 그대로입니다.</p>
+
+  <div class="note">
+    ⚠️ <b>태초의 신부(파랑)</b>와 <b>시간의 영속성(하늘)</b>이 둘 다 파랑 계열이라 섞이기 쉬워서,
+    시간의 영속성을 <b>청록(터콰이즈) 쪽으로 밀었습니다.</b> 색상환에서 <b>39도</b> 떨어져 있어
+    나란히 놓아도 다른 색으로 읽힙니다. (30도만 넘어도 사람 눈은 다른 색으로 봅니다)
+  </div>
+
+  <div class="filters">
+    <span class="chip" style="--th:#8296c4">전체</span>
+    <span class="chip on" style="--th:#93B4FF">태초의 신부</span>
+    <span class="chip" style="--th:#C9A6F5">사자의 서</span>
+    <span class="chip" style="--th:#FFB27A">락다운시티</span>
+    <span class="chip" style="--th:#79DFE4">시간의 영속성</span>
+  </div>
+
+  <div class="rev-cards">
+    <div class="rev-card" style="--th:#93B4FF">
+      <div class="rc-top"><span class="rc-theme">태초의 신부</span><span class="rc-src">네이버 블로그</span></div>
+      <p class="rc-body">스토리가 정말 촘촘해서 마지막에 소름 돋았어요. 장치 퀄리티도 기대 이상이었고, 직원분 연출이 몰입감을 확 올려줬습니다.</p>
+      <div class="rc-foot"><span class="rc-who">밤샘탈출</span><span class="rc-date">2026.08.11 (화)</span></div>
+      <span class="rc-more">전문 보기 →</span>
+    </div>
+    <div class="rev-card" style="--th:#C9A6F5">
+      <div class="rc-top"><span class="rc-theme">사자의 서</span><span class="rc-src">네이버 블로그</span></div>
+      <p class="rc-body">이집트 테마 특유의 분위기가 압도적이었습니다. 방 전환될 때마다 탄성이 나왔어요. 난이도도 적당해서 초보랑 같이 가도 좋았습니다.</p>
+      <div class="rc-foot"><span class="rc-who">방탈러비</span><span class="rc-date">2026.08.10 (월)</span></div>
+      <span class="rc-more">전문 보기 →</span>
+    </div>
+    <div class="rev-card" style="--th:#FFB27A">
+      <div class="rc-top"><span class="rc-theme">락다운시티</span><span class="rc-src">네이버 블로그</span></div>
+      <p class="rc-body">군복 입고 진행하는 밀리터리 찐몰입! 메인과 서브 문제 밸런스 굿. 쫄 3명을 펄쩍 뛰게 만든 뜻밖의 공포도! 덕분에 몰입감 폭발</p>
+      <div class="rc-foot"><span class="rc-who">탈출하는개미</span><span class="rc-date">2026.08.09 (일)</span></div>
+      <span class="rc-more">전문 보기 →</span>
+    </div>
+    <div class="rev-card" style="--th:#79DFE4">
+      <div class="rc-top"><span class="rc-theme">시간의 영속성</span><span class="rc-src">네이버 블로그</span></div>
+      <p class="rc-body">머더미스터리 처음이었는데 배우처럼 몰입하게 되더라고요. 추리가 풀릴 때 쾌감이 엄청났습니다. 인생 테마로 남을 것 같아요.</p>
+      <div class="rc-foot"><span class="rc-who">추리덕후</span><span class="rc-date">2026.08.08 (토)</span></div>
+      <span class="rc-more">전문 보기 →</span>
+    </div>
+  </div>
+
+  <h2>가장 중요한 것 — 파랑 vs 하늘, 붙여서 보기</h2>
+  <div class="pair">
+    <div class="rev-card" style="--th:#93B4FF">
+      <div class="rc-top"><span class="rc-theme">태초의 신부</span></div>
+      <p class="rc-body">파랑(페리윙클) — 남색 배경보다 밝고 살짝 보랏빛이 도는 파랑</p>
+      <div class="rc-foot"><span class="rc-who">#93B4FF</span><span class="rc-date">222도</span></div>
+    </div>
+    <div class="rev-card" style="--th:#79DFE4">
+      <div class="rc-top"><span class="rc-theme">시간의 영속성</span></div>
+      <p class="rc-body">하늘·청록 — 초록이 섞인 물빛. 파랑과 헷갈리지 않습니다</p>
+      <div class="rc-foot"><span class="rc-who">#79DFE4</span><span class="rc-date">183도</span></div>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>테마</th><th>색</th><th>색값</th><th>배경 대비</th></tr>
+    <tr><td>태초의 신부</td><td><span class="sw" style="background:#93B4FF"></span>파랑</td><td>#93B4FF</td><td class="ok">6.19 : 1</td></tr>
+    <tr><td>사자의 서</td><td><span class="sw" style="background:#C9A6F5"></span>보라</td><td>#C9A6F5</td><td class="ok">6.21 : 1</td></tr>
+    <tr><td>락다운시티</td><td><span class="sw" style="background:#FFB27A"></span>주황</td><td>#FFB27A</td><td class="ok">7.21 : 1</td></tr>
+    <tr><td>시간의 영속성</td><td><span class="sw" style="background:#79DFE4"></span>하늘·청록</td><td>#79DFE4</td><td class="ok">8.17 : 1</td></tr>
+  </table>
+  <p class="sub" style="margin-top:10px">
+    ※ 대비는 글자가 배경 위에서 얼마나 잘 읽히는지입니다. 웹 기준은 4.5:1 이고 네 색 모두 넉넉히 넘깁니다.
+    햇빛 아래 폰에서도 읽힙니다.
+  </p>
+</div>
+</body>
+</html>
