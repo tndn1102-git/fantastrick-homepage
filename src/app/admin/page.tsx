@@ -2044,6 +2044,9 @@ function AlimtalkTab() {
   const [rows, setRows] = useState<TalkRow[]>([]);
   const [days, setDays] = useState(7);
   const [loaded, setLoaded] = useState(false); const [err, setErr] = useState("");
+  // 카톡 못 받은 손님 — 원래 [설정→문자 문구]에 있었는데 찾기 어려워서 이리로 옮김(2026-08-13 사장님).
+  const [missed, setMissed] = useState<MissedRow[]>([]);
+  const [msg, setMsg] = useState("");
 
   const load = useCallback(() => {
     setLoaded(false);
@@ -2051,8 +2054,20 @@ function AlimtalkTab() {
       if (j.error) { setErr(j.error); setLoaded(true); return; }
       setErr(""); setRows(j.items || []); setLoaded(true);
     }).catch(() => { setErr("불러오기 실패"); setLoaded(true); });
+    // 못 받은 명단은 우리 발송 기록에서 (NHN 조회와 별개라 실패해도 서로 안 얽힘)
+    fetch("/api/admin/sms").then((r) => r.json()).then((j) => setMissed(j.missed || [])).catch(() => {});
   }, [days]);
   useEffect(() => { load(); }, [load]);
+
+  // 직접 연락한 건을 명단에서 내린다 (기록은 지우지 않고 표시만)
+  async function markHandled(id: string) {
+    const res = await fetch("/api/admin/sms", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, action: "handled" }),
+    });
+    if (res.ok) { setMsg("연락함으로 표시했어요 ✅"); load(); }
+    else { const j = await res.json(); setMsg("⚠️ " + (j.error || "실패")); }
+  }
 
   const delivered = rows.filter((r) => r.state === "delivered").length;
   const failed = rows.filter((r) => r.state === "failed").length;
@@ -2065,6 +2080,37 @@ function AlimtalkTab() {
           ⚠️ &ldquo;읽었는지&rdquo;는 카카오가 어느 업체에도 제공하지 않아 확인이 불가능합니다 — <b>도착 확인이 가능한 전부</b>입니다.
         </span>
       </div>
+      {/* 카톡 못 받은 손님 — 알림톡이 실패한 분들. 발신번호 승인 전까지는 사장님이 직접 연락.
+          비어 있으면 아예 안 그린다. */}
+      {missed.length > 0 && (
+        <div className="admin-card" style={{ marginBottom: 16, borderColor: "#d9a441" }}>
+          <b style={{ color: "#b06f00" }}>📵 카톡 못 받은 손님 {missed.length}명 — 직접 연락해 주세요</b>
+          {missed.map((m) => {
+            const v = readBody(m.body);
+            return (
+              <div key={m.id} style={{ marginTop: 10, padding: "10px 12px", background: "var(--bg2)", border: "1px solid var(--line)", borderRadius: 9 }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "baseline" }}>
+                  <b style={{ fontSize: 15 }}>{v.name || "이름 확인 필요"}</b>
+                  <a href={`tel:${m.phone}`} style={{ fontWeight: 700, color: "var(--cyan)" }}>{formatPhone(m.phone)}</a>
+                  <span style={{ fontSize: 12.5, color: "var(--muted)" }}>{v.theme}{v.when ? ` · ${v.when}` : ""}</span>
+                  <span style={{ fontSize: 11.5, color: "var(--faint)" }}>{new Date(m.created_at).toLocaleString("ko-KR")} 실패</span>
+                </div>
+                <div className="admin-tools" style={{ marginTop: 8 }}>
+                  <button className="btn sm ghost" onClick={() => {
+                    navigator.clipboard?.writeText(m.body).then(
+                      () => setMsg("문구를 복사했어요 — 문자앱에 붙여넣으세요 📋"),
+                      () => setMsg("⚠️ 복사가 안 됐어요."),
+                    );
+                  }}>안내 문구 복사</button>
+                  <button className="btn primary sm" onClick={() => markHandled(m.id)}>연락함</button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {msg && <div className={msg.startsWith("⚠️") ? "msg-err" : "notice ok"} style={{ marginBottom: 12 }}>{msg}</div>}
+
       <div className="admin-tools" style={{ marginBottom: 12 }}>
         <select value={days} onChange={(e) => setDays(Number(e.target.value))}>
           <option value={1}>오늘</option><option value={7}>최근 7일</option><option value={30}>최근 30일</option>
@@ -2537,54 +2583,6 @@ function SmsTab() {
           : "⚠️ NHN Cloud 문자/알림톡 키가 아직 없어요. 지금은 발송 내역만 기록되고 실제 발송은 안 나가요. (가입·키 등록 시 자동 발송)"}
       </div>
 
-      {/* 카톡 못 받은 손님 — 문자 발신번호 심사가 끝날 때까지만 쓰는 화면.
-          승인되면 NHN 이 알아서 문자로 대신 보내주므로 이 명단은 저절로 비게 된다.
-          비어 있으면 아무것도 그리지 않는다 — 평소에 눈에 걸리적거릴 이유가 없다. */}
-      {missed.length > 0 && (
-        <div className="admin-card" style={{ marginBottom: 16, borderColor: "#d9a441" }}>
-          <b style={{ color: "#b06f00" }}>📵 카톡 못 받은 손님 {missed.length}명 — 직접 연락해 주세요</b>
-          <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 6, lineHeight: 1.6 }}>
-            카카오톡을 쓰지 않는 분들이라 알림톡이 도착하지 못했습니다.
-            문자 발신번호 심사가 끝나면 <b>자동으로 문자가 나가서 이 목록은 사라집니다.</b> 그때까지만 손이 필요합니다.
-          </div>
-          {missed.map((m) => {
-            const v = readBody(m.body);
-            return (
-              <div key={m.id} style={{ marginTop: 10, padding: "10px 12px", background: "var(--bg2)", border: "1px solid var(--line)", borderRadius: 9 }}>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "baseline" }}>
-                  <b style={{ fontSize: 15 }}>{v.name || "이름 확인 필요"}</b>
-                  <a href={`tel:${m.phone}`} style={{ fontWeight: 700, color: "var(--cyan)" }}>{formatPhone(m.phone)}</a>
-                  <span style={{ fontSize: 12.5, color: "var(--muted)" }}>{v.theme}{v.when ? ` · ${v.when}` : ""}</span>
-                </div>
-                <div style={{ fontSize: 11.5, color: "var(--faint)", marginTop: 3 }}>
-                  {new Date(m.created_at).toLocaleString("ko-KR")} 실패{m.error ? ` · ${m.error}` : ""}
-                </div>
-                <div className="admin-tools" style={{ marginTop: 8 }}>
-                  {/* 보낼 문구를 통째로 복사 — 사장님이 폰 문자앱에 붙여넣기만 하면 된다 */}
-                  <button className="btn sm ghost" onClick={() => {
-                    navigator.clipboard?.writeText(m.body).then(
-                      () => setMsg("문구를 복사했어요 — 문자앱에 붙여넣으세요 📋"),
-                      () => setMsg("⚠️ 복사가 안 됐어요. 아래 문구를 직접 긁어 복사해 주세요."),
-                    );
-                  }}>안내 문구 복사</button>
-                  <button className="btn primary sm" onClick={() => markHandled(m.id, true)}>연락함</button>
-                </div>
-                <details style={{ marginTop: 8 }}>
-                  <summary style={{ cursor: "pointer", fontSize: 12.5, color: "var(--muted)" }}>보낼 문구 보기</summary>
-                  <div style={{ whiteSpace: "pre-wrap", fontSize: 13, marginTop: 6, lineHeight: 1.7 }}>{m.body}</div>
-                </details>
-              </div>
-            );
-          })}
-        </div>
-      )}
-      <div className="notice info" style={{ marginBottom: 14 }}>
-        <b>테마별</b> 딱지가 붙은 문자는 <b>테마마다 문구가 따로</b>예요(기존 사이트와 동일).
-        예약대기는 테마마다 예약금이 다르고(3만·2.5만·12만·6.3만), 입금확정은 사자의 서만 인스타·길안내가 더 붙어요.
-        그래서 <b>테마를 고른 뒤 그 테마 문구만</b> 고칩니다. 한 번에 전부 바꾸는 기능은 일부러 없앴어요(예약금이 잘못 안내될 수 있어서).
-        <br />아직 저장한 적 없는 문구는 <b>기존 사이트 문구</b>가 그대로 나갑니다.
-      </div>
-
       {groups.map((g) => {
         // 테마별 종류는 공통 탭이 없으므로 항상 테마 하나가 선택돼 있다
         const cur = g.perTheme ? (pickTheme[g.type] || g.themes[0]?.id || "") : "";
@@ -2623,50 +2621,6 @@ function SmsTab() {
         );
       })}
       {msg && <div className={msg.startsWith("⚠️") ? "msg-err" : "notice ok"}>{msg}</div>}
-      <div className="admin-card">
-        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <b>발송 내역</b>
-          <span className="sp" />
-          {/* "저 문자 못 받았어요" 전화가 오면 이름·전화로 바로 찾는다 (예전엔 50건을 눈으로 훑어야 했음) */}
-          <input type="search" className="payer" style={{ width: 150 }} placeholder="이름·전화 검색"
-            value={logQ} onChange={(e) => setLogQ(e.target.value)} onKeyDown={(e) => e.key === "Enter" && load()} />
-          <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12.5, fontWeight: 400, cursor: "pointer" }}>
-            <input type="checkbox" checked={onlyFailed} onChange={(e) => setOnlyFailed(e.target.checked)} style={{ width: "auto", accentColor: "var(--brand)" }} />
-            실패·미발송만
-          </label>
-          <button className="btn sm" onClick={() => load()}>찾기</button>
-        </div>
-        <div style={{ marginTop: 8 }}>
-          {log.length === 0 ? <span style={{ color: "var(--muted)" }}>{logQ || onlyFailed ? "찾는 내역이 없어요." : "내역 없음"}</span> : log.map((l) => (
-            <div key={l.id} style={{ padding: "7px 0", borderTop: "1px solid var(--line)", fontSize: 12.5 }}>
-              <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-                <span style={{ color: l.status === "sent" ? "#137a4c" : l.status === "failed" ? "var(--danger)" : "var(--faint)", fontWeight: 700, minWidth: 54 }}>
-                  {l.status === "sent" ? "발송" : l.status === "failed" ? "실패" : "미발송"}
-                </span>
-                <span style={{ minWidth: 34, fontSize: 11, fontWeight: 700, color: l.channel === "alimtalk" ? "#3c1e1e" : "var(--faint)", background: l.channel === "alimtalk" ? "#fee500" : "var(--bg2)", borderRadius: 5, padding: "1px 6px" }}>
-                  {l.channel === "alimtalk" ? "카톡" : "문자"}
-                </span>
-                <Phone v={l.phone} />
-                <span style={{ color: "var(--faint)" }}>{formatStampShort(l.created_at)}</span>
-                {l.status !== "sent" && (
-                  <span className="rt">
-                    {isActiveSmsType(l.type) ? (
-                      <button className="btn sm ghost" disabled={resend === l.id} onClick={() => resendSms(l.id)}>
-                        {resend === l.id ? "보내는 중…" : <>다시 보내기</>}
-                      </button>
-                    ) : (
-                      // 이제 안 쓰는 종류(방문 전날 자동안내)의 옛 기록 — 눌러도 안 나가므로 버튼을 안 보여준다.
-                      <span style={{ color: "var(--faint)", fontSize: 11 }}>지금은 안 쓰는 안내</span>
-                    )}
-                  </span>
-                )}
-              </div>
-              {l.error && <div style={{ color: "var(--danger)", marginTop: 2, fontSize: 11.5 }}>{l.error}</div>}
-              <div style={{ color: "var(--muted)", whiteSpace: "pre-wrap", marginTop: 2 }}>{l.body}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+          </div>
   );
 }
