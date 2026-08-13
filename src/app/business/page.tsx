@@ -256,7 +256,7 @@ export default function BusinessPage() {
             <div className="ask reveal">매장을 새로 오픈하고 싶은데 어디서부터 문의를 해야할지 모르겠다.</div>
             <div className="ask reveal">장치가 작동을 안 하는데 어디로 문의해야 할지 모르겠다.</div>
             <div className="ask reveal">테마를 하나 더 만들거나 인테리어를 어디에서 상담해야할까?</div>
-            <div className="ask reveal">출퇴근 프로그램, 대타스케줄관리, 급여 계산, 홈페이지 등등 운영 프로그램을 도입하고 싶다.</div>
+            <div className="ask reveal">출퇴근 프로그램, 대타 스케줄 관리, 급여 계산,<br />홈페이지 등등 운영 프로그램을 도입하고 싶다.</div>
           </div>
         </section>
       </div>
