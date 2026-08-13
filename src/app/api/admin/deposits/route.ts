@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
 import { isAdmin } from "@/lib/admin";
 import { PATCH as adminPatch } from "@/app/api/admin/reservations/route";
+import { playStartMs, balanceReason } from "@/lib/bank/balance";
 
 /**
  * 관리자 [입출금 내역] — **통장(카톡) 기준** 목록.
@@ -101,9 +102,9 @@ export async function GET(req: NextRequest) {
     const dn = normalizeName(d.depositor_name);
     const matched = d.matched_reservation_id ? matchedMap.get(d.matched_reservation_id) ?? null : null;
 
-    // 이미 자동으로 붙은 건은 후보를 계산하지 않는다(볼 이유가 없다).
+    // 이미 자동으로 붙은 건(입금확인·현장 잔금)은 후보를 계산하지 않는다(볼 이유가 없다).
     let candidates: Array<ResRow & { why: string; strength: number }> = [];
-    if (d.status !== "approved" && d.status !== "parse_failed") {
+    if (d.status !== "approved" && d.status !== "balance" && d.status !== "parse_failed") {
       candidates = candidatesPool
         .map((r) => {
           const rn = normalizeName(r.name);
@@ -142,13 +143,28 @@ export async function GET(req: NextRequest) {
 
     const verdict =
       d.status === "approved" ? "ok"
-        : d.status === "parse_failed" ? "parse_failed"
-          : d.status === "dry_run" ? "dry_run"
-            : d.status === "failed" ? "failed"
-              : candidates.length ? "near"
-                : "none";
+        : d.status === "balance" ? "balance"
+          : d.status === "parse_failed" ? "parse_failed"
+            : d.status === "dry_run" ? "dry_run"
+              : d.status === "failed" ? "failed"
+                : candidates.length ? "near"
+                  : "none";
+
+    // 현장 잔금이면 "왜 그렇게 봤는지"를 문장으로. (예약 시각과 입금 시각의 거리)
+    let balanceWhy: string | null = null;
+    if (verdict === "balance" && matched) {
+      const gapMin = Math.round(
+        (playStartMs(matched.date, matched.time) - new Date(d.received_at).getTime()) / 60000,
+      );
+      balanceWhy = balanceReason({
+        reservation: { id: matched.id, name: matched.name, theme_name: matched.theme_name, date: matched.date, time: matched.time },
+        minutesToPlay: gapMin,
+        total: 1, // 여기서는 몇 건 중에 골랐는지 다시 세지 않는다(판단은 이미 끝났다)
+      });
+    }
 
     return {
+      balanceWhy,
       id: d.id,
       at: d.created_at,
       receivedAt: d.received_at,

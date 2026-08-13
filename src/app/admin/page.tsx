@@ -1801,6 +1801,7 @@ type DepRow = {
   id: string; at: string; depositorName: string; amount: number; rawText: string;
   status: string; errorMessage: string | null; verdict: string;
   matched: DepCand | null; candidates: DepCand[];
+  balanceWhy?: string | null;
 };
 
 /** why 문장의 **강조** 만 굵게. (설명이 길어 핵심이 안 보이면 읽히지 않는다) */
@@ -1810,6 +1811,8 @@ function Emph({ text }: { text: string }) {
 
 const V_LABEL: Record<string, { t: string; c: string }> = {
   ok: { t: "자동확정됨", c: "st-confirmed" },
+  // 예약금이 아니라 플레이 당일 현장에서 낸 나머지 금액. 손댈 것이 없다는 뜻이라 초록.
+  balance: { t: "현장 잔금", c: "st-confirmed" },
   near: { t: "보류 — 확인 필요", c: "st-pending" },
   none: { t: "맞는 예약 없음", c: "st-pending" },
   dry_run: { t: "연습모드(실제 처리 안 함)", c: "st-pending" },
@@ -1843,7 +1846,8 @@ function BankLedger({ from, to }: { from: string; to: string }) {
     load();
   }
 
-  const view = onlyIssue ? rows.filter((d) => d.verdict !== "ok") : rows;
+  // 손댈 것이 없는 건 = 자동확정 + 현장 잔금. 둘 다 "손이 필요한 것만 보기"에서 빠진다.
+  const view = onlyIssue ? rows.filter((d) => d.verdict !== "ok" && d.verdict !== "balance") : rows;
 
   return (
     <>
@@ -1890,6 +1894,7 @@ function BankLedger({ from, to }: { from: string; to: string }) {
                       {d.matched.theme_name} · {formatDate(d.matched.date)} {d.matched.time} · 예약금 {d.matched.deposit.toLocaleString()}원
                     </div>
                     {d.verdict === "ok" && <p className="dcmp-why">이 예약의 입금으로 처리됐습니다.</p>}
+                    {d.verdict === "balance" && d.balanceWhy && <p className="dcmp-why"><Emph text={d.balanceWhy} /></p>}
                     {d.verdict === "failed" && <p className="dcmp-why err">예약은 찾았지만 처리 중 오류가 났습니다: {d.errorMessage}</p>}
                   </>
                 ) : d.verdict === "parse_failed" ? (

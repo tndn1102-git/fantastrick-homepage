@@ -4,7 +4,9 @@ import { getSupabase, DB_NOT_CONFIGURED } from "@/lib/supabase";
 import { sweepExpiredReservations } from "@/lib/expire";
 import { parseDeposit, looksLikeBankNotice } from "@/lib/bank/parser";
 import { findMatch } from "@/lib/bank/matcher";
+import { findBalanceMatch, kstDatesAround, type ConfirmedRow, type BalanceMatch } from "@/lib/bank/balance";
 import type { Deposit, Reservation } from "@/lib/bank/types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { makeAdminToken, INTERNAL_HEADER } from "@/lib/admin";
 import { PATCH as adminPatch } from "@/app/api/admin/reservations/route";
 
@@ -36,6 +38,29 @@ function jsonError(status: number, error: string, extra: Record<string, unknown>
 /** 같은 알림인지 판별하는 지문. 태블릿이 재전송해도 같은 값이 나온다. */
 function deriveEventId(rawText: string, receivedAt: number): string {
   return createHash("sha256").update(`${receivedAt}|${rawText}`).digest("hex").slice(0, 32);
+}
+
+/**
+ * 현장 잔금 찾기 — 확정된 예약 중 플레이 시각이 입금 시각 앞뒤 1시간인 동명 예약.
+ * 어제·오늘·내일(한국 날짜)만 훑으므로 표를 통째로 읽지 않는다.
+ * 조회가 실패해도 던지지 않는다 — 이건 "덤"이라 실패하면 원래대로 no_match 로 가면 된다.
+ */
+async function findBalance(
+  db: SupabaseClient,
+  depositorName: string,
+  receivedAt: number,
+): Promise<BalanceMatch | null> {
+  try {
+    const { data, error } = await db
+      .from("reservations")
+      .select("id, name, theme_name, date, time")
+      .eq("status", "confirmed")
+      .in("date", kstDatesAround(receivedAt));
+    if (error || !data) return null;
+    return findBalanceMatch(depositorName, receivedAt, data as ConfirmedRow[]);
+  } catch {
+    return null;
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -167,6 +192,20 @@ export async function POST(req: NextRequest) {
 
   const match = findMatch(deposit, candidates);
   if (!match) {
+    // ── 4-b) 예약금이 아니라 **현장 잔금**인가? ────────────────────
+    //   기다리는 예약 중엔 없다. 그렇다면 이미 확정된 손님이 플레이하러 와서
+    //   나머지 금액을 보낸 것일 수 있다 — 플레이 시각 앞뒤 1시간이면 그렇게 본다.
+    //   ⚠️ 예약은 건드리지 않는다. 딱지만 붙여 "손댈 것 없음"으로 넘긴다.
+    const bal = await findBalance(db, depositorName, receivedAt);
+    if (bal) {
+      await finish({ status: "balance", matched_reservation_id: bal.reservation.id });
+      console.log(`[입금] 현장 잔금으로 판단: ${depositorName} ${amount}원 → ${bal.reservation.theme_name} ${bal.reservation.date} ${bal.reservation.time} (${bal.minutesToPlay}분 전)`);
+      return NextResponse.json({
+        ok: true, decision: "balance", id: depositId,
+        reservation_id: bal.reservation.id, minutesToPlay: bal.minutesToPlay,
+      });
+    }
+
     await finish({ status: "no_match" });
     console.log(`[입금] 매칭 실패: ${depositorName} ${amount}원 (대기 ${candidates.length}건)`);
     return NextResponse.json({ ok: true, decision: "no_match", id: depositId, pending: candidates.length });
