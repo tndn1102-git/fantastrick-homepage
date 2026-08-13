@@ -3,24 +3,7 @@ import { useMemo, useState } from "react";
 import { THEMES } from "@/lib/data";
 import { formatDate } from "@/lib/util";
 import type { Review } from "./types";
-import { IconStar, IconCheck, IconWarn } from "@/components/Icon";
-
-function Stars({ n, onPick }: { n: number; onPick?: (v: number) => void }) {
-  return (
-    <span className="stars">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <span
-          key={i}
-          className={"star" + (i <= n ? " on" : "")}
-          onClick={onPick ? () => onPick(i) : undefined}
-          style={{ cursor: onPick ? "pointer" : "default" }}
-        >
-          <IconStar />
-        </span>
-      ))}
-    </span>
-  );
-}
+import { IconCheck, IconWarn } from "@/components/Icon";
 
 // 후기 목록은 **서버가 미리 그려서** initialReviews 로 넘겨준다(화면 튐 방지 — page.tsx 설명 참고).
 // 그래서 여기서는 처음에 불러오지 않고, 후기를 새로 쓴 뒤에만 다시 불러온다.
@@ -33,7 +16,6 @@ export default function ReviewsClient({ initialReviews }: { initialReviews: Revi
   const [themeId, setThemeId] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [rating, setRating] = useState(0);
   const [body, setBody] = useState("");
   const [err, setErr] = useState("");
   const [ok, setOk] = useState(false);
@@ -62,20 +44,19 @@ export default function ReviewsClient({ initialReviews }: { initialReviews: Revi
     if (!themeId) return setErr("테마를 선택해 주세요.");
     if (!name.trim()) return setErr("이름(닉네임)을 입력해 주세요.");
     if (!phone.trim()) return setErr("전화번호를 입력해 주세요.");
-    if (rating < 1) return setErr("별점을 선택해 주세요.");
     if (body.trim().length < 5) return setErr("후기를 5자 이상 입력해 주세요.");
     setLoading(true);
     try {
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ themeId, name, phone, rating, body }),
+        body: JSON.stringify({ themeId, name, phone, body }),
       });
       const j = await res.json();
       if (!res.ok) { setErr(j.error || "등록에 실패했습니다."); }
       else {
         setOk(true);
-        setName(""); setPhone(""); setRating(0); setBody(""); setThemeId("");
+        setName(""); setPhone(""); setBody(""); setThemeId("");
         reload();
         setTimeout(() => setShowForm(false), 2600);
       }
@@ -119,10 +100,6 @@ export default function ReviewsClient({ initialReviews }: { initialReviews: Revi
               <label htmlFor="rw-phone">전화번호 (예약 확인용)</label>
               <input id="rw-phone" type="tel" value={phone} placeholder="010-1234-5678" onChange={(e) => setPhone(e.target.value)} />
             </div>
-          </div>
-          <div className="field">
-            <label>별점</label>
-            <Stars n={rating} onPick={setRating} />
           </div>
           <div className="field">
             <label htmlFor="rw-body">후기</label>
@@ -185,17 +162,9 @@ export default function ReviewsClient({ initialReviews }: { initialReviews: Revi
                 ) : null}
               </div>
               <div className="rev-h">
+                {/* 🔴 2026-08-13 별점 폐지(사장님 지시) — 이 자리에 있던 별 다섯 개를 뺐다.
+                    옛 후기에 남아 있는 rating 값도 화면에 절대 쓰지 않는다. */}
                 <span className="who">{r.name} <span style={{ color: "var(--faint)", fontWeight: 400, fontSize: 12 }}>{r.phone}</span></span>
-                {/* 별점이 없는 후기(블로그에서 옮겨온 것)는 별을 그리지 않는다.
-                    0점짜리 빈 별 다섯 개가 뜨면 "형편없다"는 뜻으로 읽힌다 — 없는 것과 나쁜 것은 다르다. */}
-                {typeof r.rating === "number" && r.rating > 0 ? (
-                  <span className="rev-stars" aria-label={`5점 만점에 ${r.rating}점`}>
-                    <span aria-hidden="true">
-                      {Array.from({ length: r.rating }, (_, i) => <IconStar key={i} />)}
-                      <span style={{ color: "var(--faint)" }}>{Array.from({ length: 5 - r.rating }, (_, i) => <IconStar key={i} />)}</span>
-                    </span>
-                  </span>
-                ) : null}
               </div>
               <div className="rev-body">{r.body}</div>
               <div className="date" style={{ fontSize: 12, color: "var(--faint)", marginTop: 8 }}>{formatDate(r.created_at.slice(0, 10))}</div>

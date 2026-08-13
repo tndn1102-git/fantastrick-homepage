@@ -5,7 +5,7 @@ import { sanitizeText } from "@/lib/util";
 import { themeById } from "@/lib/data";
 import { fetchBlogReview } from "@/lib/blog-review";
 
-const COLS = "id, theme_id, theme_name, name, phone, rating, body, source, source_url, status, created_at";
+const COLS = "id, theme_id, theme_name, name, phone, body, source, source_url, status, created_at";
 
 // 리뷰 목록 (관리자) — ?status=pending|approved|all (기본 pending)
 export async function GET(req: NextRequest) {
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
   /* 블로그 주소 하나로 후기 등록 — **주소만 넣으면 나머지는 전부 자동이다.**
      preview: true 면 읽어보기만 하고 저장하지 않는다(화면에서 확인용).
 
-     ⚠️ 별점은 넣지 않는다(null). 블로그 글에는 별점이 없고, 없는 점수를 지어내면 손님을 속이는 것이다.
+     ⚠️ 별점 제도 자체가 없어졌다(2026-08-13). rating 칸은 옛 자료 때문에 남아 있을 뿐 쓰지 않는다.
      ⚠️ 전문이 아니라 발췌만 담는다. 원문 링크가 함께 가므로 읽고 싶은 사람은 원글로 간다. */
   if (action === "import") {
     const url = String(body.url || "").trim();
@@ -79,7 +79,6 @@ const consentNote = sanitizeText(String(body.consentNote || "")) || "사장님�
       theme_name: theme.name,
       name: draft.author,
       phone: null,
-      rating: null,                       // 블로그 후기는 별점 없음
       body: draft.excerpt,
       status: "approved",
       source: "네이버 블로그",
@@ -108,7 +107,6 @@ const consentNote = sanitizeText(String(body.consentNote || "")) || "사장님�
   if (action === "add") {
     const themeId = String(body.themeId || "");
     const name = sanitizeText(String(body.name || ""));
-    const rating = Number(body.rating || 0);
     const text = sanitizeText(String(body.body || ""));
     const source = sanitizeText(String(body.source || "")) || "외부";
 
@@ -117,7 +115,6 @@ const consentNote = sanitizeText(String(body.consentNote || "")) || "사장님�
     if (!name) return NextResponse.json({ error: "이름(닉네임)을 입력해 주세요." }, { status: 400 });
     if (name.length > 40) return NextResponse.json({ error: "이름이 너무 깁니다." }, { status: 400 });
     if (source.length > 20) return NextResponse.json({ error: "출처가 너무 깁니다." }, { status: 400 });
-    if (!(rating >= 1 && rating <= 5)) return NextResponse.json({ error: "별점을 선택해 주세요." }, { status: 400 });
     if (text.length < 5) return NextResponse.json({ error: "후기를 5자 이상 입력해 주세요." }, { status: 400 });
     if (text.length > 1000) return NextResponse.json({ error: "후기는 1000자 이내로 입력해 주세요." }, { status: 400 });
 
@@ -126,7 +123,6 @@ const consentNote = sanitizeText(String(body.consentNote || "")) || "사장님�
       theme_name: theme.name,
       name,
       phone: "", // 외부 후기는 전화번호 없음
-      rating,
       body: text,
       status: "approved", // 관리자 등록은 즉시 게시
       source,

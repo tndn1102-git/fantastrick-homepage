@@ -449,7 +449,6 @@ header.over-hero .btn.ghost:hover{background:rgba(255,255,255,.12)}
 /* 매장·후기 카드 = 유리(글라스) 패널 */
 .site-dark .store{background:rgba(255,255,255,.05)}
 .site-dark .store:hover{border-color:rgba(143,178,255,.5)}
-.site-dark .rev-summary .s-stars,.site-dark .rev-quote .rq-stars{color:#e7b85c}
 .site-dark .rev-quote .rq-mark{color:rgba(143,178,255,.34)}
 /* 준비중 테마 썸네일 다크 */
 .site-dark .tcard.soon .thumb{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02))}
@@ -699,8 +698,7 @@ header.over-hero .btn.ghost:hover{background:rgba(255,255,255,.12)}
 .rev-summary{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:32px;padding-bottom:22px;border-bottom:1px solid var(--line)}
 .rev-summary .rs-score{display:flex;align-items:baseline;gap:10px}
 .rev-summary .score{font-family:"Bodoni Moda","Pretendard Variable","Pretendard",serif;font-size:clamp(52px,7vw,84px);font-weight:600;line-height:.9;color:var(--text);font-feature-settings:"tnum"}
-.rev-summary .of{color:var(--faint);font-size:15px;font-weight:600}
-.rev-summary .s-stars{color:#b06f00;font-size:18px;letter-spacing:3px;align-self:center}
+.rev-summary .of{color:var(--muted);font-size:17px;font-weight:700}
 .rev-summary .rs-meta{text-align:right}
 .rev-summary .s-src{color:var(--muted);font-size:13px;margin-bottom:6px}
 .tlink{color:var(--cyan);font-size:13.5px;font-weight:600;text-decoration:none;transition:.2s;white-space:nowrap}
@@ -711,7 +709,6 @@ header.over-hero .btn.ghost:hover{background:rgba(255,255,255,.12)}
 .rev-quote{position:relative;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:26px 24px 20px;transition:.25s}
 .rev-quote:hover{border-color:rgba(47,111,224,.4);transform:translateY(-3px);box-shadow:0 16px 40px rgba(20,22,42,.12)}
 .rev-quote .rq-mark{font-family:"Bodoni Moda",serif;font-size:44px;line-height:0;color:rgba(47,111,224,.22);height:16px}
-.rev-quote .rq-stars{position:absolute;top:22px;right:22px;color:#b06f00;font-size:12px;letter-spacing:1px}
 .rev-quote .rq-body{font-size:14.5px;color:var(--text);line-height:1.7;margin:10px 0 16px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .rev-quote .rq-foot{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--line)}
 .rev-quote .rq-theme{font-size:11.5px;color:var(--cyan);font-weight:600}
@@ -956,11 +953,6 @@ footer ul li{padding:3px 0}
 .notice.warn{background:rgba(198,40,52,.07);border:1px solid rgba(198,40,52,.28);color:#9a1f28}
 .notice.ok{background:rgba(31,157,99,.08);border:1px solid rgba(31,157,99,.3);color:#146c46}
 .msg-err{color:var(--danger);font-size:13px;margin-top:10px}
-.stars{display:inline-flex;gap:4px;font-size:26px;cursor:pointer}
-.star{color:var(--faint);transition:.1s}
-/* 별색 #e0930c → #b06f00 (2026-07-17). 전 색은 흰 배경에서 대비 2.32 라 흐린 화면·햇빛 아래서
-   별이 몇 개인지 구분이 안 됐다. 지금 3.79 로 그림 기준(3:1)을 넘긴다. 점수는 숫자·읽어주기로도 알린다. */
-.star.on{color:#b06f00}
 .rev-list{display:grid;gap:14px;margin-top:8px}
 .rev{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:16px 18px}
 .rev .rev-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
@@ -975,7 +967,6 @@ footer ul li{padding:3px 0}
 /* pre-line — 원문의 줄바꿈을 살린다. 블로그에서 옮겨온 후기는 문단이 나뉘어 있는데,
    그냥 두면 전부 한 덩어리로 붙어 읽기 어렵다(연속 공백은 접어서 들여쓰기 사고는 막는다). */
 .rev .rev-body{font-size:14px;color:var(--muted);line-height:1.6;white-space:pre-line}
-.rev .rev-stars{color:#b06f00;font-size:14px;letter-spacing:1px}
 .subtab{display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid var(--line)}
 .subtab a{padding:10px 4px;font-size:14px;font-weight:700;color:var(--muted);border-bottom:2px solid transparent;margin-right:14px}
 .subtab a.on{color:var(--cyan);border-bottom-color:var(--cyan)}

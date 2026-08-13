@@ -2048,7 +2048,7 @@ function NoticeTab() {
 /* ============ 리뷰 탭 ============ */
 type AdminReview = {
   id: string; theme_id: string; theme_name: string; name: string; phone: string;
-  rating: number | null; body: string; source: string | null; status: string; created_at: string;
+  body: string; source: string | null; status: string; created_at: string;
   source_url?: string | null;
 };
 const REV_ST_LABEL: Record<string, string> = { pending: "대기", approved: "게시", rejected: "거부" };
@@ -2090,10 +2090,6 @@ function ReviewsAdminTab() {
           <div key={r.id} className="rrow open">
             <div className="head" style={{ cursor: "default" }}>
               <span className="tname">{r.theme_name}</span>
-              {/* --gold 는 보라(--violet)라 관리자 별만 보라였음 → 손님 후기 화면과 같은 #e0930c 로 통일 */}
-              {typeof r.rating === "number" && r.rating > 0
-                ? <span className="rev-stars" style={{ color: "#b06f00", fontWeight: 700 }}>{r.rating}/5</span>
-                : <span className="src-tag">별점 없음</span>}
               {r.source_url && <a href={r.source_url} target="_blank" rel="nofollow noopener noreferrer" className="src-tag" title="원문 보기">원문 ↗</a>}
               <span className="who">{r.name}{r.phone ? ` · ${formatPhone(r.phone)}` : ""}</span>
               {r.source && <span className="src-tag">{r.source}</span>}
@@ -2261,7 +2257,7 @@ function ReviewImport({ onDone }: { onDone: () => void }) {
     <div className="admin-card">
       <b>네이버 블로그 후기 옮기기 (주소만 붙여넣으면 끝)</b>
       <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 6, lineHeight: 1.6 }}>
-        별점은 넣지 않습니다(블로그에 별점이 없습니다). 전문이 아니라 <b>발췌 + 원문 링크</b>로 실립니다.
+        전문이 아니라 <b>발췌 + 원문 링크</b>로 실립니다.
         <br />⚠️ <b>작성자 동의를 받은 글만</b> 올려주세요. 동의 경로와 시각이 기록으로 남습니다.
       </div>
       <div className="admin-tools" style={{ marginTop: 12, marginBottom: 8 }}>
@@ -2300,14 +2296,14 @@ function ReviewImport({ onDone }: { onDone: () => void }) {
 
 function ReviewAdd({ onDone }: { onDone: () => void }) {
   const [themeId, setThemeId] = useState(THEMES[0].id);
-  const [name, setName] = useState(""); const [rating, setRating] = useState(5);
+  const [name, setName] = useState("");
   const [body, setBody] = useState(""); const [source, setSource] = useState("네이버");
   const [err, setErr] = useState(""); const [msg, setMsg] = useState(""); const [busy, setBusy] = useState(false);
   async function submit() {
     setErr(""); setMsg(""); setBusy(true);
-    const res = await fetch("/api/admin/reviews", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "add", themeId, name, rating, body, source }) });
+    const res = await fetch("/api/admin/reviews", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "add", themeId, name, body, source }) });
     setBusy(false);
-    if (res.ok) { setName(""); setBody(""); setRating(5); setMsg("등록되었습니다 ✅ (즉시 게시)"); onDone(); }
+    if (res.ok) { setName(""); setBody(""); setMsg("등록되었습니다 ✅ (즉시 게시)"); onDone(); }
     else { const j = await res.json(); setErr(j.error || "등록 실패"); }
   }
   return (
@@ -2316,7 +2312,6 @@ function ReviewAdd({ onDone }: { onDone: () => void }) {
       <div className="admin-tools" style={{ marginTop: 12, marginBottom: 8 }}>
         <select value={themeId} onChange={(e) => setThemeId(e.target.value)}>{THEMES.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.storeTag})</option>)}</select>
         <input type="text" placeholder="닉네임" value={name} onChange={(e) => setName(e.target.value)} />
-        <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>{[5, 4, 3, 2, 1].map((n) => <option key={n} value={n}>{"★".repeat(n)} ({n})</option>)}</select>
         <input type="text" placeholder="출처 (네이버/구글/직접)" value={source} onChange={(e) => setSource(e.target.value)} list="rev-src" />
         <datalist id="rev-src"><option value="네이버" /><option value="구글" /><option value="직접" /></datalist>
       </div>

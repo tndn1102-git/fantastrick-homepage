@@ -3,13 +3,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { STORES, THEMES, SOON_THEMES, type Theme } from "@/lib/data";
-import { IconStar } from "@/components/Icon";
 import HeroWeb from "@/components/HeroWeb";
 import CircuitFlow from "@/components/CircuitFlow";
 
 // 홈 노출용 후기 타입 (승인된 실제 후기를 API에서 가져옴)
 type HomeReview = {
-  id: string; theme_name: string; name: string; rating: number; body: string; source?: string | null;
+  id: string; theme_name: string; name: string; body: string; source?: string | null;
 };
 
 function Locks({ n }: { n: number }) {
@@ -213,8 +212,10 @@ export default function Home() {
   useEffect(() => {
     fetch("/api/reviews").then((r) => r.json()).then((j) => setReviews(j.reviews || [])).catch(() => setReviews([]));
   }, []);
-  const revAvg = reviews && reviews.length ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1) : null;
-  const topReviews = (reviews || []).slice().sort((a, b) => b.rating - a.rating).slice(0, 3);
+  // 🔴 2026-08-13 별점 폐지(사장님 지시). 평균 점수·별 표시 없음.
+  //    고를 기준이 없어졌으므로 **최신 3건**을 보여준다(전에는 별점 높은 순).
+  const hasReviews = !!reviews && reviews.length > 0;
+  const topReviews = (reviews || []).slice(0, 3);
 
   // 스크롤 등장 애니메이션
   // 🔴 deps 에 reviews 가 반드시 있어야 한다.
@@ -312,18 +313,20 @@ export default function Home() {
         </div>
       </section>
 
-      {/* REVIEWS — 별점 요약 + 대표 후기 발췌 */}
+      {/* REVIEWS — 후기 건수 + 최신 후기 발췌 (별점 없음) */}
       <section className="block" id="reviews">
         <CircuitFlow />
         <div className="wrap">
           <div className="shead reveal">
             <h2 className="title">후기 · Reviews</h2>
           </div>
+          {/* 별점을 없앤 뒤로 "4.8 / 5.0" 자리가 비었다. 빈 칸을 그대로 두면 어색하므로
+              후기 건수를 그 자리에 크게 놓는다 — 숫자로 신뢰를 주는 역할은 그대로 하되,
+              우리가 매기지 않은 점수를 내세우지는 않는다. */}
           <div className="rev-summary reveal rv-left">
             <div className="rs-score">
-              <span className="score">{revAvg ?? "—"}</span>
-              <span className="of">/ 5.0</span>
-              <div className="s-stars" aria-hidden="true">{Array.from({ length: 5 }, (_, i) => <IconStar key={i} />)}</div>
+              <span className="score">{hasReviews ? reviews!.length : "—"}</span>
+              <span className="of">건의 후기</span>
             </div>
             <div className="rs-meta">
               <div className="s-src">
@@ -331,8 +334,8 @@ export default function Home() {
                     바로 아래 목록은 "불러오는 중…"이라고 말하고 있어서 서로 모순이었다. */}
                 {reviews === null
                   ? "후기를 불러오는 중…"
-                  : revAvg
-                    ? `플레이어 후기 · ${reviews.length}건`
+                  : hasReviews
+                    ? "직접 플레이하신 분들이 남겨주신 이야기입니다"
                     : "첫 후기를 기다리고 있어요"}
               </div>
             </div>
@@ -343,7 +346,6 @@ export default function Home() {
                 {topReviews.map((r, i) => (
                   <div key={r.id} className="rev-quote reveal" style={{ "--i": i } as CSSProperties}>
                     <div className="rq-mark" aria-hidden="true">“</div>
-                    <div className="rq-stars" aria-label={`별점 ${r.rating}점`}>{Array.from({ length: r.rating }, (_, i) => <IconStar key={i} />)}</div>
                     <p className="rq-body">{r.body}</p>
                     <div className="rq-foot">
                       <span className="rq-theme">{r.theme_name}</span>

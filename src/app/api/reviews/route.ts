@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   const theme = req.nextUrl.searchParams.get("theme");
   let q = db
     .from("reviews")
-    .select("id, theme_id, theme_name, name, phone, rating, body, source, source_url, created_at")
+    .select("id, theme_id, theme_name, name, phone, body, source, source_url, created_at")
     .eq("status", "approved") // 승인된 후기만 공개
     .order("created_at", { ascending: false })
     .limit(100);
@@ -50,7 +50,6 @@ export async function POST(req: NextRequest) {
   const themeId = String(body.themeId || "");
   const name = sanitizeText(String(body.name || ""));
   const phone = normalizePhone(String(body.phone || ""));
-  const rating = Number(body.rating || 0);
   const text = sanitizeText(String(body.body || ""));
 
   const theme = themeById(themeId);
@@ -58,7 +57,6 @@ export async function POST(req: NextRequest) {
   if (!name) return NextResponse.json({ error: "이름(닉네임)을 입력해 주세요." }, { status: 400 });
   if (name.length > 40) return NextResponse.json({ error: "이름이 너무 깁니다." }, { status: 400 });
   if (!isValidPhone(phone)) return NextResponse.json({ error: "전화번호 형식을 확인해 주세요." }, { status: 400 });
-  if (!(rating >= 1 && rating <= 5)) return NextResponse.json({ error: "별점을 선택해 주세요." }, { status: 400 });
   if (text.length < 5) return NextResponse.json({ error: "후기를 5자 이상 입력해 주세요." }, { status: 400 });
   if (text.length > 1000) return NextResponse.json({ error: "후기는 1000자 이내로 입력해 주세요." }, { status: 400 });
 
@@ -81,7 +79,7 @@ export async function POST(req: NextRequest) {
     theme_name: theme.name,
     name,
     phone,
-    rating,
+    // 🔴 별점 폐지(2026-08-13) — rating 은 안 넣는다. 칸은 옛 자료 때문에 남아 있을 뿐.
     body: text,
     status: "pending", // 작성 즉시 대기 — 관리자 승인 후 공개
     source: "자체",
