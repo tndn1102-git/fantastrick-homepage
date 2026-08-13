@@ -17,6 +17,15 @@ const nextConfig: NextConfig = {
   //   ⚠️ 이 줄을 지우면 이미 설치된 앱이 입금 알림을 못 보낸다 — 앱을 새로 깔기 전엔 지우지 말 것.
   async rewrites() {
     return [
+      /* ─── 락다운시티 힌트폰 살리기 (2026-08-13 도메인 이전 직후) ───
+         매장 태블릿은 http://fantastrick.co.kr/hint-phone/ 에서 앱을 받는다(원격 재설정 불가).
+         도메인이 새 홈페이지로 오면서 이 경로가 사라졌으므로, 옛 가비아 서버로 그대로 통과시킨다.
+         old.fantastrick.co.kr = 옛 서버 뒷문(A 211.47.74.37, 이전 때 만들어 둠).
+         ⚠️ 이 앱은 매장 내부 ws:// 웹소켓을 쓴다 — 페이지가 https 로 열리면 브라우저가
+            비보안 웹소켓을 차단해서 죽는다. 그래서 "항상 https"(always_use_https)를 꺼 두었다.
+            힌트폰을 다른 곳으로 옮기기 전에는 다시 켜지 말 것. */
+      { source: "/hint-phone", destination: "http://old.fantastrick.co.kr/hint-phone/index.html" },
+      { source: "/hint-phone/:path*", destination: "http://old.fantastrick.co.kr/hint-phone/:path*" },
       { source: "/webhook/deposit", destination: "/api/bank/deposit" },
       // 앱이 보내는 진단 기록(감시 서비스 생존·화면 읽기 결과)도 같은 방식으로 받는다.
       { source: "/webhook/diag", destination: "/api/bank/diag" },
