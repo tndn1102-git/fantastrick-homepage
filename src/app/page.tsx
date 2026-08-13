@@ -2,13 +2,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
-import { STORES, THEMES, SOON_THEMES, type Theme } from "@/lib/data";
+import { STORES, THEMES, SOON_THEMES, themeColor, type Theme } from "@/lib/data";
 import HeroWeb from "@/components/HeroWeb";
 import CircuitFlow from "@/components/CircuitFlow";
 
 // 홈 노출용 후기 타입 (승인된 실제 후기를 API에서 가져옴)
 type HomeReview = {
-  id: string; theme_name: string; name: string; body: string; source?: string | null;
+  id: string; theme_id: string; theme_name: string; name: string; body: string; source?: string | null;
 };
 
 function Locks({ n }: { n: number }) {
@@ -344,7 +344,7 @@ export default function Home() {
             <>
               <div className="rev-grid">
                 {topReviews.map((r, i) => (
-                  <div key={r.id} className="rev-quote reveal" style={{ "--i": i } as CSSProperties}>
+                  <div key={r.id} className="rev-quote reveal" style={{ "--i": i, "--th": themeColor(r.theme_id) } as CSSProperties}>
                     <div className="rq-mark" aria-hidden="true">“</div>
                     <p className="rq-body">{r.body}</p>
                     <div className="rq-foot">

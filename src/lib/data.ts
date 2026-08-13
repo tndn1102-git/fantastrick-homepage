@@ -34,6 +34,15 @@ export type Theme = {
   soon?: boolean;
   soonGenres?: string[];
   deposit: number; // 테마 고정 예약금(원) — 인원과 무관
+  /**
+   * 테마 상징색(파스텔). 후기 카드·칩처럼 "어느 테마 이야기인지"를 색으로 알려야 하는 곳에 쓴다.
+   *
+   * ⚠️ 어두운 남색 배경(.site-dark) 위에 얹히므로 **밝은 파스텔**이어야 글자가 읽힌다.
+   * ⚠️ 태초의 신부(파랑)와 시간의 영속성(하늘)이 같은 파랑 계열이라 붙어 있으면 구분이 안 된다.
+   *    → 시간의 영속성을 **청록(터콰이즈) 쪽으로 밀어** 색상환에서 40도 가까이 떼어놨다.
+   *      "하늘색"의 느낌은 살리되 파랑과는 확실히 갈라진다. (2026-08-13 사장님 요청)
+   */
+  color: string;
 };
 
 export const STORES: Store[] = [
@@ -79,6 +88,7 @@ export const THEMES: Theme[] = [
     genres: ["잠입", "SF 판타지"],
     cat: "s1",
     deposit: 30000,
+    color: "#93B4FF", // 파랑 (페리윙클)
   },
   {
     id: "bookofduat",
@@ -91,6 +101,7 @@ export const THEMES: Theme[] = [
     genres: ["잠입", "SF 판타지"],
     cat: "s2",
     deposit: 25000,
+    color: "#C9A6F5", // 보라 (라일락)
   },
   {
     id: "ldc",
@@ -103,6 +114,7 @@ export const THEMES: Theme[] = [
     genres: ["액션", "SF", "이머시브", "재난"],
     cat: "s3",
     deposit: 120000,
+    color: "#FFB27A", // 주황 (살구)
   },
   {
     id: "time",
@@ -116,6 +128,7 @@ export const THEMES: Theme[] = [
     murder: true,
     cat: "s3 murder",
     deposit: 63000,
+    color: "#79DFE4", // 하늘·청록 (파랑과 확실히 갈라지도록 청록 쪽으로)
   },
 ];
 
@@ -133,6 +146,7 @@ export const SOON_THEMES: Theme[] = [
     cat: "s3",
     soon: true,
     deposit: 0,
+    color: "#8C93A8", // 준비중 — 회색
   },
   {
     id: "soon-unknown",
@@ -146,6 +160,7 @@ export const SOON_THEMES: Theme[] = [
     cat: "s3",
     soon: true,
     deposit: 0,
+    color: "#8C93A8", // 준비중 — 회색(색을 주면 아직 없는 테마가 튄다)
   },
 ];
 
@@ -275,4 +290,13 @@ export const DEPOSIT_PER_PERSON = 10000;
 
 export function themeById(id: string): Theme | undefined {
   return [...THEMES, ...SOON_THEMES].find((t) => t.id === id);
+}
+
+/**
+ * 테마 상징색 — 모르는 테마 id 면 회색.
+ * (기존 사이트에서 넘어온 옛 후기처럼 지금 목록에 없는 테마가 섞일 수 있다.
+ *  그럴 때 색이 없어 CSS 가 깨지면 카드가 통째로 이상해지므로 항상 값을 돌려준다.)
+ */
+export function themeColor(id: string | null | undefined): string {
+  return (id && themeById(id)?.color) || "#8C93A8";
 }

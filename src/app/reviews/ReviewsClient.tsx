@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
-import { THEMES } from "@/lib/data";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { THEMES, themeColor } from "@/lib/data";
 import { formatDate } from "@/lib/util";
 import type { Review } from "./types";
 
@@ -44,7 +44,8 @@ export default function ReviewsClient({ initialReviews }: { initialReviews: Revi
         {THEMES.map((t) => (
           <button
             key={t.id}
-            className={"chip" + (filter === t.id ? " on" : "")}
+            className={"chip chip-th" + (filter === t.id ? " on" : "")}
+            style={{ "--th": t.color } as CSSProperties}
             aria-pressed={filter === t.id}
             onClick={() => setFilter(t.id)}
           >
@@ -68,6 +69,7 @@ export default function ReviewsClient({ initialReviews }: { initialReviews: Revi
         <div className="rev-cards">
           {shown.map((r) => (
             <button key={r.id} type="button" className="rev-card" onClick={() => setOpen(r)}
+                    style={{ "--th": themeColor(r.theme_id) } as CSSProperties}
                     aria-label={`${r.name}님의 ${r.theme_name} 후기 전문 보기`}>
               <div className="rc-top">
                 <span className="rc-theme">{r.theme_name}</span>
@@ -106,7 +108,7 @@ function ReviewModal({ r, onClose }: { r: Review; onClose: () => void }) {
 
   return (
     <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="modal rev-modal" role="dialog" aria-modal="true" aria-label={`${r.name}님의 후기`}>
+      <div className="modal rev-modal" role="dialog" aria-modal="true" style={{ "--th": themeColor(r.theme_id) } as CSSProperties} aria-label={`${r.name}님의 후기`}>
         <button className="close-x" onClick={onClose} aria-label="닫기">×</button>
         <div className="rm-theme">{r.theme_name}</div>
         <div className="rm-who">
