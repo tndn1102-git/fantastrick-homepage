@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>입금 경고 배너 — 시간이 지나면 어떻게 보이나</title>
+<style>
+  /* 관리자 화면과 같은 색·크기 (globals.css 라이트 테마 기준) */
+  :root{
+    --text:#131620; --muted:#535a69; --faint:#9aa3b2;
+    --line:rgba(20,22,42,.12); --line2:rgba(20,22,42,.20);
+    --bg:#f4f6f9; --bg2:#e9ecf1; --surface:#fff; --cyan:#2a63c9; --brand:#2a63c9;
+    --warn:#b06f00; --warnline:#d9a441;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:"Pretendard","Malgun Gothic",system-ui,sans-serif;line-height:1.6}
+  .wrap{max-width:1000px;margin:0 auto;padding:38px 20px 90px}
+  h1{font-size:25px;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:24px}
+
+  .rule{background:var(--surface);border:1px solid var(--line);border-radius:10px;
+    padding:15px 17px;margin-bottom:28px;font-size:14px}
+  .rule b{color:var(--warn)}
+  .rule table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13.5px}
+  .rule td{padding:5px 8px;border-bottom:1px solid var(--line)}
+  .rule tr:last-child td{border-bottom:0}
+  .rule td:first-child{width:150px;font-weight:700;color:var(--muted)}
+
+  .case{margin-bottom:34px}
+  .caption{font-size:15px;font-weight:800;margin-bottom:4px}
+  .note{font-size:12.5px;color:var(--muted);margin-bottom:10px}
+
+  /* ── 실제 컴포넌트 재현 ── */
+  .admin-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .warnbox{border-color:var(--warnline);margin-bottom:14px}
+  .warnbox > b{color:var(--warn);font-size:15px}
+  .warndesc{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.6}
+  .warnlist{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+  .warnrow{font-size:13.5px}
+  .warnrow .nm{font-weight:700}
+  .warnrow .ph{color:var(--cyan);text-decoration:underline;text-underline-offset:2px}
+  .warnrow .dim{color:var(--muted)}
+  .warnrow .el{color:var(--warn);font-weight:700}
+
+  .rrow{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:13px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:13.5px}
+  .rrow .taken{color:var(--faint);font-size:12px}
+  .rrow .when{font-weight:800;color:var(--muted)}
+  .rrow .when.over{color:var(--warn)}
+  .rrow .who b{font-weight:800}
+  .rrow .tname{color:var(--muted)}
+  .rrow .amt{font-weight:800;margin-left:auto}
+  .btn{border-radius:9px;padding:7px 13px;font-size:13px;font-weight:700;border:1px solid var(--line2);
+    background:var(--surface);color:var(--text);cursor:default}
+  .btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .payer{border:1px solid var(--line);border-radius:8px;padding:6px 10px;color:var(--faint);font-size:12.5px;background:var(--surface)}
+  .ok{background:#eaf7f1;border:1px solid #bfe3d2;border-radius:10px;padding:12px 15px;font-size:13.5px;color:#12805c}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>입금 경고 배너 — 시간이 지나면 이렇게 보입니다</h1>
+  <p class="sub">관리자 › 입금·환불 › 입금 확인 화면 그대로 재현했습니다. (실제 색·글자 크기 동일)</p>
+
+  <div class="rule">
+    <b>규칙</b> — 접수 후 <b>1시간</b>이 지나도 입금이 없으면 목록 맨 위에 경고가 뜹니다.
+    <b>시스템이 자동으로 지우지는 않습니다.</b>
+    <table>
+      <tr><td>1시간 미만</td><td>경고 없음 — 목록에만 조용히 있습니다</td></tr>
+      <tr><td>1시간 경과</td><td>경고 배너 등장 · 경과 시간 표시</td></tr>
+      <tr><td>여러 건 쌓임</td><td>건수와 함께 한 줄씩 모두 나열</td></tr>
+      <tr><td>새벽 예약</td><td>오전 10시 반까지 유예 — <b>경고에 안 잡힙니다</b></td></tr>
+    </table>
+  </div>
+
+  <!-- 1 -->
+  <div class="case">
+    <div class="caption">① 아직 1시간이 안 됐을 때 — 평소 모습</div>
+    <div class="note">경고 배너가 아예 그려지지 않습니다. 화면이 조용합니다.</div>
+    <div class="rrow">
+      <span class="taken">08.13 18:40 접수</span>
+      <span class="when">42분 남음</span>
+      <span class="who"><b>김서연</b> · <span class="ph">010-2345-6789</span></span>
+      <span class="tname">태초의 신부 · 2026.08.20 (목) 14:00 · 3명</span>
+      <span class="amt">45,000원</span>
+      <span class="payer">입금자명 (다를 때만)</span>
+      <span class="btn primary">입금 확인</span><span class="btn">취소</span>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="case">
+    <div class="caption">② 1시간이 지났을 때 — 경고 등장</div>
+    <div class="note">목록 맨 위에 노란 테두리 상자가 생깁니다.</div>
+    <div class="admin-card warnbox">
+      <b>⏰ 1시간 넘게 입금이 없는 예약 1건</b>
+      <div class="warndesc">자리를 계속 차지하고 있습니다. 손님께 확인하시거나, 아래 목록에서 <b>[취소]</b> 해주세요.
+        <br>시스템이 자동으로 지우지는 않습니다.</div>
+      <div class="warnlist">
+        <div class="warnrow"><span class="nm">홍길동</span> <span class="ph">010-1234-5678</span>
+          <span class="dim"> · 태초의 신부 2026.08.19 (수) 12:00</span><span class="el"> · 1시간 경과</span></div>
+      </div>
+    </div>
+    <div class="rrow">
+      <span class="taken">08.13 18:11 접수</span>
+      <span class="when over">0분 남음</span>
+      <span class="who"><b>홍길동</b> · <span class="ph">010-1234-5678</span></span>
+      <span class="tname">태초의 신부 · 2026.08.19 (수) 12:00 · 2명</span>
+      <span class="amt">30,000원</span>
+      <span class="payer">입금자명 (다를 때만)</span>
+      <span class="btn primary">입금 확인</span><span class="btn">취소</span>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="case">
+    <div class="caption">③ 하루 넘게 방치됐을 때</div>
+    <div class="note">경과 시간이 계속 커집니다. "며칠째 그대로"인 게 숫자로 보입니다.</div>
+    <div class="admin-card warnbox">
+      <b>⏰ 1시간 넘게 입금이 없는 예약 1건</b>
+      <div class="warndesc">자리를 계속 차지하고 있습니다. 손님께 확인하시거나, 아래 목록에서 <b>[취소]</b> 해주세요.
+        <br>시스템이 자동으로 지우지는 않습니다.</div>
+      <div class="warnlist">
+        <div class="warnrow"><span class="nm">홍길동</span> <span class="ph">010-1234-5678</span>
+          <span class="dim"> · 태초의 신부 2026.08.19 (수) 12:00</span><span class="el"> · 31시간 경과</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="case">
+    <div class="caption">④ 여러 건이 쌓였을 때 — 실제로 신경 쓰이는 상황</div>
+    <div class="note">건수가 제목에 뜨고, 오래된 것부터 한 줄씩 모두 보입니다. 목록을 뒤질 필요가 없습니다.</div>
+    <div class="admin-card warnbox">
+      <b>⏰ 1시간 넘게 입금이 없는 예약 4건</b>
+      <div class="warndesc">자리를 계속 차지하고 있습니다. 손님께 확인하시거나, 아래 목록에서 <b>[취소]</b> 해주세요.
+        <br>시스템이 자동으로 지우지는 않습니다.</div>
+      <div class="warnlist">
+        <div class="warnrow"><span class="nm">홍길동</span> <span class="ph">010-1234-5678</span>
+          <span class="dim"> · 태초의 신부 2026.08.19 (수) 12:00</span><span class="el"> · 52시간 경과</span></div>
+        <div class="warnrow"><span class="nm">테스트</span> <span class="ph">010-0000-0000</span>
+          <span class="dim"> · 락다운시티 2026.08.20 (목) 19:00</span><span class="el"> · 26시간 경과</span></div>
+        <div class="warnrow"><span class="nm">박지훈</span> <span class="ph">010-8765-4321</span>
+          <span class="dim"> · 사자의 서 2026.08.18 (화) 15:30</span><span class="el"> · 7시간 경과</span></div>
+        <div class="warnrow"><span class="nm">최유나</span> <span class="ph">010-5555-1234</span>
+          <span class="dim"> · 시간의 영속성 2026.08.21 (금) 16:00</span><span class="el"> · 2시간 경과</span></div>
+      </div>
+    </div>
+    <div class="rrow">
+      <span class="taken">08.11 14:20 접수</span><span class="when over">0분 남음</span>
+      <span class="who"><b>홍길동</b> · <span class="ph">010-1234-5678</span></span>
+      <span class="tname">태초의 신부 · 2026.08.19 (수) 12:00 · 2명</span>
+      <span class="amt">30,000원</span>
+      <span class="btn primary">입금 확인</span><span class="btn">취소</span>
+    </div>
+    <div class="rrow">
+      <span class="taken">08.12 16:05 접수</span><span class="when over">0분 남음</span>
+      <span class="who"><b>테스트</b> · <span class="ph">010-0000-0000</span></span>
+      <span class="tname">락다운시티 · 2026.08.20 (목) 19:00 · 4명</span>
+      <span class="amt">120,000원</span>
+      <span class="btn primary">입금 확인</span><span class="btn">취소</span>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <div class="case">
+    <div class="caption">⑤ 다 정리했을 때</div>
+    <div class="note">경고도 목록도 사라집니다.</div>
+    <div class="ok">입금 대기 없음 — 다 처리하셨어요.</div>
+  </div>
+
+  <div class="rule" style="margin-top:8px">
+    <b>참고</b> — 손님 화면과 문자에는 여전히 “30분 안에 입금” 안내가 나갑니다(재촉 효과 유지).
+    다만 <b>시간이 지나도 시스템이 취소하지 않습니다.</b> 취소 여부는 이 화면에서 사장님이 정하십니다.
+  </div>
+</div>
+</body>
+</html>
