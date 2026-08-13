@@ -1263,7 +1263,17 @@ form.cform{border:1px solid rgba(122,59,184,.28);border-radius:var(--r-lg);paddi
 .memoline svg{width:13px;height:13px;flex:0 0 auto;opacity:.55}
 .memoline input{flex:1;min-width:0;font:inherit;font-size:12.5px;color:var(--text);background:none;border:none;border-bottom:1px dashed var(--line);padding:3px 2px;outline:none}
 .memoline input::placeholder{color:var(--faint);opacity:.7}
-.memoline input:focus{border-bottom-color:var(--brand)}
+/* 적어 넣은 메모는 눈에 띄게 — 왼쪽 주황 막대 + 옅은 배경 (D안, 2026-08-13 사장님 선택).
+   ⚠️ **글이 있을 때만** 칠한다. 빈 칸까지 칠하면 예약 줄마다 주황 상자가 줄줄이 생겨 시끄럽다.
+      :not(:placeholder-shown) = "플레이스홀더가 안 보인다" = "뭔가 적혀 있다" — 자바스크립트 없이 된다.
+   ⚠️ 막대색은 #f0a500 이 예뻤지만 흰 배경 대비 2.08:1 이라 흐린 화면에서 안 보인다.
+      #cf8400 으로 낮춰 3.02:1 을 맞췄다(그림 요소 기준 3:1). 글자 대비는 6.36:1.
+   ⚠️ 이 규칙은 도입 문의 메모(MemoLineInq)에도 함께 걸린다 — 둘 다 .memoline 을 쓴다. 의도된 것. */
+.memoline input:not(:placeholder-shown){background:#fff6ec;color:#8a4b00;font-weight:700;
+  border-bottom-color:transparent;border-left:3px solid #cf8400;border-radius:0 6px 6px 0;padding:4px 10px}
+/* 고칠 때는 테두리로 확실히 알린다 — 위에서 밑줄을 지웠으므로 focus 표시가 따로 필요하다. */
+.memoline input:focus{border-bottom-color:var(--brand);outline:2px solid var(--brand);outline-offset:1px;border-radius:4px}
+.memoline input:not(:placeholder-shown):focus{border-radius:0 6px 6px 0}
 .memoline .ml-st{font-style:normal;font-size:11.5px;color:var(--faint);flex:0 0 auto}
 .memoline .ml-st.ok{color:#137a4c;font-weight:700}
 .memoline .ml-st.err{color:var(--blood);font-weight:700}

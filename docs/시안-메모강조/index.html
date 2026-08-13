@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>예약 한 줄 메모 — 강조 4안</title>
+<style>
+  /* 관리자 화면과 같은 색 토큰 (globals.css 라이트) */
+  :root{
+    --text:#131620; --muted:#535a69; --faint:#9aa3b2;
+    --line:rgba(20,22,42,.12); --line2:rgba(20,22,42,.20);
+    --bg:#f4f6f9; --surface:#fff; --brand:#2a63c9; --cyan:#2a63c9;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:"Pretendard","Malgun Gothic",system-ui,sans-serif;line-height:1.6}
+  .wrap{max-width:980px;margin:0 auto;padding:38px 20px 100px}
+  h1{font-size:25px;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:10px}
+  .note{background:var(--surface);border:1px solid var(--line);border-radius:10px;
+    padding:13px 16px;margin:16px 0 32px;font-size:13.5px;color:var(--muted)}
+  .note b{color:var(--text)}
+
+  .opt{margin-bottom:38px}
+  .opt-h{display:flex;align-items:baseline;gap:10px;margin-bottom:3px}
+  .opt-h h2{font-size:17px;margin:0}
+  .tag{font-size:11px;font-weight:800;border-radius:5px;padding:3px 8px}
+  .tag.now{background:#e9ecf1;color:var(--muted)}
+  .tag.new{background:#12805c;color:#fff}
+  .why{font-size:13px;color:var(--faint);margin:0 0 12px}
+
+  /* 실제 줄 재현 */
+  .slot{background:var(--surface);border:1px solid var(--line);border-radius:11px;
+    padding:13px 16px;margin-bottom:8px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:13.5px}
+  .t{font-weight:800;color:var(--muted);width:52px;flex:none}
+  .who{font-weight:800;color:var(--brand);border-bottom:1px dashed var(--line2)}
+  .ph{color:var(--text);border-bottom:1px dashed var(--line2)}
+  .badge{margin-left:auto;display:flex;gap:6px}
+  .b{font-size:11.5px;font-weight:700;border-radius:6px;padding:3px 9px}
+  .b1{background:#eaf7f1;color:#12805c;border:1px solid #bfe3d2}
+  .b2{background:#eaf7f1;color:#12805c;border:1px solid #bfe3d2}
+
+  /* 메모 공통 뼈대 */
+  .memo{flex:1;min-width:180px;font-size:12.5px;padding:3px 2px}
+
+  /* A = 지금 */
+  .a .memo{color:var(--text);border-bottom:1px dashed var(--line)}
+  .a .memo.empty{color:var(--faint)}
+
+  /* B = 형광펜 */
+  .b1o .memo{border-bottom:1px dashed var(--line);color:var(--faint)}
+  .b1o .memo.has{background:#fff3bf;color:#5c4300;font-weight:700;border-bottom:0;
+    border-radius:5px;padding:3px 8px;box-shadow:inset 0 -2px 0 #ffe066}
+
+  /* C = 메모 아이콘 + 진한 글씨 */
+  .c1 .memo{border-bottom:1px dashed var(--line);color:var(--faint)}
+  .c1 .memo.has{color:#8a4b00;font-weight:800;border-bottom:0}
+  .c1 .memo.has::before{content:"✎ ";opacity:.8}
+
+  /* D = 왼쪽 색막대 + 옅은 배경 */
+  .d1 .memo{border-bottom:1px dashed var(--line);color:var(--faint)}
+  .d1 .memo.has{background:#fff6ec;color:#8a4b00;font-weight:700;border-bottom:0;
+    border-left:3px solid #f0a500;border-radius:0 6px 6px 0;padding:4px 10px}
+
+  table{width:100%;border-collapse:collapse;margin-top:26px;font-size:13px}
+  th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left}
+  th{color:var(--faint);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>예약 한 줄 메모 — 눈에 띄게 하는 4가지</h1>
+  <p class="sub">관리자 › 예약 › 날짜별 시간표 줄을 그대로 재현했습니다.</p>
+
+  <div class="note">
+    <b>핵심은 "적었을 때만 튀게"</b> 입니다. 빈 메모칸까지 색을 칠하면 예약이 있는 줄마다
+    노란 상자가 줄줄이 생겨 화면이 시끄러워집니다.
+    아래 안은 전부 <b>글이 적힌 칸만</b> 강조되고, 빈 칸은 지금처럼 조용합니다.
+    각 안마다 <b>위=메모 있음 / 아래=메모 없음</b> 두 줄을 나란히 뒀으니 같이 봐주세요.
+  </div>
+
+  <!-- A -->
+  <div class="opt a">
+    <div class="opt-h"><h2>A안 — 지금</h2><span class="tag now">현재</span></div>
+    <p class="why">이름·전화번호와 같은 무게라 스쳐 지나갑니다. 사장님이 지적하신 그 상태입니다.</p>
+    <div class="slot"><span class="t">14:00</span><span class="who">fantastrick · 2명</span><span class="ph">010-4547-0481</span>
+      <span class="memo">기석 혜연 유석 시영 테마 플레이 예정</span>
+      <span class="badge"><span class="b b1">입금완료</span><span class="b b2">확정</span></span></div>
+    <div class="slot"><span class="t">18:00</span><span class="who">진세언 · 2명</span><span class="ph">010-3424-1936</span>
+      <span class="memo empty">한 줄 메모</span>
+      <span class="badge"><span class="b b1">입금완료</span><span class="b b2">확정</span></span></div>
+  </div>
+
+  <!-- B -->
+  <div class="opt b1o">
+    <div class="opt-h"><h2>B안 — 형광펜</h2><span class="tag new">추천</span></div>
+    <p class="why">종이 장부에 형광펜 그은 모양. 화면을 훑을 때 노란 띠가 먼저 눈에 들어옵니다. 글자도 진한 갈색이라 또렷합니다.</p>
+    <div class="slot"><span class="t">14:00</span><span class="who">fantastrick · 2명</span><span class="ph">010-4547-0481</span>
+      <span class="memo has">기석 혜연 유석 시영 테마 플레이 예정</span>
+      <span class="badge"><span class="b b1">입금완료</span><span class="b b2">확정</span></span></div>
+    <div class="slot"><span class="t">18:00</span><span class="who">진세언 · 2명</span><span class="ph">010-3424-1936</span>
+      <span class="memo">한 줄 메모</span>
+      <span class="badge"><span class="b b1">입금완료</span><span class="b b2">확정</span></span></div>
+  </div>
+
+  <!-- C -->
+  <div class="opt c1">
+    <div class="opt-h"><h2>C안 — 연필 표시 + 진한 글씨</h2><span class="tag now">가장 조용함</span></div>
+    <p class="why">배경 없이 글자만 진하게. 앞에 ✎ 를 붙여 "사람이 적은 것"임을 알립니다. 화면이 깔끔하지만 B안보다는 덜 튑니다.</p>
+    <div class="slot"><span class="t">14:00</span><span class="who">fantastrick · 2명</span><span class="ph">010-4547-0481</span>
+      <span class="memo has">기석 혜연 유석 시영 테마 플레이 예정</span>
+      <span class="badge"><span class="b b1">입금완료</span><span class="b b2">확정</span></span></div>
+    <div class="slot"><span class="t">18:00</span><span class="who">진세언 · 2명</span><span class="ph">010-3424-1936</span>
+      <span class="memo">한 줄 메모</span>
+      <span class="badge"><span class="b b1">입금완료</span><span class="b b2">확정</span></span></div>
+  </div>
+
+  <!-- D -->
+  <div class="opt d1">
+    <div class="opt-h"><h2>D안 — 왼쪽 색막대 + 옅은 배경</h2><span class="tag now">참고</span></div>
+    <p class="why">쪽지를 붙인 느낌. B안보다 점잖지만, 예약 줄 안에 또 하나의 상자가 생겨 살짝 답답할 수 있습니다.</p>
+    <div class="slot"><span class="t">14:00</span><span class="who">fantastrick · 2명</span><span class="ph">010-4547-0481</span>
+      <span class="memo has">기석 혜연 유석 시영 테마 플레이 예정</span>
+      <span class="badge"><span class="b b1">입금완료</span><span class="b b2">확정</span></span></div>
+    <div class="slot"><span class="t">18:00</span><span class="who">진세언 · 2명</span><span class="ph">010-3424-1936</span>
+      <span class="memo">한 줄 메모</span>
+      <span class="badge"><span class="b b1">입금완료</span><span class="b b2">확정</span></span></div>
+  </div>
+
+  <table>
+    <tr><th>안</th><th>모양</th><th>눈에 띄는 정도</th><th>화면 소란</th></tr>
+    <tr><td>A (현재)</td><td>그냥 글씨</td><td>낮음</td><td>없음</td></tr>
+    <tr><td><b>B</b></td><td><b>노란 형광펜</b></td><td><b>가장 높음</b></td><td>보통</td></tr>
+    <tr><td>C</td><td>✎ + 진한 갈색 글씨</td><td>보통</td><td>거의 없음</td></tr>
+    <tr><td>D</td><td>주황 막대 + 옅은 배경</td><td>높음</td><td>보통</td></tr>
+  </table>
+
+  <p class="sub" style="margin-top:22px">
+    번호만 알려주시면 적용하겠습니다. 색을 바꾸고 싶으시면 <b>"B안인데 하늘색으로"</b> 처럼 말씀하셔도 됩니다.
+  </p>
+</div>
+</body>
+</html>
