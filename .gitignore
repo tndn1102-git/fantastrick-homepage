@@ -35,3 +35,7 @@ wp-sync-hidden.vbs
 
 # 손님 개인정보가 든 백업 — 절대 올리지 않음
 backups/
+
+# 진단용 임시 기록 (요청 로그 등) — 올리지 않음
+tail.json
+tail.err
