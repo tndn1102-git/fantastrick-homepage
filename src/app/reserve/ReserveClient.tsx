@@ -82,10 +82,10 @@ export default function ReserveClient({ preset }: { preset: string }) {
   // 고른 테마·날짜의 마감/예약 시간 — 서버와 같은 규칙(그 날 blocked_slots + 이미 잡힌 예약).
   //   1순위: 방금 그 슬롯만 콕 집어 받아온 신선값(freshSlots)
   //   2순위: 없으면 미리 받아둔 allSlots 로 즉시 계산(네트워크 대기 없음)
-  //   taken 은 그중 **예약이 차서** 막힌 칸만 따로 — 화면에 "마감"이 아니라 "예약있음"으로
-  //   적어주기 위해서다. 손님 입장에선 둘이 전혀 다른 말이다("마감"은 우리가 안 받는 것 같고,
-  //   "예약있음"은 남이 먼저 잡았다는 뜻이라 다른 시간을 찾게 된다). 2026-07-31 사장님 요청.
-  const { blocked, taken, dayClosed } = useMemo(() => {
+  //   ⚠️ taken(예약이 차서 막힌 칸)은 계속 계산해 두지만 **손님 화면에서는 쓰지 않는다** —
+  //      2026-08-14 부터 손님에겐 막힌 이유를 가리지 않고 전부 "매진" 한 마디로만 말한다.
+  //      관리자 화면과 /api/slots 는 여전히 둘을 구분하므로 계산 자체는 남겨 둔다.
+  const { blocked, dayClosed } = useMemo(() => {
     const empty = { blocked: [] as string[], taken: [] as string[], dayClosed: false };
     if (!themeId || !date) return empty;
     const fresh = freshSlots[`${themeId}|${date}`];
@@ -450,9 +450,11 @@ export default function ReserveClient({ preset }: { preset: string }) {
                     <div className="rv-slots">
                       {activeSlots.map((tm) => {
                         const isBlocked = blocked.includes(tm);
-                        // 같은 "못 고름"이라도 이유를 나눠서 말한다 — 예약이 찬 것 vs 우리가 닫은 것
-                        const isTaken = isBlocked && taken.includes(tm);
-                        const blockedLabel = isTaken ? "예약있음" : "마감";
+                        /* 🔴 2026-08-14 — 손님에게는 **"매진" 한 마디로만** 말한다(사장님 지시).
+                           전에는 손님 예약이 찬 칸은 "예약있음", 사장님이 닫은 칸은 "마감"으로 나눠 보였다.
+                           손님이 알아야 할 것은 "못 고른다" 하나뿐이라 구분이 오히려 헷갈렸다.
+                           ⚠️ 데이터(taken)는 그대로 둔다 — 관리자 화면은 여전히 둘을 구분해서 봐야 한다. */
+                        const blockedLabel = "매진";
                         // 이미 시작된 칸은 예약 불가 (시작 시각이 되는 순간부터 잠긴다)
                         const soon = !isBlocked && isPastSlot(date, tm, nowMs);
                         // 아직 확실하지 않은 동안에는 전부 못 누르게 한다.
@@ -489,9 +491,8 @@ export default function ReserveClient({ preset }: { preset: string }) {
                     {(slotsLoading || !cfgLoaded) && <div className="hint">예약 가능한 시간을 확인하는 중이에요…</div>}
                     {!slotsLoading && cfgLoaded && (
                       <div className="hint">
-                        {/* 범례도 화면과 같은 말을 써야 한다 — 칸엔 "예약있음"이라 적혀 있는데
-                            여기서만 "마감"이라고 하면 손님이 다른 뜻으로 읽는다. */}
-                        ※ <IconBan /> 는 <b>예약있음</b>(이미 다른 분이 예약) 또는 <b>마감</b>된 시간입니다.
+                        {/* 범례도 칸에 적힌 말과 똑같아야 한다 — 다르면 손님이 다른 뜻으로 읽는다. */}
+                        ※ <IconBan /> <b>매진</b> 은 손님 예약이 이미 있는 시간입니다.
                       </div>
                     )}
                   </>

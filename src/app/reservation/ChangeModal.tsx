@@ -158,7 +158,7 @@ export default function ChangeModal({
                       disabled={off}
                       style={{ minWidth: 64, flex: "0 0 auto" }}
                       onClick={() => { if (!off) setTime(tm); }}
-                      title={isNow ? "지금 예약된 시간" : slotsLoading ? "확인 중" : isBlocked ? "마감" : soon ? "예약 불가" : ""}
+                      title={isNow ? "지금 예약된 시간" : slotsLoading ? "확인 중" : isBlocked ? "매진" : soon ? "예약 불가" : ""}
                     >
                       {tm}{!slotsLoading && (isBlocked ? <>{" "}<IconBan /></> : soon ? <>{" "}<IconClock /></> : null)}
                     </button>
@@ -168,7 +168,7 @@ export default function ChangeModal({
             )}
             {(slotsLoading || !cfgLoaded) && <div className="hint">예약 가능한 시간을 확인하는 중이에요…</div>}
             {!slotsLoading && cfgLoaded && !(dayClosed || noSlotsDay) && (
-              <div className="hint">※ <IconBan /> 마감 · <IconClock /> 이미 시작된 시간</div>
+              <div className="hint">※ <IconBan /> <b>매진</b>(손님 예약이 이미 있음) · <IconClock /> 이미 시작된 시간</div>
             )}
           </div>
         )}

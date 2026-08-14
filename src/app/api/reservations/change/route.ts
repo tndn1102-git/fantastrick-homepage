@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "그 날짜는 예약을 받지 않아요. 다른 날짜를 선택해 주세요." }, { status: 409 });
   }
   if (relevant.some((b: { time: string | null }) => b.time === time)) {
-    return NextResponse.json({ error: "마감된 시간이에요. 다른 시간을 선택해 주세요." }, { status: 409 });
+    return NextResponse.json({ error: "매진된 시간이에요. 다른 시간을 선택해 주세요." }, { status: 409 });
   }
 
   // 옮길 칸에 이미 다른 예약이 있는지 (취소건은 칸을 차지하지 않음 — uq_res_slot 과 같은 기준)
@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
     .eq("date", date).eq("time", time).neq("status", "cancelled").neq("id", id)
     .maybeSingle();
   if (taken) {
-    return NextResponse.json({ error: "방금 다른 분이 그 시간을 예약했어요. 다른 시간을 선택해 주세요." }, { status: 409 });
+    return NextResponse.json({ error: "방금 매진됐어요. 다른 시간을 선택해 주세요." }, { status: 409 });
   }
 
   // ── 옮기기 (날짜·시간만 바꾸고 나머지는 그대로) ──────────────────────
@@ -145,7 +145,7 @@ export async function POST(req: NextRequest) {
   if (upErr) {
     // 동시성: 검사와 저장 사이에 누가 그 칸을 채웠으면 DB 가 막는다(uq_res_slot)
     if (upErr.code === "23505") {
-      return NextResponse.json({ error: "방금 다른 분이 그 시간을 예약했어요. 다른 시간을 선택해 주세요." }, { status: 409 });
+      return NextResponse.json({ error: "방금 매진됐어요. 다른 시간을 선택해 주세요." }, { status: 409 });
     }
     return NextResponse.json({ error: "변경 중 오류가 발생했어요." }, { status: 500 });
   }
