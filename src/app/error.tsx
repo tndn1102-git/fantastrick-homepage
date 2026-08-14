@@ -20,7 +20,12 @@ export default function ErrorPage({ error, reset }: { error: Error; reset: () =>
       const KEY = "fx-auto-reloaded";
       if (!sessionStorage.getItem(KEY)) {
         sessionStorage.setItem(KEY, "1");
-        location.reload();
+        /* 🔴 그냥 reload() 하면 **캐시에 있는 그 옛 화면을 또 가져온다** → 또 터지고,
+           1회 제한에 걸려 그대로 오류 화면이 남는다(2026-08-14 폰에서 실제 발생).
+           주소 뒤에 매번 다른 값을 붙여 "새 주소"로 만들면 캐시를 건너뛰고 진짜 새 화면을 받는다. */
+        const u = new URL(location.href);
+        u.searchParams.set("_fresh", String(Date.now()));
+        location.replace(u.toString());
       }
     } catch {
       /* sessionStorage 가 막혀 있으면 자동 새로고침 없이 안내만 */
@@ -36,7 +41,12 @@ export default function ErrorPage({ error, reset }: { error: Error; reset: () =>
           계속 반복되면 새로고침(Ctrl+F5) 후에도 같은지 확인해 주세요.
         </p>
         <button
-          onClick={() => { try { sessionStorage.removeItem("fx-auto-reloaded"); } catch {} location.reload(); }}
+          onClick={() => {
+            try { sessionStorage.removeItem("fx-auto-reloaded"); } catch { /* 막혀 있어도 새로고침은 한다 */ }
+            const u = new URL(location.href);
+            u.searchParams.set("_fresh", String(Date.now())); // 캐시 건너뛰고 진짜 새 화면으로
+            location.replace(u.toString());
+          }}
           style={{ padding: "11px 22px", borderRadius: 10, border: "none", background: "#2a63c9", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
         >
           다시 시도

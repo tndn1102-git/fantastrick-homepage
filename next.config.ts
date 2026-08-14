@@ -90,6 +90,31 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      /* 🔴 2026-08-14 — 관리자 화면은 **절대 캐시하지 않는다.**
+       *
+       * [무슨 일이 있었나]
+       *   폰에서 관리자에 들어가면 "화면을 불러오지 못했어요"가 떴다.
+       *   원인은 응답 헤더가 `Cache-Control: s-maxage=31536000` (**1년**) 이었던 것 —
+       *   Cloudflare 가 관리자 화면(HTML)을 1년치로 붙들고 있었다.
+       *   배포를 하면 화면이 찾는 부품(js/css) 파일 이름이 바뀌는데, 캐시된 옛 화면은
+       *   **이미 사라진 옛 부품**을 찾다가 터진다. 새로고침해도 같은 옛 화면이 다시 와서
+       *   자가 치유(error.tsx 의 자동 새로고침)도 소용이 없었다.
+       *   오늘 하루 종일 "Ctrl+F5 해야 반영된다"던 것도 전부 이것 때문이다.
+       *
+       * [왜 관리자만인가]
+       *   손님 화면은 캐시가 있어야 빠르다(같은 화면을 수천 명이 본다).
+       *   관리자는 사장님 한 사람이 보는 **매번 달라지는 화면**이라 캐시 이득이 없고,
+       *   오히려 옛 화면이 남는 손해만 크다.
+       *
+       * ⚠️ 이 규칙을 지우면 배포할 때마다 관리자가 터진다. 손대지 말 것. */
+      {
+        source: "/admin/:path*",
+        headers: [{ key: "Cache-Control", value: "private, no-store, max-age=0, must-revalidate" }],
+      },
+      {
+        source: "/admin",
+        headers: [{ key: "Cache-Control", value: "private, no-store, max-age=0, must-revalidate" }],
+      },
       {
         source: "/:path*",
         headers: [
