@@ -47,6 +47,12 @@ export type Theme = {
    *    ⚠️ 여기 색을 바꾸면 거기도 같이 바꿀 것. 한쪽만 고치면 두 화면 색이 어긋난다.
    */
   color: string;
+  /**
+   * 같은 색인데 **흰 배경용**(관리자 화면). 위 color 는 어두운 배경용 파스텔이라
+   * 흰 바탕에 올리면 글씨가 흐려 안 읽힌다(대비 2:1 수준).
+   * 색상(hue)은 그대로 두고 명도만 낮춘 짝이라 손님 화면과 같은 색으로 읽힌다.
+   */
+  colorInk: string;
 };
 
 export const STORES: Store[] = [
@@ -93,6 +99,7 @@ export const THEMES: Theme[] = [
     cat: "s1",
     deposit: 30000,
     color: "#93B4FF", // 파랑 (페리윙클)
+    colorInk: "#1E50C9", // 관리자(흰 배경)용 — 같은 색상, 명도만 낮춤
   },
   {
     id: "bookofduat",
@@ -106,6 +113,7 @@ export const THEMES: Theme[] = [
     cat: "s2",
     deposit: 25000,
     color: "#C9A6F5", // 보라 (라일락)
+    colorInk: "#6D2FBD", // 관리자(흰 배경)용 — 같은 색상, 명도만 낮춤
   },
   {
     id: "ldc",
@@ -119,6 +127,7 @@ export const THEMES: Theme[] = [
     cat: "s3",
     deposit: 120000,
     color: "#FFB27A", // 주황 (살구)
+    colorInk: "#A8560E", // 관리자(흰 배경)용 — 같은 색상, 명도만 낮춤
   },
   {
     id: "time",
@@ -133,6 +142,7 @@ export const THEMES: Theme[] = [
     cat: "s3 murder",
     deposit: 63000,
     color: "#79DFE4", // 하늘·청록 (파랑과 확실히 갈라지도록 청록 쪽으로)
+    colorInk: "#0E7A82", // 관리자(흰 배경)용 — 같은 색상, 명도만 낮춤
   },
 ];
 
@@ -151,6 +161,7 @@ export const SOON_THEMES: Theme[] = [
     soon: true,
     deposit: 0,
     color: "#8C93A8", // 준비중 — 회색
+    colorInk: "#5D6478", // 관리자(흰 배경)용 — 같은 색상, 명도만 낮춤
   },
   {
     id: "soon-unknown",
@@ -165,6 +176,7 @@ export const SOON_THEMES: Theme[] = [
     soon: true,
     deposit: 0,
     color: "#8C93A8", // 준비중 — 회색(색을 주면 아직 없는 테마가 튄다)
+    colorInk: "#5D6478", // 관리자(흰 배경)용 — 같은 색상, 명도만 낮춤
   },
 ];
 
@@ -309,4 +321,9 @@ export function themeById(id: string): Theme | undefined {
  */
 export function themeColor(id: string | null | undefined): string {
   return (id && themeById(id)?.color) || "#8C93A8";
+}
+
+/** 관리자(흰 배경)용 테마색 — 손님 화면과 같은 색상, 명도만 낮춘 짝. */
+export function themeColorInk(id: string | null | undefined): string {
+  return (id && themeById(id)?.colorInk) || "#5D6478";
 }

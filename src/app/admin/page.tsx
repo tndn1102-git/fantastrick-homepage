@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { STORES, THEMES, TIME_SLOTS, DOW_LABELS, slotsForThemeDate, themeColor, type StoreSlots, type SlotSchedule } from "@/lib/data";
+import { STORES, THEMES, TIME_SLOTS, DOW_LABELS, slotsForThemeDate, themeColorInk, type StoreSlots, type SlotSchedule } from "@/lib/data";
 import { isRefundOwed, isRefundReady, refundAmount, cancelledBy, isAutoCancelled } from "@/lib/money";
 import { isActiveSmsType } from "@/lib/sms-templates";
 import { EXPIRE_MINUTES, GRACE_UNTIL_HOUR, DELETE_AFTER_DAYS } from "@/lib/expire";
@@ -1559,7 +1559,7 @@ function RefundQueue({ onDone }: { onDone: () => void }) {
         /* 🔴 2026-08-14 — 3안 채택(사장님 선택). **보낼 금액을 카드 왼쪽 기둥으로** 뺐다.
            사장님이 이 화면에서 하는 일은 딱 둘 — 얼마를, 어느 계좌로. 그 둘이 제일 커야 한다.
            왼쪽 기둥 배경에 테마색을 옅게 깔아, 금액을 보는 동시에 어느 방인지도 읽힌다. */
-        <div key={r.id} className="rfcard" style={{ "--th": themeColor(r.theme_id) } as CSSProperties}>
+        <div key={r.id} className="rfcard" style={{ "--th": themeColorInk(r.theme_id) } as CSSProperties}>
           <div className="rf-amt">
             <span className="k">보낼 금액</span>
             <b className="v">{refundAmount(r).toLocaleString()}<i>원</i></b>
@@ -1667,7 +1667,7 @@ function NeedAcctRow({ r, onSaved }: { r: Reservation; onSaved: () => void }) {
 
   return (
     /* 계좌 입력 대기 카드도 같은 모양(3안)으로 — 두 종류가 나란히 놓이므로 생김새가 같아야 읽힌다. */
-    <div className="rfcard" style={{ "--th": themeColor(r.theme_id) } as CSSProperties}>
+    <div className="rfcard" style={{ "--th": themeColorInk(r.theme_id) } as CSSProperties}>
       <div className="rf-amt">
         <span className="k">돌려줄 금액</span>
         <b className="v">{refundAmount(r).toLocaleString()}<i>원</i></b>
