@@ -44,6 +44,32 @@ function Phone({ v }: { v: string }) {
   );
 }
 // 예약 탭이 기본 화면(사장님 지시 2026-07-30) — 로그인하면 바로 예약 목록부터.
+/**
+ * 화면을 **보고 있을 때만** 주기적으로 다시 물어본다.
+ *
+ * 🔴 2026-08-14 — 클라우드플레어 하루 요청 한도(10만)를 넘겨서 만들었다.
+ *   원인을 재보니 **관리자 화면 한 대가 하루 약 16,000 요청**을 쓰고 있었다.
+ *   매장 태블릿·사장님 폰에 이 화면을 켜두면, 아무도 안 보는 새벽에도
+ *   30초·60초마다 계속 서버를 깨운다. 두세 대면 하루 3~5만 건이 그냥 사라진다.
+ *
+ *   이제 다른 탭·앱으로 넘어가거나 화면이 꺼지면 **묻는 것을 멈춘다.**
+ *   다시 돌아오면 그 즉시 한 번 불러오므로, 사장님이 보는 내용은 늘 최신이다.
+ *   (돌아왔을 때 낡은 값이 잠깐 보이지 않도록 즉시 갱신이 핵심이다)
+ *
+ * @returns useEffect 에서 그대로 return 할 정리 함수
+ */
+function pollWhileVisible(fn: () => void, ms: number): () => void {
+  let timer: ReturnType<typeof setInterval> | null = null;
+  const start = () => { if (timer === null) timer = setInterval(fn, ms); };
+  const stop = () => { if (timer !== null) { clearInterval(timer); timer = null; } };
+  const onVis = () => {
+    if (document.visibilityState === "visible") { fn(); start(); } else stop();
+  };
+  if (document.visibilityState === "visible") start();
+  document.addEventListener("visibilitychange", onVis);
+  return () => { stop(); document.removeEventListener("visibilitychange", onVis); };
+}
+
 const TABS = [
   { k: "res", label: "예약" }, { k: "money", label: "입금·환불" },
   { k: "biz", label: "도입 문의" },
@@ -72,8 +98,7 @@ export default function AdminPage() {
       .then((j) => { if (j?.stats) setTodo((j.stats.pendingUnpaid || 0) + (j.stats.refundPending || 0)); })
       .catch(() => {});
     f();
-    const t = setInterval(f, 30000);
-    return () => clearInterval(t);
+    return pollWhileVisible(f, 30000);
   }, [phase]);
 
   // 도입 문의 뱃지 — 새 문의는 하루에 몇 건 안 되지만, 놓치면 그게 곧 매출이라 눈에 띄게 둔다.
@@ -85,8 +110,7 @@ export default function AdminPage() {
       .then((j) => { if (j) setBizNew(j.newCount || 0); })
       .catch(() => {});
     f();
-    const t = setInterval(f, 60000);
-    return () => clearInterval(t);
+    return pollWhileVisible(f, 60000);
   }, [phase]);
 
   async function doLogin() {
@@ -375,7 +399,7 @@ function ListView() {
   }, [fStatus, fStore, fTheme, fFrom, fTo, q]);
 
   useEffect(() => { load(); }, [fStatus, fStore, fTheme, fFrom, fTo]); // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => { const t = setInterval(() => load(true), 30000); return () => clearInterval(t); }, [load]);
+  useEffect(() => pollWhileVisible(() => load(true), 30000), [load]);
 
   async function patch(id: string, body: Record<string, unknown>) {
     const res = await fetch("/api/admin/reservations", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, ...body }) });
@@ -555,7 +579,7 @@ function DayView() {
   const loadBlocks = useCallback(() => fetch("/api/admin/slots").then((r) => r.json()).then((j) => setBlocks(j.blocks || [])).catch(() => {}), []);
   useEffect(() => { loadMonth(); }, [loadMonth]);
   useEffect(() => { loadBlocks(); fetch("/api/admin/settings").then((r) => r.json()).then(setCfg).catch(() => {}); }, [loadBlocks]);
-  useEffect(() => { const t = setInterval(loadMonth, 30000); return () => clearInterval(t); }, [loadMonth]); // 새 예약 자동 반영
+  useEffect(() => pollWhileVisible(loadMonth, 30000), [loadMonth]); // 새 예약 자동 반영
   const reload = () => { loadMonth(); loadBlocks(); };
 
   // 취소 건은 칸을 차지하지 않음(그 시간은 다시 비어 있는 것)
@@ -1092,7 +1116,7 @@ function MoneyTab() {
       .then((j) => setStats(j.stats || null)).catch(() => {});
   }, []);
   useEffect(() => { loadStats(); }, [loadStats, tick]);
-  useEffect(() => { const t = setInterval(loadStats, 30000); return () => clearInterval(t); }, [loadStats]);
+  useEffect(() => pollWhileVisible(loadStats, 30000), [loadStats]);
 
   const nPay = stats?.pendingUnpaid || 0;
   const nRef = stats?.refundPending || 0;
@@ -1162,7 +1186,7 @@ function BankHealth() {
   }, []);
   useEffect(() => { load(); }, [load]);
   // 하트비트가 5분 주기라 1분마다면 충분하다(더 자주 물어도 새 정보가 없다).
-  useEffect(() => { const t = setInterval(load, 60000); return () => clearInterval(t); }, [load]);
+  useEffect(() => pollWhileVisible(load, 60000), [load]);
 
   if (!h) return null;
   const lv = h.overall.level;
@@ -1323,7 +1347,7 @@ function PayQueue({ onDone }: { onDone: () => void }) {
     setLoaded(true);
   }, []);
   useEffect(() => { load(); }, [load]);
-  useEffect(() => { const t = setInterval(load, 30000); return () => clearInterval(t); }, [load]);
+  useEffect(() => pollWhileVisible(load, 30000), [load]);
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, []);
 
   // 남은 시간 — 자정 이후 접수 건은 그날 오전 10시 30분까지 봐주므로(expire.ts) 그 기준으로 센다.
