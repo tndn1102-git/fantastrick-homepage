@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>환불 기록이 쌓이면 이렇게 보입니다</title>
+<style>
+  /* 관리자 화면과 같은 색·크기 (globals.css 라이트 테마) */
+  :root{
+    --text:#131620; --muted:#535a69; --faint:#9aa3b2;
+    --line:rgba(20,22,42,.12); --line2:rgba(20,22,42,.20);
+    --bg:#f4f6f9; --bg2:#e9ecf1; --surface:#fff; --cyan:#2a63c9; --brand:#2a63c9;
+    --r:12px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:"Pretendard","Malgun Gothic",system-ui,sans-serif;line-height:1.6}
+  .wrap{max-width:1040px;margin:0 auto;padding:36px 20px 100px}
+  h1{font-size:25px;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:8px}
+  .note{background:var(--surface);border:1px solid var(--line);border-radius:10px;
+    padding:13px 16px;margin:16px 0 30px;font-size:13.5px;color:var(--muted)}
+  .note b{color:var(--text)}
+
+  .sec{margin-bottom:44px}
+  .sec>h2{font-size:18px;margin:0 0 3px}
+  .sec>.why{font-size:13px;color:var(--faint);margin:0 0 14px}
+  .where{display:inline-block;font-size:11.5px;font-weight:800;background:var(--bg2);
+    color:var(--muted);border-radius:6px;padding:3px 9px;margin-bottom:8px}
+
+  /* 실제 컴포넌트 재현 */
+  .card-h{font-size:14px;font-weight:800;margin:22px 0 9px;color:var(--muted)}
+  .rrow{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin-bottom:8px}
+  .rrow .head{display:flex;align-items:center;gap:13px;flex-wrap:wrap;padding:13px 16px;font-size:13.5px}
+  .rrow.open .detail{border-top:1px solid var(--line);padding:14px 16px}
+  .when{font-weight:800;color:var(--muted);min-width:96px}
+  .who{font-weight:600}
+  .who b{font-weight:800}
+  .tname{color:var(--muted)}
+  .amt{font-weight:800;margin-left:auto}
+  .rt{display:flex;align-items:center;gap:7px}
+  .badge-st{font-size:11.5px;font-weight:700;border-radius:6px;padding:3px 9px}
+  .st-confirmed{background:#eaf7f1;color:#12805c;border:1px solid #bfe3d2}
+  .st-pending{background:#fdf6e3;color:#8a6d1f;border:1px solid #ecdcb0}
+  .st-cancelled{background:#fdeceb;color:#b4322a;border:1px solid #f3cbc7}
+  .src-tag{font-size:11px;font-weight:700;color:var(--faint);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+  .btn{border-radius:9px;padding:7px 13px;font-size:13px;font-weight:700;border:1px solid var(--line2);
+    background:var(--surface);color:var(--text);cursor:default}
+  .btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .btn.ghost{background:transparent}
+  .sp{flex:1}
+  .refund-amt{display:flex;align-items:baseline;gap:10px;margin-bottom:9px}
+  .refund-amt span{font-size:12.5px;color:var(--muted);font-weight:700}
+  .refund-amt b{font-size:23px;font-weight:800}
+  .acct{display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:var(--bg2);
+    border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:13.5px}
+  .acct .bank{font-weight:700;color:var(--muted)}
+  .acct b{font-weight:800;letter-spacing:.01em}
+  .refund-meta{margin:9px 0 0;font-size:12.5px;color:var(--faint)}
+  .refund-warn{margin:5px 0 0;font-size:12.5px;font-weight:700;color:#b4322a}
+  .act-row{margin-top:11px}
+  .notice{font-size:13px;border-radius:9px;padding:12px 14px;margin-bottom:12px}
+  .notice.ok{background:rgba(31,157,99,.08);border:1px solid rgba(31,157,99,.3);color:#146c46}
+  .notice.warn{background:rgba(198,40,52,.07);border:1px solid rgba(198,40,52,.28);color:#9a1f28}
+  .admin-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .admin-tools input,.admin-tools select{border:1px solid var(--line2);border-radius:8px;padding:7px 10px;font:inherit;font-size:13px;background:var(--surface);color:var(--text)}
+  .sum{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .sum>div{flex:1;min-width:150px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+  .sum .k{font-size:12px;color:var(--muted);font-weight:700}
+  .sum .v{font-size:21px;font-weight:800;margin-top:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>환불 기록이 쌓이면 이렇게 보입니다</h1>
+  <p class="sub">실제 관리자 화면과 같은 크기·색으로 그렸습니다. 아래 내용은 <b>보여드리려고 지어낸 가짜 자료</b>입니다.</p>
+
+  <div class="note">
+    지금 실제 환불 완료 기록은 <b>0건</b>이라 화면이 비어 있습니다. 화면이 없는 게 아니라 <b>담길 내용이 아직 없는 것</b>입니다.
+    앞으로 <b>[○○원 환불 완료]</b> 버튼을 누르시면 그때부터 아래처럼 쌓입니다.
+  </div>
+
+  <!-- 1 -->
+  <div class="sec">
+    <span class="where">입금·환불 › 환불 처리</span>
+    <h2>① 보내야 할 환불 (아직 안 보낸 것)</h2>
+    <p class="why">사장님이 실제로 손을 대는 자리입니다. 금액을 제일 크게, 바로 아래 계좌를 둡니다. 버튼에도 금액이 박혀 있어 잘못 보내기 어렵습니다.</p>
+    <div class="rrow open">
+      <div class="head">
+        <span class="when">2일 전 취소</span>
+        <span class="who"><b>김서연</b> · 010-2345-6789</span>
+        <span class="tname">태초의 신부 · 2026.08.18 (화) 18:40</span>
+        <span class="rt"><span class="badge-st st-pending">환불 100%</span></span>
+      </div>
+      <div class="detail">
+        <div class="refund-amt"><span>보낼 금액</span><b>30,000원</b></div>
+        <div class="acct">
+          <span class="bank">카카오뱅크</span><b>3333-01-2345678</b>
+          <span style="color:var(--muted)">예금주 김서연</span>
+          <span class="sp"></span><span class="btn ghost" style="font-size:12px">계좌 복사</span>
+        </div>
+        <p class="refund-meta">예약금 30,000원 × 100% · 2026.08.12 (수) 14:22 손님이 직접 취소</p>
+        <div class="act-row"><span class="btn primary">30,000원 환불 완료</span></div>
+      </div>
+    </div>
+    <div class="rrow open">
+      <div class="head">
+        <span class="when">어제 취소</span>
+        <span class="who"><b>박민수</b> · 010-8765-4321</span>
+        <span class="tname">락다운시티 · 2026.08.17 (월) 21:00</span>
+        <span class="rt"><span class="badge-st st-pending">환불 80%</span></span>
+      </div>
+      <div class="detail">
+        <div class="refund-amt"><span>보낼 금액</span><b>96,000원</b></div>
+        <div class="acct">
+          <span class="bank">국민은행</span><b>123456-01-234567</b>
+          <span style="color:var(--muted)">예금주 박수진</span>
+          <span class="sp"></span><span class="btn ghost" style="font-size:12px">계좌 복사</span>
+        </div>
+        <p class="refund-meta">예약금 120,000원 × 80% · 2026.08.13 (목) 20:05 손님이 직접 취소</p>
+        <p class="refund-warn">예금주(박수진)가 예약자(박민수)와 달라요 — 보내기 전 확인</p>
+        <div class="act-row"><span class="btn primary">96,000원 환불 완료</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="sec">
+    <span class="where">입금·환불 › 환불 처리 (맨 아래)</span>
+    <h2>② 환불 완료 목록 — 여쭤보신 부분</h2>
+    <p class="why">보낸 뒤에는 여기로 내려옵니다. 왼쪽 시각은 예약일이 아니라 <b>돈을 보낸 시각</b>이에요 — 통장 이체 기록과 나란히 맞춰보라고 그렇게 뒀습니다. 잘못 눌렀을 때를 위해 [되돌리기]가 있습니다.</p>
+    <div class="card-h">최근 환불 완료 4건</div>
+    <div class="rrow"><div class="head">
+      <span class="when" style="color:var(--faint)">08.13 21:40</span>
+      <span class="who">이지훈</span>
+      <span class="tname">사자의 서 · 2026.08.16 (일) 20:10</span>
+      <span class="amt">25,000원</span>
+      <span class="rt"><span class="badge-st st-confirmed">환불완료</span><span class="btn ghost" style="font-size:12px">되돌리기</span></span>
+    </div></div>
+    <div class="rrow"><div class="head">
+      <span class="when" style="color:var(--faint)">08.12 15:08</span>
+      <span class="who">최유나</span>
+      <span class="tname">시간의 영속성 · 2026.08.15 (금) 18:00</span>
+      <span class="amt">63,000원</span>
+      <span class="rt"><span class="badge-st st-confirmed">환불완료</span><span class="btn ghost" style="font-size:12px">되돌리기</span></span>
+    </div></div>
+    <div class="rrow"><div class="head">
+      <span class="when" style="color:var(--faint)">08.11 11:22</span>
+      <span class="who">정다은</span>
+      <span class="tname">태초의 신부 · 2026.08.14 (금) 14:40</span>
+      <span class="amt">24,000원</span>
+      <span class="rt"><span class="badge-st st-confirmed">환불완료</span><span class="btn ghost" style="font-size:12px">되돌리기</span></span>
+    </div></div>
+    <div class="rrow"><div class="head">
+      <span class="when" style="color:var(--faint)">08.09 19:47</span>
+      <span class="who">한지우</span>
+      <span class="tname">락다운시티 · 2026.08.12 (수) 19:00</span>
+      <span class="amt">120,000원</span>
+      <span class="rt"><span class="badge-st st-confirmed">환불완료</span><span class="btn ghost" style="font-size:12px">되돌리기</span></span>
+    </div></div>
+    <p class="refund-meta">⚠️ 이 목록은 <b>최근 20건까지만</b> 보입니다. 그보다 오래된 건 아래 ③에서 찾습니다.</p>
+  </div>
+
+  <!-- 3 -->
+  <div class="sec">
+    <span class="where">입금·환불 › 입출금 내역 › 예약 기준</span>
+    <h2>③ 전체 기록 — 기간을 정해 찾기</h2>
+    <p class="why">여기가 진짜 장부입니다. 20건 제한이 없고 <b>기간 조회 · 환불만 보기 · CSV 내보내기</b>가 됩니다. 환불은 나간 돈이라 <b>−</b> 로 찍힙니다.</p>
+    <div class="admin-tools">
+      <input type="date" value="2026-08-01"><span style="color:var(--faint)">~</span><input type="date" value="2026-08-14">
+      <span class="btn">조회</span>
+    </div>
+    <div class="sum">
+      <div><div class="k">받은 돈</div><div class="v" style="color:#137a4c">1,842,000원</div></div>
+      <div><div class="k">돌려준 돈</div><div class="v" style="color:#b4322a">−232,000원</div></div>
+      <div><div class="k">실수령</div><div class="v">1,610,000원</div></div>
+    </div>
+    <div class="admin-tools">
+      <select><option>환불만</option></select>
+      <span class="sp"></span><span class="btn ghost">CSV 내보내기</span>
+    </div>
+    <div class="rrow"><div class="head">
+      <span class="when">08.13 21:40</span><span class="who">이지훈</span>
+      <span class="tname">사자의 서 · 2026.08.16 (일) 20:10</span>
+      <span class="amt" style="color:var(--muted)">−25,000원</span>
+      <span class="rt"><span class="badge-st st-cancelled">환불 100%</span></span>
+    </div></div>
+    <div class="rrow"><div class="head">
+      <span class="when">08.12 15:08</span><span class="who">최유나</span>
+      <span class="tname">시간의 영속성 · 2026.08.15 (금) 18:00</span>
+      <span class="amt" style="color:var(--muted)">−63,000원</span>
+      <span class="rt"><span class="badge-st st-cancelled">환불 100%</span></span>
+    </div></div>
+    <div class="rrow"><div class="head">
+      <span class="when">08.11 11:22</span><span class="who">정다은</span>
+      <span class="tname">태초의 신부 · 2026.08.14 (금) 14:40</span>
+      <span class="amt" style="color:var(--muted)">−24,000원</span>
+      <span class="rt"><span class="badge-st st-cancelled">환불 80%</span></span>
+    </div></div>
+    <div class="rrow"><div class="head">
+      <span class="when">08.09 19:47</span><span class="who">한지우</span>
+      <span class="tname">락다운시티 · 2026.08.12 (수) 19:00</span>
+      <span class="amt" style="color:var(--muted)">−120,000원</span>
+      <span class="rt"><span class="badge-st st-cancelled">환불 100%</span></span>
+    </div></div>
+  </div>
+
+  <!-- 4 -->
+  <div class="sec">
+    <span class="where">예약 › 목록·검색 › 취소된 예약</span>
+    <h2>④ 예약 하나하나에도 남습니다</h2>
+    <p class="why">손님이 "환불 받았나요?" 하고 물어보실 때 그 예약만 열어 확인하는 자리입니다.</p>
+    <div class="rrow open"><div class="head">
+      <span class="when" style="color:var(--faint)">취소됨</span>
+      <span class="who"><b>이지훈</b> · 010-3333-4444</span>
+      <span class="tname">사자의 서 · 2026.08.16 (일) 20:10</span>
+      <span class="rt"><span class="badge-st st-cancelled">취소</span><span class="badge-st st-confirmed">환불완료</span></span>
+    </div>
+    <div class="detail" style="font-size:13px;color:var(--muted)">
+      <div style="display:flex;justify-content:space-between;padding:3px 0"><span>입금 확인</span><b style="color:var(--text)">2026.08.10 (월) 13:02</b></div>
+      <div style="display:flex;justify-content:space-between;padding:3px 0"><span>취소</span><b style="color:var(--text)">2026.08.13 (목) 21:15 손님이 직접 취소</b></div>
+      <div style="display:flex;justify-content:space-between;padding:3px 0"><span>환불 완료</span><b style="color:var(--text)">2026.08.13 (목) 21:40</b></div>
+    </div></div>
+  </div>
+
+  <div class="note" style="margin-top:0">
+    <b>바꾸고 싶으신 게 있으면 말씀해 주세요.</b> 예를 들어 —
+    ②의 <b>20건 제한을 늘리기</b>, 환불 완료만 따로 <b>기간 조회</b>하게 만들기,
+    목록에 <b>은행·계좌</b>까지 같이 보여주기, 합계 금액 표시하기 등 전부 가능합니다.
+  </div>
+</div>
+</body>
+</html>
