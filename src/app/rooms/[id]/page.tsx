@@ -122,7 +122,7 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
           <div className="rm-acct">
             <span>입금 계좌</span><b>{BOOKING_INFO.account}</b>
           </div>
-          <Link href={`/reserve?theme=${theme.id}`} className="btn primary" style={{ marginTop: 16 }}>
+          <Link prefetch={false} href={`/reserve?theme=${theme.id}`} className="btn primary" style={{ marginTop: 16 }}>
             이 테마 예약하기 →
           </Link>
         </section>
@@ -144,7 +144,7 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
           <h2 className="rm-h" style={{ marginBottom: 12 }}>다른 테마</h2>
           <div className="rm-others">
             {others.map((t) => (
-              <Link key={t.id} href={`/rooms/${t.id}`} className="ro-card">
+              <Link prefetch={false} key={t.id} href={`/rooms/${t.id}`} className="ro-card">
                 {t.poster && <Image src={t.poster} alt="" width={220} height={300} sizes="220px" />}
                 <div className="ro-in">
                   <span className="ro-tag">{t.storeTag}</span>

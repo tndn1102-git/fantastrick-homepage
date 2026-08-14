@@ -255,7 +255,7 @@ export default function ReservationLookup() {
       )}
 
       <p style={{ marginTop: 18, textAlign: "center" }}>
-        <Link href="/reserve" style={{ color: "var(--muted)" }}>← 새 예약하기</Link>
+        <Link prefetch={false} href="/reserve" style={{ color: "var(--muted)" }}>← 새 예약하기</Link>
       </p>
 
       {/* 취소 흐름 — ① 환불 규정 안내(먼저!) → ② 환불 계좌 입력.

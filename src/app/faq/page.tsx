@@ -49,7 +49,7 @@ export default async function FaqPage() {
               </div>
             );
           })}
-          <p className="faq-note">테마별 자세한 안내는 <Link href="/rooms/firstfoundbride" className="tlink">테마 페이지</Link>에서 보실 수 있어요.</p>
+          <p className="faq-note">테마별 자세한 안내는 <Link prefetch={false} href="/rooms/firstfoundbride" className="tlink">테마 페이지</Link>에서 보실 수 있어요.</p>
         </div>
       </details>
 
@@ -102,15 +102,15 @@ export default async function FaqPage() {
           <ul>
             {BOOKING_INFO.refund.map((l, i) => <li key={i}>{l}</li>)}
           </ul>
-          <p><Link href="/reservation" className="tlink">예약 조회·취소</Link> 에서 직접 취소하실 수 있고, 그때 <b>환불 받으실 계좌</b>를 함께 남겨주세요.</p>
+          <p><Link prefetch={false} href="/reservation" className="tlink">예약 조회·취소</Link> 에서 직접 취소하실 수 있고, 그때 <b>환불 받으실 계좌</b>를 함께 남겨주세요.</p>
         </div>
       </details>
 
       <details className="faq">
         <summary>예약을 확인하거나 바꾸고 싶어요.</summary>
         <div className="faq-b">
-          <p><Link href="/reservation" className="tlink">예약 조회·취소</Link> 에서 <b>이름 · 전화번호 · 예약 시 정한 비밀번호 4자리</b>로 확인하실 수 있어요.</p>
-          <p>날짜나 시간을 바꾸고 싶으시면 <Link href="/reservation" className="tlink">예약 조회</Link>에서 <b>1회</b> 직접 변경하실 수 있어요. <br className="pc-br" />1회를 초과했을 때는 <b>매장으로 전화</b> 주세요.</p>
+          <p><Link prefetch={false} href="/reservation" className="tlink">예약 조회·취소</Link> 에서 <b>이름 · 전화번호 · 예약 시 정한 비밀번호 4자리</b>로 확인하실 수 있어요.</p>
+          <p>날짜나 시간을 바꾸고 싶으시면 <Link prefetch={false} href="/reservation" className="tlink">예약 조회</Link>에서 <b>1회</b> 직접 변경하실 수 있어요. <br className="pc-br" />1회를 초과했을 때는 <b>매장으로 전화</b> 주세요.</p>
         </div>
       </details>
 
@@ -133,7 +133,7 @@ export default async function FaqPage() {
               <li key={t.id}><b>{t.name}</b> · {THEME_CONTENT[t.id]?.players}</li>
             ))}
           </ul>
-          <p className="faq-note">테마마다 추천 인원이 달라요. 각 <Link href="/rooms/bookofduat" className="tlink">테마 페이지</Link>의 주의사항을 확인해 주세요.</p>
+          <p className="faq-note">테마마다 추천 인원이 달라요. 각 <Link prefetch={false} href="/rooms/bookofduat" className="tlink">테마 페이지</Link>의 주의사항을 확인해 주세요.</p>
           <p className="faq-note">1인 이용 시 <b>2인 가격</b>으로 결제 진행 후 플레이 가능합니다.</p>
         </div>
       </details>
@@ -183,7 +183,7 @@ export default async function FaqPage() {
 
       <div className="notice info" style={{ marginTop: 26 }}>
         찾으시는 답이 없나요? 예약하신 테마의 <b>매장으로 전화</b> 주시면 안내해 드릴게요.
-        비즈니스·외주 문의는 <Link href="/business" className="tlink">비즈니스 페이지</Link>를 봐주세요.
+        비즈니스·외주 문의는 <Link prefetch={false} href="/business" className="tlink">비즈니스 페이지</Link>를 봐주세요.
       </div>
     </div>
   );

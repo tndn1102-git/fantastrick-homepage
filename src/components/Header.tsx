@@ -51,18 +51,18 @@ export default function Header() {
     <>
     <header className={(scrolled ? "scrolled" : "") + (overDark ? " over-hero" : "")}>
       <div className="hdr-in">
-        <Link href="/" className="brand" aria-label="FANTASTRICK 홈">
+        <Link prefetch={false} href="/" className="brand" aria-label="FANTASTRICK 홈">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="logo-img" src="/images/logo-blue.png" alt="FANTASTRICK" />
         </Link>
         <nav className="main">
           {MENU.map((m) => (
-            <Link key={m.href} href={m.href}>{m.label}</Link>
+            <Link prefetch={false} key={m.href} href={m.href}>{m.label}</Link>
           ))}
         </nav>
         <div className="hdr-cta">
-          <Link href="/reservation" className="btn ghost sm">예약 조회·취소</Link>
-          <Link href="/reserve" className="btn primary sm">예약하기</Link>
+          <Link prefetch={false} href="/reservation" className="btn ghost sm">예약 조회·취소</Link>
+          <Link prefetch={false} href="/reserve" className="btn primary sm">예약하기</Link>
         </div>
         <button
           className="menu-btn"
@@ -88,7 +88,7 @@ export default function Header() {
             <button className="drawer-close" onClick={() => setOpen(false)} aria-label="메뉴 닫기"><IconClose /></button>
           </div>
           {MENU.map((m, i) => (
-            <Link
+            <Link prefetch={false}
               key={m.href}
               href={m.href}
               className="menu-link"
@@ -99,8 +99,8 @@ export default function Header() {
             </Link>
           ))}
           <div className="drawer-cta">
-            <Link href="/reservation" className="btn ghost" onClick={() => setOpen(false)}>예약 조회·취소</Link>
-            <Link href="/reserve" className="btn primary" onClick={() => setOpen(false)}>예약하기</Link>
+            <Link prefetch={false} href="/reservation" className="btn ghost" onClick={() => setOpen(false)}>예약 조회·취소</Link>
+            <Link prefetch={false} href="/reserve" className="btn primary" onClick={() => setOpen(false)}>예약하기</Link>
           </div>
         </div>
       </div>

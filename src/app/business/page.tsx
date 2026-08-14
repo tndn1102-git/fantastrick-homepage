@@ -523,7 +523,7 @@ export default function BusinessPage() {
 
           <div className="crossline reveal" style={{ marginTop: 22 }}>
             <p>브랜드 팝업이나 기업 교육처럼 방탈출 매장이 아닌 곳에 만드는 일도 합니다.</p>
-            <Link href="/business/collab">협업 이야기 보기 →</Link>
+            <Link prefetch={false} href="/business/collab">협업 이야기 보기 →</Link>
           </div>
         </section>
       </div></div>}
@@ -904,7 +904,7 @@ export default function BusinessPage() {
 
           <div className="crossline reveal" style={{ marginTop: 22 }}>
             <p>브랜드 팝업이나 기업 교육처럼 방탈출 매장이 아닌 곳에 만드는 일도 합니다.</p>
-            <Link href="/business/collab">협업 이야기 보기 →</Link>
+            <Link prefetch={false} href="/business/collab">협업 이야기 보기 →</Link>
           </div>
         </section>
       </div></div>}
@@ -1102,7 +1102,7 @@ export default function BusinessPage() {
 
           <div className="crossline reveal" style={{ marginTop: 22 }}>
             <p>브랜드 팝업이나 기업 교육처럼 방탈출 매장이 아닌 곳에 만드는 일도 합니다.</p>
-            <Link href="/business/collab">협업 이야기 보기 →</Link>
+            <Link prefetch={false} href="/business/collab">협업 이야기 보기 →</Link>
           </div>
         </section>
       </div></div>}

@@ -218,7 +218,7 @@ export default function EventsPage() {
                 <ul>{t.notes.map((n, j) => <li key={j}>{n}</li>)}</ul>
               </div>
               <div className="ev-modal-cta">
-                <Link href={`/rooms/${t.roomId}`} className="btn primary" onClick={close}>이 테마 보기 →</Link>
+                <Link prefetch={false} href={`/rooms/${t.roomId}`} className="btn primary" onClick={close}>이 테마 보기 →</Link>
               </div>
               <div className="ev-dots">
                 {OBSERVER_THEMES.map((th, j) => (
@@ -248,7 +248,7 @@ export default function EventsPage() {
                 </div>
               ))}
               <div className="ev-modal-cta">
-                <Link href={REVIEW.cta.href} className="btn primary" onClick={close}>{REVIEW.cta.label}</Link>
+                <Link prefetch={false} href={REVIEW.cta.href} className="btn primary" onClick={close}>{REVIEW.cta.label}</Link>
               </div>
             </div>
           </div>
@@ -270,7 +270,7 @@ export default function EventsPage() {
                 </div>
               ))}
               <div className="ev-modal-cta">
-                <Link href={BIRTHDAY.cta.href} className="btn primary" onClick={close}>{BIRTHDAY.cta.label}</Link>
+                <Link prefetch={false} href={BIRTHDAY.cta.href} className="btn primary" onClick={close}>{BIRTHDAY.cta.label}</Link>
               </div>
             </div>
           </div>

@@ -28,7 +28,7 @@ function ThemeCard({ t, no }: { t: Theme; no: number }) {
   // draggable=false — 포스터를 잡아끌 때 브라우저가 링크를 끌고 다니는 유령 이미지를 띄우지 않게.
   // (전에는 CSS 로 카드 자체를 pointer-events:none 처리했는데, 그러면 클릭이 아예 안 먹었다)
   return (
-    <Link className="tcard" data-cat={t.cat} href={`/rooms/${t.id}`} draggable={false}>
+    <Link prefetch={false} className="tcard" data-cat={t.cat} href={`/rooms/${t.id}`} draggable={false}>
       <div className="thumb">
         {/* ⚠️ CSS 배경(backgroundImage)으로 넣으면 next/image 최적화를 통째로 건너뛴다.
             예전엔 그렇게 해서 poster-ldc.png 1MB 원본이 그대로 내려갔음(화면엔 266px로 보이는데).
@@ -295,8 +295,8 @@ export default function Home() {
           </h1>
           <div className="ht-rule" aria-hidden="true" />
           <div className="cta">
-            <Link href="/reserve" className="btn primary">테마 예약하기 →</Link>
-            <Link href="/business" className="btn gold-ghost">외주·컨설팅 문의</Link>
+            <Link prefetch={false} href="/reserve" className="btn primary">테마 예약하기 →</Link>
+            <Link prefetch={false} href="/business" className="btn gold-ghost">외주·컨설팅 문의</Link>
           </div>
         </div>
         <div className="scrollcue">SCROLL ↓</div>
@@ -354,14 +354,14 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-              <div className="rev-more"><Link href="/reviews" className="tlink">전체 후기 →</Link></div>
+              <div className="rev-more"><Link prefetch={false} href="/reviews" className="tlink">전체 후기 →</Link></div>
             </>
           ) : reviews === null ? (
             <div className="notice info reveal">후기를 불러오는 중…</div>
           ) : (
             <div className="rev-empty reveal">
               <p>첫 후기의 주인공이 되어주세요.</p>
-              <Link href="/reviews" className="btn primary sm">플레이하고 후기 남기기 →</Link>
+              <Link prefetch={false} href="/reviews" className="btn primary sm">플레이하고 후기 남기기 →</Link>
             </div>
           )}
         </div>
@@ -376,7 +376,7 @@ export default function Home() {
               <h2 className="title">제작 · Production</h2>
               <p className="lead">2012년부터 직영으로 검증한 콘텐츠·공간·장치 제작.</p>
             </div>
-            <Link href="/business" className="btn gold">제작 역량 보기 →</Link>
+            <Link prefetch={false} href="/business" className="btn gold">제작 역량 보기 →</Link>
           </div>
           <div className="cap3 cap3-mini">
             <div className="cap reveal" style={{ "--i": 0 } as CSSProperties}><span className="cno">01</span><div className="en">Contents</div><h4>콘텐츠 제작</h4><span className="ckw">시나리오 · 연출 · 운영 설계</span></div>
@@ -385,7 +385,7 @@ export default function Home() {
           </div>
           <div className="biz-cta reveal">
             <div className="bt-actions">
-              <Link href="/business" className="btn gold">비즈니스 문의 →</Link>
+              <Link prefetch={false} href="/business" className="btn gold">비즈니스 문의 →</Link>
               <a href="mailto:fantastrick@fantastrick.co.kr" className="btn gold-ghost">이메일</a>
             </div>
           </div>
@@ -430,7 +430,7 @@ export default function Home() {
         </div>
       </section>
 
-      <Link href="/reserve" className="btn primary float">예약하기</Link>
+      <Link prefetch={false} href="/reserve" className="btn primary float">예약하기</Link>
     </>
   );
 }

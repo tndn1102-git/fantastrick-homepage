@@ -25,7 +25,11 @@ export async function GET(req: NextRequest) {
     ...r,
     phone: r.phone ? maskPhone(r.phone) : "",
   }));
-  return NextResponse.json({ ok: true, reviews });
+  // 🔴 2026-08-14 — 5분 동안 클라우드플레어가 대신 답하게 한다(요청 한도 절약).
+  //   후기는 사장님이 등록할 때만 바뀌는데, 손님이 홈을 열 때마다 불린다.
+  return NextResponse.json({ ok: true, reviews }, {
+    headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=1800" },
+  });
 }
 
 /* 🔴 2026-08-13 — 손님이 직접 후기를 쓰는 통로(POST)를 **닫았다**(사장님 지시).

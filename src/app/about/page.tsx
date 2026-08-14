@@ -47,8 +47,8 @@ export default function AboutPage() {
             문을 여는 순간 당신을 다른 세계에 세웁니다.
           </p>
           <div className="ah-cta">
-            <Link href="/reserve" className="btn primary">테마 예약하기 →</Link>
-            <Link href="/business" className="btn gold-ghost">제작·컨설팅 문의</Link>
+            <Link prefetch={false} href="/reserve" className="btn primary">테마 예약하기 →</Link>
+            <Link prefetch={false} href="/business" className="btn gold-ghost">제작·컨설팅 문의</Link>
           </div>
         </div>
       </section>
@@ -143,7 +143,7 @@ export default function AboutPage() {
             </div>
           </div>
           <div className="about-more">
-            <Link href="/business" className="tlink">제작·B2B 자세히 보기 →</Link>
+            <Link prefetch={false} href="/business" className="tlink">제작·B2B 자세히 보기 →</Link>
           </div>
         </div>
       </section>
@@ -186,7 +186,7 @@ export default function AboutPage() {
             ))}
           </div>
           <div className="about-more">
-            <Link href="/#stores" className="tlink">오시는 길 →</Link>
+            <Link prefetch={false} href="/#stores" className="tlink">오시는 길 →</Link>
           </div>
         </div>
       </section>
@@ -229,8 +229,8 @@ export default function AboutPage() {
             강남에서, 판타스트릭이 지은 세계가 당신을 기다립니다.
           </p>
           <div className="af-cta">
-            <Link href="/reserve" className="btn primary">테마 예약하기 →</Link>
-            <Link href="/business" className="btn gold-ghost">제작·컨설팅 문의</Link>
+            <Link prefetch={false} href="/reserve" className="btn primary">테마 예약하기 →</Link>
+            <Link prefetch={false} href="/business" className="btn gold-ghost">제작·컨설팅 문의</Link>
           </div>
         </div>
       </section>

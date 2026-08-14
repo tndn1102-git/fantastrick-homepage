@@ -234,7 +234,7 @@ export default function CollabPage() {
 
           <div className="crossline reveal" style={{ marginTop: 22 }}>
             <p>방탈출 매장을 하시거나 열려고 하신다면 이쪽입니다.</p>
-            <Link href="/business">장치와 시공 이야기 보기 →</Link>
+            <Link prefetch={false} href="/business">장치와 시공 이야기 보기 →</Link>
           </div>
         </section>
       </div>

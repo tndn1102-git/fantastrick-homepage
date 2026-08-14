@@ -24,26 +24,26 @@ export default function Footer() {
           <div>
             <h5>바로가기</h5>
             <ul>
-              <li><Link href="/#themes">테마</Link></li>
-              <li><Link href="/#reviews">후기</Link></li>
-              <li><Link href="/events">이벤트</Link></li>
-              <li><Link href="/business">제작</Link></li>
-              <li><Link href="/#stores">오시는길</Link></li>
+              <li><Link prefetch={false} href="/#themes">테마</Link></li>
+              <li><Link prefetch={false} href="/#reviews">후기</Link></li>
+              <li><Link prefetch={false} href="/events">이벤트</Link></li>
+              <li><Link prefetch={false} href="/business">제작</Link></li>
+              <li><Link prefetch={false} href="/#stores">오시는길</Link></li>
             </ul>
           </div>
           <div>
             <h5>문의 · 예약</h5>
             <ul>
-              <li>예약 · <Link href="/reserve">홈페이지에서 예약</Link></li>
-              <li>예약 조회·취소 · <Link href="/reservation">바로가기</Link></li>
+              <li>예약 · <Link prefetch={false} href="/reserve">홈페이지에서 예약</Link></li>
+              <li>예약 조회·취소 · <Link prefetch={false} href="/reservation">바로가기</Link></li>
             </ul>
           </div>
         </div>
         <div className="foot-bottom">
           <span>
             © 2026 FANTASTRICK. All rights reserved.
-            <Link href="/privacy" className="foot-privacy">개인정보처리방침</Link>
-            <Link href="/admin" className="foot-admin">관리자</Link>
+            <Link prefetch={false} href="/privacy" className="foot-privacy">개인정보처리방침</Link>
+            <Link prefetch={false} href="/admin" className="foot-admin">관리자</Link>
           </span>
           <span className="slogan-foot">일상이 멈추고, 이야기가 시작된다</span>
         </div>

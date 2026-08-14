@@ -286,12 +286,12 @@ export default function ReserveClient({ preset }: { preset: string }) {
             <b> 입금이 확인되어야 예약이 확정</b>되며, 확정되면 <b>확정 안내 문자</b>를 보내드립니다.
             <b> 30분 내 미입금 시 예약은 자동 취소</b>됩니다.
             예약 확인 및 취소는{" "}
-            <Link href="/reservation" style={{ color: "var(--cyan)", fontWeight: 700 }}>예약조회</Link>
+            <Link prefetch={false} href="/reservation" style={{ color: "var(--cyan)", fontWeight: 700 }}>예약조회</Link>
             에서 진행하실 수 있습니다.
           </div>
           <div style={{ display: "flex", gap: 10, marginTop: 6 }}>
-            <Link href="/reservation" className="btn primary">예약 조회·취소</Link>
-            <Link href="/" className="btn ghost">홈으로</Link>
+            <Link prefetch={false} href="/reservation" className="btn primary">예약 조회·취소</Link>
+            <Link prefetch={false} href="/" className="btn ghost">홈으로</Link>
           </div>
         </div>
 
@@ -563,7 +563,7 @@ export default function ReserveClient({ preset }: { preset: string }) {
 
         <label className="agree-row" style={{ marginTop: 4 }}>
           <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
-          <span><b>[필수]</b> <Link href="/privacy" className="tlink" target="_blank" rel="noopener noreferrer">개인정보 수집·이용</Link>에 동의합니다. <span style={{ color: "var(--faint)" }}>(이름·전화번호를 예약 접수·확인·취소·안내 목적으로 이용)</span></span>
+          <span><b>[필수]</b> <Link prefetch={false} href="/privacy" className="tlink" target="_blank" rel="noopener noreferrer">개인정보 수집·이용</Link>에 동의합니다. <span style={{ color: "var(--faint)" }}>(이름·전화번호를 예약 접수·확인·취소·안내 목적으로 이용)</span></span>
         </label>
 
         {err && <div className="msg-err"><IconWarn /> {err}</div>}
@@ -576,7 +576,7 @@ export default function ReserveClient({ preset }: { preset: string }) {
       </div>
 
       <p style={{ marginTop: 16, textAlign: "center" }}>
-        <Link href="/reservation" style={{ color: "var(--muted)" }}>이미 예약하셨나요? 예약 조회·취소 →</Link>
+        <Link prefetch={false} href="/reservation" style={{ color: "var(--muted)" }}>이미 예약하셨나요? 예약 조회·취소 →</Link>
       </p>
     </div>
   );
