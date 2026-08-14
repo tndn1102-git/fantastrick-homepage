@@ -25,7 +25,7 @@ const BASE = "https://homepage.internal";
 
 const JOBS = {
   "0 3 * * 1": { path: "/api/cron/backup", label: "backup" },
-  "*/5 * * * *": { path: "/api/cron/wp-sync", label: "wp-sync" },
+  // 🔴 2026-08-14 wp-sync 삭제 — 옛 사이트 동기화가 취소를 되돌렸다(사장님 지시로 중단).
 };
 
 async function run(job, env) {

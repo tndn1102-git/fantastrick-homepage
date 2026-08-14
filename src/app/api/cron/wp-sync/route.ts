@@ -29,9 +29,33 @@ function authorized(req: NextRequest): boolean | Promise<boolean> {
   return isAdmin(req); // 관리자가 화면에서 "지금 맞추기" 를 눌러도 되게
 }
 
+/* 🔴 2026-08-14 — **동기화 중단**(사장님 지시). 이 통로는 이제 아무 일도 하지 않는다.
+ *
+ * [무슨 일이 있었나]
+ *   새 홈페이지에서 예약을 취소해도 5분 안에 되살아났다. 이 동기화가 옛 사이트를 정답으로
+ *   보고 우리 상태를 덮어썼기 때문이다(wp-sync.ts: 저쪽에 살아있으면 status 를 되돌리고
+ *   cancelled_at 까지 null 로 지운다 → **취소한 흔적조차 안 남는다**).
+ *   실측: 이희망님 예약을 13:28·14:19 두 번 취소했는데 두 번 다 confirmed 로 돌아왔다.
+ *
+ * [왜 크론만 지우지 않고 여기도 막나]
+ *   크론은 껐지만 이 주소는 살아 있어서, 관리자 로그인 상태로 누가 부르면 그 한 번으로
+ *   예약이 통째로 되살아난다. **길목을 막아야 사고가 안 난다.**
+ *
+ * 되살릴 일이 생기면 이 블록만 지우면 아래 옛 코드가 그대로 동작한다.
+ * ⚠️ 단, 되살리기 전에 wp-sync.ts 의 "취소 되돌리기" 부분을 먼저 손봐야 같은 사고가 안 난다. */
+const SYNC_DISABLED = true;
+
 async function run(req: NextRequest) {
   if (!(await authorized(req))) {
     return NextResponse.json({ error: "권한이 없습니다." }, { status: 401 });
+  }
+
+  if (SYNC_DISABLED) {
+    return NextResponse.json({
+      ok: true,
+      skipped: true,
+      message: "옛 사이트 동기화는 2026-08-14 부터 중단됐습니다. 새 홈페이지가 본 사이트입니다.",
+    });
   }
 
   const { WP_DB_HOST, WP_DB_PORT, WP_DB_USER, WP_DB_PASSWORD, WP_DB_NAME, WP_TABLE_PREFIX,
