@@ -1,6 +1,6 @@
 "use client";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { STORES, THEMES, TIME_SLOTS, DOW_LABELS, slotsForThemeDate, type StoreSlots, type SlotSchedule } from "@/lib/data";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { STORES, THEMES, TIME_SLOTS, DOW_LABELS, slotsForThemeDate, themeColor, type StoreSlots, type SlotSchedule } from "@/lib/data";
 import { isRefundOwed, isRefundReady, refundAmount, cancelledBy, isAutoCancelled } from "@/lib/money";
 import { isActiveSmsType } from "@/lib/sms-templates";
 import { EXPIRE_MINUTES, GRACE_UNTIL_HOUR, DELETE_AFTER_DAYS } from "@/lib/expire";
@@ -1556,17 +1556,23 @@ function RefundQueue({ onDone }: { onDone: () => void }) {
           <div className="notice ok">보내드릴 환불 없음 — 다 처리하셨어요.</div>
         )
       ) : todo.map((r) => (
-        <div key={r.id} className="rrow open">
-          <div className="head" style={{ cursor: "default" }}>
-            <span className="when">{daysAgoLabel(r.cancelled_at)}</span>
-            <span className="who"><b>{r.refund_holder || r.name}</b> · <Phone v={r.phone} /></span>
-            <span className="tname">{r.theme_name} · {formatDate(r.date)} {r.time}</span>
-            <span className="rt"><span className="badge-st st-pending">환불 {r.refund_rate}%</span></span>
+        /* 🔴 2026-08-14 — 3안 채택(사장님 선택). **보낼 금액을 카드 왼쪽 기둥으로** 뺐다.
+           사장님이 이 화면에서 하는 일은 딱 둘 — 얼마를, 어느 계좌로. 그 둘이 제일 커야 한다.
+           왼쪽 기둥 배경에 테마색을 옅게 깔아, 금액을 보는 동시에 어느 방인지도 읽힌다. */
+        <div key={r.id} className="rfcard" style={{ "--th": themeColor(r.theme_id) } as CSSProperties}>
+          <div className="rf-amt">
+            <span className="k">보낼 금액</span>
+            <b className="v">{refundAmount(r).toLocaleString()}<i>원</i></b>
           </div>
-          <div className="detail">
-            {/* 사장님이 할 일은 하나 — **이 계좌로 이 금액을 보내는 것.**
-                그래서 금액을 제일 크게, 바로 아래 계좌를 둔다. 나머지는 근거라 작게 내린다. */}
-            <div className="refund-amt"><span>보낼 금액</span><b>{refundAmount(r).toLocaleString()}원</b></div>
+          <div className="rf-body">
+            <div className="rf-top">
+              <span className="rf-theme">{r.theme_name}</span>
+              <span className="rf-when">{formatDate(r.date)} {r.time}</span>
+              <span className="badge-st st-pending">환불 {r.refund_rate}%</span>
+              <span className="sp" />
+              <span className="rf-ago">{daysAgoLabel(r.cancelled_at)}</span>
+            </div>
+            <div className="rf-who"><b>{r.refund_holder || r.name}</b> · <Phone v={r.phone} /></div>
             {/* 은행·계좌·예금주를 한 줄에 — 눈이 위아래로 안 움직이게 */}
             <div className="acct">
               <span className="bank">{r.refund_bank || "은행 없음"}</span>
@@ -1660,17 +1666,23 @@ function NeedAcctRow({ r, onSaved }: { r: Reservation; onSaved: () => void }) {
   }
 
   return (
-    <div className="rrow open">
-      <div className="head" style={{ cursor: "default" }}>
-        <span className="when">{daysAgoLabel(r.cancelled_at)}</span>
-        <span className="who"><b>{r.name}</b> · <Phone v={r.phone} /></span>
-        <span className="tname">{r.theme_name} · {formatDate(r.date)} {r.time}</span>
-        <span className="amt">{refundAmount(r).toLocaleString()}원</span>
-        <span className="rt"><span className="badge-st st-pending">환불 {r.refund_rate}%</span></span>
+    /* 계좌 입력 대기 카드도 같은 모양(3안)으로 — 두 종류가 나란히 놓이므로 생김새가 같아야 읽힌다. */
+    <div className="rfcard" style={{ "--th": themeColor(r.theme_id) } as CSSProperties}>
+      <div className="rf-amt">
+        <span className="k">돌려줄 금액</span>
+        <b className="v">{refundAmount(r).toLocaleString()}<i>원</i></b>
       </div>
-      <div className="detail">
-        <p className="hint" style={{ margin: "0 0 8px" }}>
-          예약금 {r.deposit.toLocaleString()}원 × 환불율 {r.refund_rate}% = <b style={{ color: "var(--text)" }}>{refundAmount(r).toLocaleString()}원</b>
+      <div className="rf-body">
+        <div className="rf-top">
+          <span className="rf-theme">{r.theme_name}</span>
+          <span className="rf-when">{formatDate(r.date)} {r.time}</span>
+          <span className="badge-st st-pending">환불 {r.refund_rate}%</span>
+          <span className="sp" />
+          <span className="rf-ago">{daysAgoLabel(r.cancelled_at)}</span>
+        </div>
+        <div className="rf-who"><b>{r.name}</b> · <Phone v={r.phone} /></div>
+        <p className="refund-meta" style={{ margin: "8px 0 10px" }}>
+          예약금 {r.deposit.toLocaleString()}원 × 환불율 {r.refund_rate}%
           {" · "}취소 {formatStamp(r.cancelled_at)} ({cancelledBy(r)})
         </p>
         <div className="acct-form">
