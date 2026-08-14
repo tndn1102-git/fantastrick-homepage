@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>환불 처리 카드 — 10안</title>
+<style>
+  :root{
+    --text:#131620; --muted:#535a69; --faint:#9aa3b2;
+    --line:rgba(20,22,42,.12); --line2:rgba(20,22,42,.20);
+    --bg:#f4f6f9; --bg2:#eef1f6; --surface:#fff; --brand:#2a63c9; --r:12px;
+    /* 테마색 — 관리자(흰 배경)용. 리뷰 카드 색과 같은 색상, 명도만 낮춘 짝 */
+    --t-bride:#1E50C9; --t-duat:#6D2FBD; --t-ldc:#A8560E; --t-time:#0E7A82;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:"Pretendard","Malgun Gothic",system-ui,sans-serif;line-height:1.6}
+  .wrap{max-width:1000px;margin:0 auto;padding:36px 20px 110px}
+  h1{font-size:25px;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:14px}
+  .note{background:var(--surface);border:1px solid var(--line);border-radius:10px;
+    padding:13px 16px;margin:16px 0 32px;font-size:13.5px;color:var(--muted)}
+  .note b{color:var(--text)}
+
+  .opt{margin-bottom:34px}
+  .opt-h{display:flex;align-items:baseline;gap:9px;margin-bottom:2px}
+  .opt-h h2{font-size:17px;margin:0}
+  .tag{font-size:11px;font-weight:800;border-radius:5px;padding:3px 8px}
+  .now{background:#e9ecf1;color:var(--muted)}
+  .rec{background:#12805c;color:#fff}
+  .why{font-size:13px;color:var(--faint);margin:0 0 11px}
+
+  /* 공통 부품 */
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+  .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;font-size:13.5px}
+  .ago{font-weight:800;color:var(--muted);min-width:74px}
+  .nm{font-weight:800}
+  .ph{color:var(--muted)}
+  .th{font-weight:800}
+  .when{color:var(--muted);font-size:12.5px}
+  .pill{font-size:11.5px;font-weight:800;border-radius:6px;padding:3px 9px;background:#fdf6e3;color:#8a6d1f;border:1px solid #ecdcb0}
+  .body{border-top:1px solid var(--line);padding:14px 16px}
+  .meta{font-size:12.5px;color:var(--faint);margin:9px 0 0}
+  .btn{border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;border:1px solid var(--line2);background:var(--surface);color:var(--text);cursor:default}
+  .btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .acts{display:flex;gap:8px;margin-top:12px}
+  .num{font-variant-numeric:tabular-nums;letter-spacing:.02em}
+  .money{font-weight:800;font-variant-numeric:tabular-nums}
+  .copy{margin-left:auto}
+
+  /* 1 현재 */
+  .s1 .amt{font-size:23px;font-weight:800}
+  .s1 .acct{display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:var(--bg2);
+    border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin-top:8px}
+
+  /* 2 왼쪽 테마색 띠 */
+  .s2 .card{border-left:5px solid var(--c)}
+  .s2 .th{color:var(--c)}
+  .s2 .amt{font-size:23px;font-weight:800}
+  .s2 .acct{display:flex;align-items:center;gap:9px;background:var(--bg2);border-radius:9px;padding:9px 12px;margin-top:8px}
+
+  /* 3 금액 왼쪽 큰 기둥 */
+  .s3 .grid{display:flex;gap:0}
+  .s3 .left{flex:0 0 168px;background:color-mix(in srgb,var(--c) 8%,var(--surface));
+    border-right:1px solid var(--line);padding:16px;display:flex;flex-direction:column;justify-content:center}
+  .s3 .left .k{font-size:11.5px;font-weight:800;color:var(--muted)}
+  .s3 .left .v{font-size:26px;font-weight:800;color:var(--c);font-variant-numeric:tabular-nums;line-height:1.15}
+  .s3 .right{flex:1;padding:14px 16px}
+  .s3 .th{color:var(--c)}
+
+  /* 4 계좌 = 복사 카드 */
+  .s4 .th{color:var(--c)}
+  .s4 .amt{font-size:23px;font-weight:800}
+  .s4 .acctbox{border:1.5px dashed var(--line2);border-radius:10px;padding:12px 14px;margin-top:10px;
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .s4 .bankchip{font-size:12px;font-weight:800;background:var(--bg2);border-radius:6px;padding:4px 9px}
+  .s4 .no{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.03em}
+
+  /* 5 두 칸 나란히 */
+  .s5 .two{display:grid;grid-template-columns:1fr 1.4fr;gap:12px}
+  .s5 .box{border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .s5 .box .k{font-size:11.5px;font-weight:800;color:var(--muted);margin-bottom:3px}
+  .s5 .box .v{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums}
+  .s5 .box.acc .v{font-size:17px}
+  .s5 .th{color:var(--c)}
+
+  /* 6 표 형식 */
+  .s6 .th{color:var(--c)}
+  .s6 table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:4px}
+  .s6 td{padding:7px 0;border-bottom:1px solid var(--line)}
+  .s6 td:first-child{width:88px;color:var(--muted);font-weight:700;font-size:12.5px}
+  .s6 tr:last-child td{border-bottom:0}
+  .s6 .big{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+
+  /* 7 영수증 */
+  .s7 .card{border-style:solid}
+  .s7 .th{color:var(--c)}
+  .s7 .rc{padding:14px 16px}
+  .s7 .l{display:flex;justify-content:space-between;padding:5px 0;font-size:13.5px;color:var(--muted)}
+  .s7 .l b{color:var(--text);font-variant-numeric:tabular-nums}
+  .s7 .tot{border-top:2px dashed var(--line2);margin-top:8px;padding-top:10px}
+  .s7 .tot b{font-size:22px;color:var(--c)}
+
+  /* 8 색 머리띠 */
+  .s8 .top{background:color-mix(in srgb,var(--c) 12%,var(--surface));
+    border-bottom:1px solid color-mix(in srgb,var(--c) 26%,transparent)}
+  .s8 .th{color:var(--c)}
+  .s8 .amt{font-size:23px;font-weight:800}
+  .s8 .acct{display:flex;align-items:center;gap:9px;background:var(--bg2);border-radius:9px;padding:9px 12px;margin-top:8px}
+
+  /* 9 금액 알약 */
+  .s9 .th{color:var(--c)}
+  .s9 .chip{display:inline-block;background:var(--c);color:#fff;border-radius:999px;
+    padding:6px 15px;font-size:19px;font-weight:800;font-variant-numeric:tabular-nums}
+  .s9 .acct{margin-top:10px;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+  .s9 .bank{font-size:12.5px;font-weight:700;color:var(--muted);margin-right:8px}
+
+  /* 10 최소 */
+  .s10 .card{border-left:5px solid var(--c)}
+  .s10 .th{color:var(--c);font-size:12.5px}
+  .s10 .big{font-size:27px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.15}
+  .s10 .acc{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:2px}
+  .s10 .dim{font-size:12px;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>환불 처리 카드 — 10안</h1>
+  <p class="sub">관리자 › 입금·환불 › 환불 처리 화면. 실제 크기·색 그대로입니다.</p>
+
+  <div class="note">
+    ※ 보내주신 사진이 <b>예약 시간표 화면</b>이라, 말씀하신 내용(테마색·금액·계좌번호)에 맞춰
+    <b>환불 처리 화면</b>으로 만들었습니다. 다른 화면이었다면 알려주세요.
+    <br><br>
+    <b>사장님이 이 화면에서 하는 일은 딱 두 가지</b>입니다 — ① 얼마를 ② 어느 계좌로 보낼지.
+    그래서 아래 안들은 전부 <b>금액과 계좌를 가장 크고 진하게</b> 두고, 나머지(취소 시각·환불율 근거)는 작게 내렸습니다.
+    테마 이름에는 정해둔 테마색을 넣었습니다.
+  </div>
+
+  <!-- 1 -->
+  <div class="opt s1">
+    <div class="opt-h"><h2>1안 — 지금</h2><span class="tag now">현재</span></div>
+    <p class="why">금액은 큰데 테마 이름이 회색이라 어느 방인지 눈에 안 들어옵니다. 계좌도 배경만 살짝 다릅니다.</p>
+    <div class="card">
+      <div class="row"><span class="ago">2일 전 취소</span><span class="nm">김서연</span><span class="ph">010-2345-6789</span>
+        <span class="th" style="color:var(--muted)">시간의 영속성 · 2026.08.18 (화) 18:00</span>
+        <span class="pill copy">환불 100%</span></div>
+      <div class="body">
+        <div style="font-size:12.5px;color:var(--muted);font-weight:700">보낼 금액</div>
+        <div class="amt">63,000원</div>
+        <div class="acct"><b style="color:var(--muted)">카카오뱅크</b><b class="num">3333-01-2345678</b>
+          <span style="color:var(--muted)">예금주 김서연</span><span class="btn copy" style="font-size:12px">계좌 복사</span></div>
+        <p class="meta">예약금 63,000원 × 100% · 2026.08.12 (수) 14:22 손님이 직접 취소</p>
+        <div class="acts"><span class="btn p">63,000원 환불 완료</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="opt s2" style="--c:var(--t-time)">
+    <div class="opt-h"><h2>2안 — 왼쪽 테마색 띠</h2></div>
+    <p class="why">카드 왼쪽에 테마색 기둥. 여러 건이 쌓였을 때 색만 보고 어느 방인지 훑입니다. 지금 구조를 거의 안 바꿔도 됩니다.</p>
+    <div class="card">
+      <div class="row"><span class="ago">2일 전 취소</span><span class="nm">김서연</span><span class="ph">010-2345-6789</span>
+        <span class="th">시간의 영속성</span><span class="when">2026.08.18 (화) 18:00</span>
+        <span class="pill copy">환불 100%</span></div>
+      <div class="body">
+        <div style="font-size:12.5px;color:var(--muted);font-weight:700">보낼 금액</div>
+        <div class="amt">63,000원</div>
+        <div class="acct"><b style="color:var(--muted)">카카오뱅크</b><b class="num">3333-01-2345678</b>
+          <span style="color:var(--muted)">예금주 김서연</span><span class="btn copy" style="font-size:12px">계좌 복사</span></div>
+        <p class="meta">예약금 63,000원 × 100% · 08.12 (수) 14:22 손님이 직접 취소</p>
+        <div class="acts"><span class="btn p">63,000원 환불 완료</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="opt s3" style="--c:var(--t-ldc)">
+    <div class="opt-h"><h2>3안 — 금액을 왼쪽 기둥으로</h2><span class="tag rec">추천</span></div>
+    <p class="why">보낼 금액이 카드 왼쪽에 통째로 자리잡아 시선이 제일 먼저 닿습니다. 금액 칸 배경도 테마색이라 방 구분까지 같이 됩니다.</p>
+    <div class="card"><div class="grid">
+      <div class="left"><div class="k">보낼 금액</div><div class="v">120,000<span style="font-size:16px">원</span></div></div>
+      <div class="right">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span class="th">락다운시티</span><span class="when">2026.08.17 (월) 21:00</span>
+          <span class="pill copy">환불 100%</span></div>
+        <div style="margin:8px 0 0;font-size:14px"><b>박민수</b> <span class="ph">010-8765-4321</span></div>
+        <div style="display:flex;align-items:center;gap:9px;background:var(--bg2);border-radius:9px;padding:9px 12px;margin-top:9px;flex-wrap:wrap">
+          <b style="color:var(--muted)">국민은행</b><b class="num" style="font-size:15px">123456-01-234567</b>
+          <span style="color:var(--muted)">예금주 박수진</span><span class="btn copy" style="font-size:12px">계좌 복사</span></div>
+        <p class="meta">예약금 120,000원 × 100% · 08.13 (목) 20:05 손님이 직접 취소</p>
+        <div class="acts"><span class="btn p">120,000원 환불 완료</span></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 4 -->
+  <div class="opt s4" style="--c:var(--t-bride)">
+    <div class="opt-h"><h2>4안 — 계좌를 복사 카드로</h2><span class="tag rec">추천</span></div>
+    <p class="why">계좌번호를 점선 상자에 크게 넣어 "여기를 복사해서 붙여넣는다"가 눈에 보입니다. 숫자 폭을 고정해 자릿수를 잘못 읽는 실수를 줄입니다.</p>
+    <div class="card">
+      <div class="row"><span class="ago">어제 취소</span><span class="nm">정다은</span><span class="ph">010-1111-2222</span>
+        <span class="th">태초의 신부</span><span class="when">2026.08.16 (일) 14:40</span><span class="pill copy">환불 80%</span></div>
+      <div class="body">
+        <div style="font-size:12.5px;color:var(--muted);font-weight:700">보낼 금액</div>
+        <div class="amt">24,000원</div>
+        <div class="acctbox">
+          <span class="bankchip">국민은행</span><span class="no">123456-01-234567</span>
+          <span style="color:var(--muted);font-size:12.5px">예금주 정다은</span>
+          <span class="btn copy" style="font-size:12px">계좌 복사</span></div>
+        <p class="meta">예약금 30,000원 × 80% · 08.13 (목) 11:20 손님이 직접 취소</p>
+        <div class="acts"><span class="btn p">24,000원 환불 완료</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <div class="opt s5" style="--c:var(--t-duat)">
+    <div class="opt-h"><h2>5안 — 금액 / 계좌 두 칸</h2></div>
+    <p class="why">해야 할 두 가지를 아예 두 상자로 나눴습니다. 왼쪽 얼마, 오른쪽 어디로.</p>
+    <div class="card">
+      <div class="row"><span class="ago">3일 전 취소</span><span class="nm">이지훈</span><span class="ph">010-3333-4444</span>
+        <span class="th">사자의 서</span><span class="when">2026.08.19 (수) 20:10</span><span class="pill copy">환불 100%</span></div>
+      <div class="body">
+        <div class="two">
+          <div class="box"><div class="k">보낼 금액</div><div class="v">25,000원</div></div>
+          <div class="box acc"><div class="k">받을 계좌</div><div class="v num">신한 110-123-456789</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px">예금주 이지훈</div></div>
+        </div>
+        <p class="meta">예약금 25,000원 × 100% · 08.11 (월) 09:30 손님이 직접 취소</p>
+        <div class="acts"><span class="btn p">25,000원 환불 완료</span><span class="btn">계좌 복사</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6 -->
+  <div class="opt s6" style="--c:var(--t-time)">
+    <div class="opt-h"><h2>6안 — 라벨-값 표</h2></div>
+    <p class="why">은행·계좌·예금주가 줄 맞춰 정렬됩니다. 정보가 많아도 안 헝클어지지만, 세로로 조금 길어집니다.</p>
+    <div class="card">
+      <div class="row"><span class="ago">2일 전 취소</span><span class="nm">최유나</span><span class="ph">010-5555-6666</span>
+        <span class="th">시간의 영속성</span><span class="when">2026.08.20 (목) 16:00</span><span class="pill copy">환불 100%</span></div>
+      <div class="body"><table>
+        <tr><td>보낼 금액</td><td class="big">63,000원</td></tr>
+        <tr><td>은행</td><td><b>카카오뱅크</b></td></tr>
+        <tr><td>계좌번호</td><td><b class="num" style="font-size:16px">3333-01-2345678</b> <span class="btn copy" style="font-size:12px">복사</span></td></tr>
+        <tr><td>예금주</td><td>최유나</td></tr>
+      </table>
+        <p class="meta">예약금 63,000원 × 100% · 08.12 (수) 18:10 손님이 직접 취소</p>
+        <div class="acts"><span class="btn p">63,000원 환불 완료</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7 -->
+  <div class="opt s7" style="--c:var(--t-ldc)">
+    <div class="opt-h"><h2>7안 — 영수증</h2></div>
+    <p class="why">계산 과정이 그대로 보여 "왜 이 금액인지" 설명이 필요 없습니다. 손님이 금액을 물어볼 때 화면째로 읽어주기 좋습니다.</p>
+    <div class="card">
+      <div class="row"><span class="ago">어제 취소</span><span class="nm">한지우</span><span class="ph">010-7777-8888</span>
+        <span class="th">락다운시티</span><span class="when">2026.08.18 (화) 19:00</span></div>
+      <div class="rc" style="border-top:1px solid var(--line)">
+        <div class="l"><span>예약금</span><b>120,000원</b></div>
+        <div class="l"><span>환불율 (24시간 이내 취소)</span><b>80%</b></div>
+        <div class="l tot"><span style="font-weight:800;color:var(--text)">보낼 금액</span><b>96,000원</b></div>
+        <div style="display:flex;align-items:center;gap:9px;background:var(--bg2);border-radius:9px;padding:9px 12px;margin-top:12px;flex-wrap:wrap">
+          <b style="color:var(--muted)">우리은행</b><b class="num">1002-345-678901</b>
+          <span style="color:var(--muted)">예금주 한지우</span><span class="btn copy" style="font-size:12px">계좌 복사</span></div>
+        <div class="acts"><span class="btn p">96,000원 환불 완료</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8 -->
+  <div class="opt s8" style="--c:var(--t-bride)">
+    <div class="opt-h"><h2>8안 — 테마색 머리띠</h2></div>
+    <p class="why">후기 카드에 적용한 것과 같은 결. 관리자·손님 화면이 같은 규칙으로 보입니다.</p>
+    <div class="card">
+      <div class="row top"><span class="ago">오늘 취소</span><span class="nm">황연우</span><span class="ph">010-9999-0000</span>
+        <span class="th">태초의 신부</span><span class="when">2026.08.21 (금) 16:00</span><span class="pill copy">환불 100%</span></div>
+      <div class="body">
+        <div style="font-size:12.5px;color:var(--muted);font-weight:700">보낼 금액</div>
+        <div class="amt">30,000원</div>
+        <div class="acct"><b style="color:var(--muted)">농협</b><b class="num">302-1234-5678-91</b>
+          <span style="color:var(--muted)">예금주 황연우</span><span class="btn copy" style="font-size:12px">계좌 복사</span></div>
+        <p class="meta">예약금 30,000원 × 100% · 08.14 (금) 09:15 손님이 직접 취소</p>
+        <div class="acts"><span class="btn p">30,000원 환불 완료</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9 -->
+  <div class="opt s9" style="--c:var(--t-duat)">
+    <div class="opt-h"><h2>9안 — 금액 알약</h2></div>
+    <p class="why">금액을 테마색 알약으로. 색과 숫자가 한 덩어리라 목록에서 제일 먼저 보입니다. 다만 색이 강해 여러 건이면 화려합니다.</p>
+    <div class="card">
+      <div class="row"><span class="ago">4일 전 취소</span><span class="nm">채유진</span><span class="ph">010-4444-5555</span>
+        <span class="th">사자의 서</span><span class="when">2026.08.16 (일) 17:50</span></div>
+      <div class="body">
+        <span class="chip">25,000원</span>
+        <div class="acct"><span class="bank">기업은행</span>010-1234-5678-01</div>
+        <div style="font-size:12px;color:var(--muted)">예금주 채유진</div>
+        <p class="meta">예약금 25,000원 × 100% · 08.10 (월) 21:40 손님이 직접 취소</p>
+        <div class="acts"><span class="btn p">25,000원 환불 완료</span><span class="btn">계좌 복사</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10 -->
+  <div class="opt s10" style="--c:var(--t-time)">
+    <div class="opt-h"><h2>10안 — 가장 단순하게</h2><span class="tag rec">추천</span></div>
+    <p class="why">군더더기를 다 뺐습니다. 큰 금액과 큰 계좌, 나머지는 전부 작은 회색 한 줄. 여러 건이 쌓여도 조용합니다.</p>
+    <div class="card">
+      <div class="body" style="border-top:0">
+        <div class="th">시간의 영속성 · 2026.08.22 (토) 12:00</div>
+        <div class="big">63,000원</div>
+        <div class="acc">카카오뱅크 3333-01-2345678</div>
+        <div class="dim">예금주 최유나 · 예약금 63,000원 × 100% · 08.12 (수) 취소 · 010-5555-6666</div>
+        <div class="acts"><span class="btn p">63,000원 환불 완료</span><span class="btn">계좌 복사</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note" style="margin-bottom:0">
+    번호만 알려주시면 적용하겠습니다. <b>섞어도 됩니다</b> — 예를 들어
+    <b>"3안 구조에 4안 계좌 상자"</b> 처럼 말씀하셔도 그대로 만듭니다.
+  </div>
+</div>
+</body>
+</html>
