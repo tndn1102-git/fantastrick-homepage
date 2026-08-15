@@ -1594,6 +1594,202 @@ function daysAgoLabel(iso: string | null) {
   return d <= 0 ? "오늘 취소" : `${d}일 지남`;
 }
 
+/* 🏪 매장 수동 환불 접수 (2026-08-15 사장님 요청)
+ *
+ * [왜 필요한가]
+ *   [환불 처리] 탭에는 **홈페이지에서 취소된 예약**만 떴다. 그런데 현장에서 손님을
+ *   직접 응대하다 환불해야 하는 경우(현장 취소·착오 입금·중복 결제 등)는 어디에도
+ *   안 남아서, 직원이 사장님께 말로 전해야 했다 — 잊히거나 금액이 틀리기 쉽다.
+ *   → 직원이 여기 적어두면 사장님이 같은 화면에서 보고 보낸다.
+ *
+ * [색을 왜 따로 주나]
+ *   테마마다 색이 있으니 매장 접수 건도 같은 규칙으로 색을 줘야 한눈에 갈린다.
+ *   기존 4색(파랑 222°·보라 266°·주황 28°·청록 184°)에서 **최소 57도 떨어진 로즈(331°)**
+ *   를 골랐다. 흰 배경 대비 6.2:1 이라 작은 글씨도 읽힌다.
+ */
+const MANUAL_COLOR = "#B02A6B";
+
+type ManualRefund = {
+  id: string; name: string; phone: string | null; amount: number;
+  bank: string; account: string; holder: string; reason: string;
+  staff: string | null; status: string; memo: string | null;
+  created_at: string; done_at: string | null;
+};
+
+function ManualRefunds() {
+  const [rows, setRows] = useState<ManualRefund[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const [err, setErr] = useState("");
+  const [msg, setMsg] = useState("");
+  const [open, setOpen] = useState(false);      // 접수 폼 열림
+  const [showDone, setShowDone] = useState(false);
+  const [busy, setBusy] = useState("");
+
+  const load = useCallback(async () => {
+    setErr("");
+    const res = await fetch("/api/admin/manual-refunds");
+    if (res.ok) { const j = await res.json(); setRows(j.items || []); }
+    else { const j = await res.json().catch(() => ({})); setErr(j.error || "불러오지 못했습니다."); }
+    setLoaded(true);
+  }, []);
+  useEffect(() => { load(); }, [load]);
+
+  const flash = (t: string) => { setMsg(t); setTimeout(() => setMsg(""), 3000); };
+
+  async function patch(id: string, body: Record<string, unknown>) {
+    setBusy(id);
+    const res = await fetch("/api/admin/manual-refunds", {
+      method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, ...body }),
+    });
+    setBusy("");
+    if (res.ok) load(); else alert(((await res.json().catch(() => ({}))) as { error?: string }).error || "처리 실패");
+  }
+  async function remove(id: string) {
+    if (!confirm("이 접수를 지울까요? 되돌릴 수 없습니다.")) return;
+    const res = await fetch(`/api/admin/manual-refunds?id=${id}`, { method: "DELETE" });
+    if (res.ok) load(); else alert("삭제 실패");
+  }
+
+  const pending = rows.filter((r) => r.status === "pending");
+  const done = rows.filter((r) => r.status !== "pending").slice(0, 20);
+
+  return (
+    <div className="mrf-wrap" style={{ "--th": MANUAL_COLOR } as CSSProperties}>
+      <div className="mrf-head">
+        <b>🏪 매장 접수 환불{pending.length > 0 && <span className="mrf-count">{pending.length}</span>}</b>
+        <span className="mrf-desc">현장에서 환불해드려야 할 건을 직접 적어 두는 곳이에요.</span>
+        <span className="sp" />
+        <button className="btn sm" onClick={() => setOpen((v) => !v)}>{open ? "닫기" : "+ 새로 접수"}</button>
+      </div>
+
+      {err && <div className="notice info" style={{ marginBottom: 10 }}>{err}</div>}
+      {msg && <div className="notice ok" style={{ marginBottom: 10 }}>{msg}</div>}
+      {open && <ManualRefundForm onDone={() => { setOpen(false); flash("접수했습니다 ✅ 사장님이 확인 후 보내드립니다."); load(); }} />}
+
+      {!loaded ? null : pending.length === 0 ? (
+        !open && <p className="mrf-empty">매장에서 접수한 환불이 없습니다.</p>
+      ) : pending.map((r) => (
+        <div key={r.id} className="rfcard" style={{ "--th": MANUAL_COLOR } as CSSProperties}>
+          <div className="rf-amt">
+            <span className="k">보낼 금액</span>
+            <b className="v">{r.amount.toLocaleString()}<i>원</i></b>
+          </div>
+          <div className="rf-body">
+            <div className="rf-top">
+              <span className="rf-theme">매장 접수</span>
+              <span className="rf-when">{formatStampShort(r.created_at)}</span>
+              {r.staff && <span className="src-tag">접수 {r.staff}</span>}
+            </div>
+            <div className="rf-who"><b>{r.name}</b>{r.phone ? <> · <Phone v={r.phone} /></> : null}</div>
+            <div className="acct">
+              <span className="bank">{r.bank}</span>
+              <b>{r.account}</b>
+              <span style={{ color: "var(--muted)" }}>예금주 {r.holder}</span>
+              <span className="sp" />
+              <button className="btn sm ghost" onClick={() => {
+                navigator.clipboard?.writeText(r.account.replace(/[^0-9]/g, "")).then(
+                  () => flash("계좌를 복사했어요 📋"),
+                  () => alert("복사가 안 됐어요."),
+                );
+              }}>계좌 복사</button>
+            </div>
+            {/* 사유는 사장님이 "보낼지 말지" 판단하는 근거라 눈에 띄게 둔다 */}
+            <p className="mrf-reason"><b>사유</b> {r.reason}</p>
+            {r.holder !== r.name && (
+              <p className="refund-warn">예금주({r.holder})가 손님 이름({r.name})과 달라요 — 보내기 전 확인</p>
+            )}
+            <div className="act-row">
+              <button className="btn sm primary" disabled={busy === r.id} onClick={() => {
+                if (!confirm(`${r.holder} 님께 ${r.amount.toLocaleString()}원을 보내셨나요?`)) return;
+                patch(r.id, { status: "done" });
+              }}>{busy === r.id ? "처리 중…" : `${r.amount.toLocaleString()}원 보냄`}</button>
+              <button className="btn sm ghost" disabled={busy === r.id} onClick={() => {
+                if (!confirm("이 건을 취소 처리할까요? (환불하지 않기로 한 경우)")) return;
+                patch(r.id, { status: "cancelled" });
+              }}>안 보냄</button>
+              <button className="btn sm danger" onClick={() => remove(r.id)}>지우기</button>
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {done.length > 0 && (
+        <>
+          <button className="mrf-toggle" onClick={() => setShowDone((v) => !v)}>
+            {showDone ? "▲ 처리된 것 숨기기" : `▼ 처리된 것 ${done.length}건 보기`}
+          </button>
+          {showDone && done.map((r) => (
+            <div key={r.id} className="rrow" style={{ opacity: 0.75 }}>
+              <div className="head" style={{ cursor: "default" }}>
+                <span className="when" style={{ color: "var(--faint)" }}>{formatStampShort(r.done_at || r.created_at)}</span>
+                <span className="who">{r.name}</span>
+                <span className="tname">{r.bank} {r.account} · {r.reason.slice(0, 20)}</span>
+                <span className="amt">{r.amount.toLocaleString()}원</span>
+                <span className="rt">
+                  <span className={"badge-st " + (r.status === "done" ? "st-confirmed" : "st-cancelled")}>
+                    {r.status === "done" ? "보냄" : "안 보냄"}
+                  </span>
+                  <button className="btn sm ghost" onClick={() => patch(r.id, { status: "pending" })}>되돌리기</button>
+                </span>
+              </div>
+            </div>
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
+/* 접수 폼 — 현장 직원이 적는다. 필요한 것만 묻고, 헷갈릴 칸엔 예시를 넣는다. */
+function ManualRefundForm({ onDone }: { onDone: () => void }) {
+  const [f, setF] = useState({ name: "", phone: "", amount: "", bank: "", account: "", holder: "", reason: "", staff: "" });
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setF((p) => ({ ...p, [k]: e.target.value }));
+
+  async function submit() {
+    setErr(""); setBusy(true);
+    const res = await fetch("/api/admin/manual-refunds", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(f),
+    });
+    setBusy(false);
+    if (res.ok) onDone();
+    else setErr(((await res.json().catch(() => ({}))) as { error?: string }).error || "접수하지 못했습니다.");
+  }
+
+  return (
+    <div className="mrf-form">
+      <div className="acct-form">
+        <div className="field"><label>손님 이름 *</label>
+          <input value={f.name} onChange={set("name")} placeholder="홍길동" maxLength={40} /></div>
+        <div className="field"><label>연락처</label>
+          <input value={f.phone} onChange={set("phone")} placeholder="010-1234-5678 (선택)" maxLength={20} /></div>
+        <div className="field"><label>환불 금액 *</label>
+          <input value={f.amount} onChange={set("amount")} placeholder="25000" inputMode="numeric" maxLength={12} /></div>
+      </div>
+      <div className="acct-form" style={{ marginTop: 10 }}>
+        <div className="field"><label>은행 *</label>
+          <input value={f.bank} onChange={set("bank")} placeholder="카카오뱅크" maxLength={30} /></div>
+        <div className="field"><label>계좌번호 *</label>
+          <input value={f.account} onChange={set("account")} placeholder="3333-01-2345678" inputMode="numeric" maxLength={40} /></div>
+        <div className="field"><label>예금주 *</label>
+          <input value={f.holder} onChange={set("holder")} placeholder="홍길동" maxLength={40} /></div>
+      </div>
+      <div className="field" style={{ marginTop: 10 }}><label>환불 사유 *</label>
+        <textarea value={f.reason} onChange={set("reason")} rows={2}
+          placeholder="예) 현장에서 인원이 줄어 1명분 환불 / 중복 입금 / 기기 고장으로 진행 불가" maxLength={200} /></div>
+      <div className="field" style={{ marginTop: 10 }}><label>접수한 직원</label>
+        <input value={f.staff} onChange={set("staff")} placeholder="이름 (선택 — 나중에 확인할 때 씁니다)" maxLength={30} /></div>
+      {err && <div className="msg-err">{err}</div>}
+      <div className="act-row" style={{ marginTop: 12 }}>
+        <button className="btn sm primary" disabled={busy} onClick={submit}>{busy ? "접수 중…" : "접수하기"}</button>
+      </div>
+    </div>
+  );
+}
+
+
 /* 💸 환불 처리 — 행을 항상 펼쳐 둔다(.rrow.open). 계좌를 봐야 일이 시작되므로 클릭 1회를 없앰.
    사장님 동선: [계좌 복사] → 은행앱 이체 → [✓ N원 환불 완료]  */
 function RefundQueue({ onDone }: { onDone: () => void }) {
@@ -1641,6 +1837,9 @@ function RefundQueue({ onDone }: { onDone: () => void }) {
         <div className="sp" />
         <button className="btn ghost sm" onClick={load}>새로고침</button>
       </div>
+
+      {/* 매장에서 손으로 접수한 환불 — 홈페이지 취소와 성격이 달라 맨 위에 따로 둔다. */}
+      <ManualRefunds />
 
       {/* 🔴 사장님이 취소한 입금완료 건 — 돈은 돌려줘야 하는데 손님 계좌를 모른다.
           손님에게 계좌를 받아 여기서 입력하면, 아래 "바로 보낼 수 있음" 칸으로 내려간다. */}
