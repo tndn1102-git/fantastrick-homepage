@@ -1384,6 +1384,16 @@ form.cform{border:1px solid rgba(122,59,184,.28);border-radius:var(--r-lg);paddi
 .refund-amt{display:flex;align-items:baseline;gap:9px;margin:2px 0 8px}
 .refund-amt span{font-size:12px;color:var(--muted)}
 .refund-amt b{font-size:23px;font-weight:800;color:var(--text);font-feature-settings:"tnum";letter-spacing:-.01em}
+/* ── 시간변경 탭: "언제 → 언제" 한 줄 (2026-08-15) ──
+   이 화면을 여는 이유가 사실상 이 한 줄이라 제일 크게 둔다.
+   옛 시간은 흐리게 취소선, 새 시간은 진하게 — 눈으로 바로 갈린다. */
+.movedline{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  background:var(--bg2);border-radius:10px;padding:11px 14px;font-variant-numeric:tabular-nums}
+.movedline .mv-from{font-size:14.5px;color:var(--faint);text-decoration:line-through;text-decoration-thickness:1px}
+.movedline .mv-arrow{color:var(--th,var(--muted));font-weight:800;font-size:16px}
+.movedline .mv-to{font-size:17px;font-weight:800;color:var(--text)}
+@media(max-width:520px){.movedline{gap:7px}.movedline .mv-to{font-size:15.5px}}
+
 .refund-meta{margin:6px 0 0;font-size:12px;color:var(--muted)}
 .refund-warn{margin:5px 0 0;font-size:12.5px;font-weight:700;color:#b3261e}
 

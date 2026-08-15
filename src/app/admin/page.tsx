@@ -158,14 +158,112 @@ export default function AdminPage() {
    "목록·검색"은 날짜를 모를 때 이름·전화로 찾고, 취소건을 보고 되돌리는 용도(날짜별엔 없는 기능).
    ※ "월 전체" 보기는 삭제함(2026-07-15) — 날짜별과 같은 달력인데 읽기 전용이라 손실 없음.  */
 function ReservationsTab() {
-  const [view, setView] = useState<"day" | "list">("day");
+  const [view, setView] = useState<"day" | "list" | "moved">("day");
   return (
     <>
       <div className="viewtoggle">
         <button className={view === "day" ? "on" : ""} onClick={() => setView("day")}>날짜별</button>
         <button className={view === "list" ? "on" : ""} onClick={() => setView("list")}>목록·검색</button>
+        <button className={view === "moved" ? "on" : ""} onClick={() => setView("moved")}>시간변경</button>
       </div>
-      {view === "day" ? <DayView /> : <ListView />}
+      {view === "day" ? <DayView /> : view === "list" ? <ListView /> : <MovedView />}
+    </>
+  );
+}
+
+/* ============ 시간변경 탭 ============
+   손님·사장님이 예약 시간을 옮긴 내역만 모아 본다(2026-08-15 사장님 요청).
+
+   [왜 필요한가]
+     "이 손님 원래 몇 시였죠?" 를 확인하려면 예약을 하나씩 열어봐야 했다.
+     자주 있는 일은 아니지만 생기면 손님과 말이 엇갈리기 쉬운 지점이라 한 화면에 모은다.
+
+   [두 종류를 색으로 구분한다]
+     · 손님이 옮김  — 손님이 [예약 조회]에서 직접 (예약 1건당 딱 1번만 가능)
+     · 사장님이 옮김 — 관리자 화면에서 (횟수 제한 없음) */
+type MovedRow = {
+  id: string; reservationId: string; at: string; by: "customer" | "admin";
+  from: string; to: string; name: string; phone: string;
+  themeId: string; themeName: string; nowDate: string; nowTime: string;
+  status: string; depositPaid: boolean;
+};
+
+function MovedView() {
+  const [rows, setRows] = useState<MovedRow[]>([]);
+  const [orphan, setOrphan] = useState(0);
+  const [days, setDays] = useState(90);
+  const [who, setWho] = useState<"all" | "customer" | "admin">("all");
+  const [loaded, setLoaded] = useState(false);
+  const [err, setErr] = useState("");
+
+  const load = useCallback(async () => {
+    setLoaded(false); setErr("");
+    const res = await fetch(`/api/admin/time-changes?days=${days}`);
+    if (res.ok) { const j = await res.json(); setRows(j.items || []); setOrphan(j.orphan || 0); }
+    else { const j = await res.json().catch(() => ({})); setErr(j.error || "불러오지 못했습니다."); }
+    setLoaded(true);
+  }, [days]);
+  useEffect(() => { load(); }, [load]);
+
+  const view = who === "all" ? rows : rows.filter((r) => r.by === who);
+
+  return (
+    <>
+      <div className="admin-tools">
+        <select value={days} onChange={(e) => setDays(Number(e.target.value))}>
+          <option value={30}>최근 30일</option>
+          <option value={90}>최근 90일</option>
+          <option value={365}>최근 1년</option>
+        </select>
+        <select value={who} onChange={(e) => setWho(e.target.value as "all" | "customer" | "admin")}>
+          <option value="all">전체</option>
+          <option value="customer">손님이 옮긴 것</option>
+          <option value="admin">사장님이 옮긴 것</option>
+        </select>
+        <div className="sp" />
+        <button className="btn ghost sm" onClick={load}>새로고침</button>
+      </div>
+
+      {err && <div className="notice info" style={{ marginBottom: 12 }}>{err}</div>}
+      <div style={{ marginBottom: 10, fontSize: 13, color: "var(--muted)" }}>
+        총 {view.length}건
+        {orphan > 0 && <span style={{ color: "var(--faint)" }}> · 지워진 예약 {orphan}건은 제외</span>}
+      </div>
+
+      {!loaded ? <p style={{ color: "var(--muted)" }}>불러오는 중…</p>
+        : view.length === 0 ? <div className="notice info">이 기간엔 시간을 옮긴 예약이 없습니다.</div>
+          : view.map((r) => (
+            <div key={r.id} className="rrow open" style={{ "--th": themeColorInk(r.themeId) } as CSSProperties}>
+              <div className="head" style={{ cursor: "default" }}>
+                <span className="when" style={{ color: "var(--faint)" }}>{formatStampShort(r.at)}</span>
+                <span className="who"><b>{r.name}</b> · <Phone v={r.phone} /></span>
+                <span className="tname" style={{ color: "var(--th)", fontWeight: 700 }}>{r.themeName}</span>
+                <span className="rt">
+                  {/* 누가 옮겼는지가 이 화면의 핵심 — 색으로 먼저 구분되게 */}
+                  <span className={"badge-st " + (r.by === "customer" ? "st-pending" : "st-confirmed")}>
+                    {r.by === "customer" ? "손님이 옮김" : "사장님이 옮김"}
+                  </span>
+                  {r.status === "cancelled" && <span className="badge-st st-cancelled">취소됨</span>}
+                </span>
+              </div>
+              <div className="detail">
+                {/* 옮기기 전 → 후. 이 화면을 여는 이유가 사실상 이 한 줄이다. */}
+                <div className="movedline">
+                  <span className="mv-from">{r.from || "(기록 없음)"}</span>
+                  <span className="mv-arrow">→</span>
+                  <span className="mv-to">{r.to}</span>
+                </div>
+                <p className="refund-meta">
+                  지금 예약: {formatDate(r.nowDate)} {r.nowTime}
+                  {" · "}{r.depositPaid ? "입금완료" : "입금대기"}
+                  {/* 옮긴 뒤 또 옮겨졌으면 이 줄의 '이후'와 현재가 다르다 — 헷갈리기 쉬워 짚어준다 */}
+                  {r.to !== `${r.nowDate} ${r.nowTime}` && (
+                    <span style={{ color: "#b4322a", fontWeight: 700 }}> · 그 뒤 또 바뀜</span>
+                  )}
+                </p>
+              </div>
+            </div>
+          ))}
     </>
   );
 }
