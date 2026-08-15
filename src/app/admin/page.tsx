@@ -1000,6 +1000,22 @@ function ResDetail({ r, onClose, onDone }: { r: Reservation; onClose: () => void
     else alert(((await res.json().catch(() => ({}))) as { error?: string }).error || "저장 실패");
   }
 
+  /* 📨 예약확정 알림톡 다시 보내기 — 지금 저장된 번호로 나간다.
+     번호를 고쳤어도 시스템은 저절로 다시 보내지 않으므로, 사장님이 여기서 직접 누른다.
+     한 통마다 요금이 나가므로 확인을 받는다(실수로 두 번 누르는 것 방지). */
+  async function resendConfirm() {
+    if (!confirm(`알림톡 비용이 발생합니다. 보내시겠습니까?\n\n받는 번호: ${formatPhone(r.phone)}\n${r.name}님 · ${r.theme_name} ${formatDate(r.date)} ${r.time}`)) return;
+    setBusy(true);
+    const res = await fetch("/api/admin/reservations", {
+      method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: r.id, resend_confirm: true }),
+    });
+    setBusy(false);
+    const j = (await res.json().catch(() => ({}))) as { error?: string; sentTo?: string };
+    if (res.ok) alert(`${j.sentTo || formatPhone(r.phone)} 로 예약확정 알림톡을 보냈습니다.`);
+    else alert(j.error || "발송하지 못했습니다.");
+  }
+
   // 🔑 예약 비밀번호 재설정 — 손님이 4자리를 잊었을 때.
   //   옛 번호를 보여주지 않는 이유: 같은 4자리를 다른 곳에서도 쓰는 손님이 있다.
   //   "찾아주기"가 아니라 "새로 정해주기"라 사고가 나도 피해가 작다.
@@ -1075,7 +1091,16 @@ function ResDetail({ r, onClose, onDone }: { r: Reservation; onClose: () => void
         {r.status !== "cancelled" && (
           <div className="mvbox">
             {!move ? (
-              <button className="btn sm ghost" onClick={() => setMove(true)}>시간·날짜 옮기기</button>
+              <>
+                <button className="btn sm ghost" onClick={() => setMove(true)}>시간·날짜 옮기기</button>
+                {/* 📨 번호를 고친 뒤 다시 보내는 용도. 돈이 드는 동작이라 확인을 한 번 받는다.
+                    확정된 예약에만 보인다 — 대기 건에 "확정됐습니다" 문구가 나가면 안 된다. */}
+                {(r.deposit_paid || r.status === "confirmed") && (
+                  <button className="btn sm ghost" style={{ marginLeft: 8 }} disabled={busy} onClick={resendConfirm}>
+                    알림톡 재발송
+                  </button>
+                )}
+              </>
             ) : (
               <>
                 <div className="gc-h">예약 옮기기 — 취소하지 않고 그대로 옮겨요 (입금·환불 상태 유지)</div>

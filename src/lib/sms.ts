@@ -463,7 +463,13 @@ export async function sendReservationSms(
   r: {
     name: string; phone: string; theme_name: string; date: string; time: string; people: number;
     theme_id?: string; source?: string | null;
-  }
+  },
+  /** force — 사장님이 관리자 화면에서 **직접 [알림톡 재발송] 을 누른 경우**.
+   *  아래 "가져온 예약(wp-import)에는 안 보낸다" 규칙만 건너뛴다. 그 규칙은 이사 때
+   *  손님이 같은 안내를 두 번 받는 걸 막으려던 것인데, 사장님이 번호를 고치고 일부러
+   *  다시 보내는 상황에서는 오히려 방해가 된다(조용히 안 나가고 로그에만 남는다).
+   *  ⚠️ 발송 종류 게이트(SENDABLE_TYPES)·연습번호 차단은 **그대로 지난다.** */
+  opts?: { force?: boolean },
 ) {
   const tpl = await getTemplate(type, r.theme_id);
   const body = renderTemplate(tpl, {
@@ -477,7 +483,7 @@ export async function sendReservationSms(
   // 가져온 예약에는 보내지 않는다(손님은 기존 사이트에서 이미 안내를 받았다).
   // 여기서 막는 이유: 예약 문자는 결국 이 함수를 지난다 — 알림톡·SMS 어느 갈래로 가든 함께 막힌다.
   // 문구를 만든 **뒤에** 막는 건, 로그에 "무엇이 나갈 뻔했는지"를 남겨두기 위해서다.
-  if (isImportedReservation(r.source)) {
+  if (isImportedReservation(r.source) && !opts?.force) {
     await writeLog({ phone: r.phone, body, type, status: "skipped", channel: "sms", error: IMPORT_BLOCK_REASON });
     return { ok: false, skipped: true };
   }

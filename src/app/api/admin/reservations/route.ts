@@ -214,6 +214,38 @@ export async function PATCH(req: NextRequest) {
     if (ph !== before.phone) patch.phone = ph;
   }
 
+  /* 📨 예약확정 알림톡 **재발송** — 사장님이 [알림톡 재발송] 을 눌렀을 때만 (2026-08-15 요청).
+   *
+   *   [왜 필요한가]
+   *     손님이 번호를 잘못 적으면 확정 알림톡이 엉뚱한 번호로 한 번 나가버린다. 번호를 고쳐도
+   *     시스템은 아무것도 다시 보내지 않는다(고치는 것과 보내는 것은 별개 동작이라 일부러 그렇게 뒀다).
+   *     → 번호를 고친 뒤 이 버튼으로 **지금 저장된 번호**에 다시 보낸다.
+   *
+   *   [돈이 든다]
+   *     한 통마다 요금이 나가므로 화면에서 확인을 한 번 받고, 이력에도 남긴다.
+   *
+   *   ⚠️ 확정된 예약에만 보낸다. 문구가 "입금이 확인되어 예약이 확정되었습니다" 라서,
+   *      대기 중인 예약에 보내면 손님이 입금을 안 해도 된 줄 안다. */
+  if (body.resend_confirm === true) {
+    if (!(before.deposit_paid || before.status === "confirmed")) {
+      return NextResponse.json({ error: "확정된 예약에만 보낼 수 있어요. 입금 확인을 먼저 해주세요." }, { status: 400 });
+    }
+    if (before.status === "cancelled") {
+      return NextResponse.json({ error: "취소된 예약에는 보낼 수 없어요." }, { status: 400 });
+    }
+    // 번호를 이번 요청에서 같이 고쳤다면 **고친 번호**로 보낸다.
+    const to = typeof patch.phone === "string" ? patch.phone : String(before.phone);
+    const sent = await sendReservationSms("payment", { ...before, phone: to }, { force: true });
+    await db.from("reservation_logs").insert({
+      reservation_id: id, action: "알림톡 재발송",
+      detail: `${formatPhone(to)} 로 예약확정 안내${sent.ok ? "" : " — 발송 실패"}`,
+    }).then(({ error: e }) => { if (e) console.error("[변경이력 기록 실패]", e.message); });
+    if (!sent.ok) {
+      return NextResponse.json({ error: "발송하지 못했습니다. 알림톡 탭에서 실패 사유를 확인해 주세요." }, { status: 502 });
+    }
+    return NextResponse.json({ ok: true, sentTo: formatPhone(to) });
+  }
+
   if (Object.keys(patch).length === 0) return NextResponse.json({ error: "변경할 내용이 없습니다." }, { status: 400 });
 
   // 입금확인 = 예약확정 (기존 fantastrick.co.kr 과 같은 방식).
