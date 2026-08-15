@@ -245,8 +245,9 @@ export async function PATCH(req: NextRequest) {
          · 막힘  = 연습용 번호(010-0000-xxxx) 같은 규칙에 걸린 것 → 번호를 확인해야 한다
          · 실패  = 통신사 쪽 문제 → 알림톡 탭에서 사유를 봐야 한다
          한 문장으로 뭉뚱그리면 엉뚱한 데를 찾게 된다. */
+      const blocked = "skipped" in sent && sent.skipped;
       return NextResponse.json({
-        error: sent.skipped
+        error: blocked
           ? "이 번호로는 보낼 수 없습니다. 연습용 번호(010-0000-…)가 아닌지 확인해 주세요."
           : "발송하지 못했습니다. 알림톡 탭에서 실패 사유를 확인해 주세요.",
       }, { status: 502 });
