@@ -1359,6 +1359,14 @@ form.cform{border:1px solid rgba(122,59,184,.28);border-radius:var(--r-lg);paddi
 /* ── 매장 수동 환불 접수 (2026-08-15) ──
    홈페이지 취소 건과 성격이 달라 맨 위에 따로 묶고, 전용 색(로즈)으로 감싼다.
    ⚠️ 색은 화면(tsx)의 MANUAL_COLOR 한 곳에서 넣는다. 바꾸려면 거기만 고치면 된다. */
+/* 예약 상세 — 이름·전화 고치기 칸 (2026-08-15) */
+.whoedit{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px 13px;margin:6px 0 10px}
+.whoedit .field{margin-bottom:8px}
+.whoedit .field:last-of-type{margin-bottom:4px}
+.whoedit input{width:100%;border:1px solid var(--line2);border-radius:8px;padding:8px 11px;
+  font:inherit;font-size:14px;background:var(--surface);color:var(--text)}
+.whoedit input:focus{outline:none;border-color:var(--brand)}
+
 .mrf-wrap{border:1px solid color-mix(in srgb,var(--th) 30%,var(--line));border-left:5px solid var(--th);
   border-radius:var(--r);background:color-mix(in srgb,var(--th) 4%,var(--surface));
   padding:14px 16px;margin-bottom:20px}

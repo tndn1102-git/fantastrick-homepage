@@ -3,7 +3,7 @@ import { randomInt } from "crypto";
 import { clearLookupFails } from "@/lib/pin-guard";
 import { getSupabase, DB_NOT_CONFIGURED } from "@/lib/supabase";
 import { isAdmin } from "@/lib/admin";
-import { normalizePhone, isValidPhone } from "@/lib/util";
+import { normalizePhone, isValidPhone, sanitizeText, formatPhone } from "@/lib/util";
 import { themeById, isSlotTime } from "@/lib/data";
 import { isRefundOwed, refundAmount, refundRateFor } from "@/lib/money";
 import { getConfig, depositOf } from "@/lib/settings";
@@ -197,6 +197,23 @@ export async function PATCH(req: NextRequest) {
     if (newPeople !== before.people) patch.people = newPeople;
   }
 
+  /* 🔴 2026-08-15 — 이름·전화번호 고치기(사장님 요청).
+     손님이 오타를 냈거나 번호가 바뀌었을 때 예약을 지웠다 다시 만들 필요가 없게 한다.
+     ⚠️ 전화번호는 손님이 [예약 조회]에 쓰는 열쇠다. 바꾸면 손님은 **새 번호로** 조회해야 한다.
+        그래서 번호를 바꿀 때는 조회 실패 잠금도 함께 풀어준다(아래 clearLookupFails).
+     ⚠️ 이름은 입금자명 자동매칭의 기준이기도 하다(lib/bank/matcher.ts). 바꾸면 그 뒤 들어오는
+        입금은 **새 이름**으로 맞춰진다 — 입금이 이미 끝난 건은 영향 없다. */
+  if (typeof body.name === "string") {
+    const nm = sanitizeText(body.name).slice(0, 40);
+    if (!nm) return NextResponse.json({ error: "이름을 입력해 주세요." }, { status: 400 });
+    if (nm !== before.name) patch.name = nm;
+  }
+  if (typeof body.phone === "string") {
+    const ph = normalizePhone(body.phone);
+    if (!isValidPhone(ph)) return NextResponse.json({ error: "전화번호 형식을 확인해 주세요." }, { status: 400 });
+    if (ph !== before.phone) patch.phone = ph;
+  }
+
   if (Object.keys(patch).length === 0) return NextResponse.json({ error: "변경할 내용이 없습니다." }, { status: 400 });
 
   // 입금확인 = 예약확정 (기존 fantastrick.co.kr 과 같은 방식).
@@ -284,11 +301,16 @@ export async function PATCH(req: NextRequest) {
   }
   if (moved) logs.push({ reservation_id: id, action: "시간 옮김", detail: `${moved.from} → ${moved.to}` });
   if (patch.people != null) logs.push({ reservation_id: id, action: "인원 변경", detail: `${before.people}명 → ${patch.people}명` });
+  // 이름·전화 수정도 흔적을 남긴다 — "내가 안 바꿨는데?" 를 나중에 확인할 수 있어야 한다.
+  if (patch.name) logs.push({ reservation_id: id, action: "이름 수정", detail: `${before.name} → ${patch.name}` });
+  if (patch.phone) logs.push({ reservation_id: id, action: "전화번호 수정", detail: `${formatPhone(String(before.phone))} → ${formatPhone(String(patch.phone))}` });
   if (typeof body.memo === "string" && body.memo !== (before.memo || "")) logs.push({ reservation_id: id, action: "메모", detail: body.memo.slice(0, 60) || "(지움)" });
   if (typeof body.admin_note === "string" && body.admin_note !== (before.admin_note || "")) logs.push({ reservation_id: id, action: "메모", detail: body.admin_note.slice(0, 60) || "(지움)" });
   // 환불 계좌를 채워 넣었을 때 — 이제 [환불 처리] 큐에서 바로 보낼 수 있는 상태가 됐다는 흔적.
   if (patch.refund_account) logs.push({ reservation_id: id, action: "환불 계좌 입력", detail: `${patch.refund_bank || ""} ${patch.refund_account}`.trim() });
   // ⚠️ 새 비밀번호는 이력에 적지 않는다 — 이력은 화면에 그대로 보이므로 적으면 저장한 의미가 없다.
+  // 번호를 바꾸면 옛 번호로 쌓인 조회 실패 잠금을 풀어준다 — 안 그러면 새 번호로도 못 들어간다.
+  if (patch.phone) await clearLookupFails(db, String(before.phone || "")).catch(() => {});
   if (newPin) {
     logs.push({ reservation_id: id, action: "비밀번호 재설정", detail: "관리자가 새 4자리로 바꿈" });
     // 손님이 여러 번 틀려 조회가 잠긴 상태로 전화한 경우가 대부분이다 —

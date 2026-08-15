@@ -960,6 +960,10 @@ function slotState(t: string, busy: { taken: string[]; blocked: string[] }, keep
 function ResDetail({ r, onClose, onDone }: { r: Reservation; onClose: () => void; onDone: () => void }) {
   const [busy, setBusy] = useState(false);
   const [move, setMove] = useState(false);
+  // 이름·전화 고치기 (평소엔 닫혀 있다 — 보기만 하려다 값이 바뀌지 않게)
+  const [editWho, setEditWho] = useState(false);
+  const [eName, setEName] = useState("");
+  const [ePhone, setEPhone] = useState("");
   const [mDate, setMDate] = useState(r.date);
   const [mTime, setMTime] = useState(r.time);
   const [mPeople, setMPeople] = useState(r.people);
@@ -976,6 +980,24 @@ function ResDetail({ r, onClose, onDone }: { r: Reservation; onClose: () => void
     });
     setBusy(false);
     if (res.ok) onDone(); else { const j = await res.json(); alert(j.error || "처리 실패"); }
+  }
+
+  /* 이름·전화 고치기 — 저장하면 화면을 닫지 않고 목록만 새로 읽는다(onDone).
+     번호를 바꾸면 서버가 옛 번호로 쌓인 조회 잠금도 함께 풀어준다. */
+  async function saveWho() {
+    const nm = eName.trim();
+    if (!nm) { alert("이름을 입력해 주세요."); return; }
+    if (ePhone.replace(/[^0-9]/g, "").length < 10) { alert("전화번호를 정확히 입력해 주세요."); return; }
+    if (ePhone.replace(/[^0-9]/g, "") !== r.phone.replace(/[^0-9]/g, "")
+      && !confirm(`전화번호를 바꾸면 손님은 새 번호로 예약 조회를 하셔야 합니다.\n\n${formatPhone(r.phone)}\n→ ${ePhone}\n\n바꿀까요?`)) return;
+    setBusy(true);
+    const res = await fetch("/api/admin/reservations", {
+      method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: r.id, name: nm, phone: ePhone }),
+    });
+    setBusy(false);
+    if (res.ok) { setEditWho(false); onDone(); }
+    else alert(((await res.json().catch(() => ({}))) as { error?: string }).error || "저장 실패");
   }
 
   // 🔑 예약 비밀번호 재설정 — 손님이 4자리를 잊었을 때.
@@ -1015,8 +1037,33 @@ function ResDetail({ r, onClose, onDone }: { r: Reservation; onClose: () => void
         <button className="close-x" onClick={onClose} aria-label="닫기">×</button>
         <h3>{r.theme_name} · {formatDate(r.date)} {r.time}</h3>
         <div className="res-summary">
-          <div className="r"><span>이름</span><b>{r.name}</b></div>
-          <div className="r"><span>전화</span><b><Phone v={r.phone} /></b></div>
+          {/* 🔴 2026-08-15 — 이름·전화를 여기서 바로 고칠 수 있게 했다(사장님 요청).
+              손님이 오타를 냈거나 번호가 바뀌면 예약을 지웠다 다시 만들어야 했다.
+              평소엔 그냥 글자로 보이고, [고치기]를 눌러야 입력칸이 열린다 —
+              보기만 하려다 실수로 값을 바꾸는 일이 없게. */}
+          {!editWho ? (
+            <>
+              <div className="r"><span>이름</span><b>{r.name}
+                <button className="btn sm ghost" style={{ marginLeft: 8, padding: "3px 9px", fontSize: 11.5 }}
+                  onClick={() => { setEName(r.name); setEPhone(formatPhone(r.phone)); setEditWho(true); }}>고치기</button>
+              </b></div>
+              <div className="r"><span>전화</span><b><Phone v={r.phone} /></b></div>
+            </>
+          ) : (
+            <div className="whoedit">
+              <div className="field"><label>이름</label>
+                <input value={eName} onChange={(e) => setEName(e.target.value)} maxLength={40} placeholder="홍길동" /></div>
+              <div className="field"><label>전화번호</label>
+                <input value={ePhone} onChange={(e) => setEPhone(e.target.value)} maxLength={20} placeholder="010-1234-5678" inputMode="numeric" /></div>
+              <p className="hint" style={{ margin: "2px 0 8px" }}>
+                ⚠️ 전화번호를 바꾸면 손님은 <b>새 번호</b>로 예약 조회를 하셔야 합니다.
+              </p>
+              <div className="act-row">
+                <button className="btn sm primary" disabled={busy} onClick={saveWho}>{busy ? "저장 중…" : "저장"}</button>
+                <button className="btn sm ghost" disabled={busy} onClick={() => setEditWho(false)}>취소</button>
+              </div>
+            </div>
+          )}
           <div className="r"><span>인원</span><b>{r.people}명</b></div>
           <div className="r"><span>예약금</span><b>{r.deposit.toLocaleString()}원 {r.deposit_paid ? "(입금완료)" : "(미입금)"}</b></div>
           {r.deposit_payer && <div className="r"><span>입금자명</span><b>{r.deposit_payer}{r.deposit_payer !== r.name && <span style={{ color: "var(--amber)", fontWeight: 400, fontSize: 12 }}> · 예약자와 다름</span>}</b></div>}
