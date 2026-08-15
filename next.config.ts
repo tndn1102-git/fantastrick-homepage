@@ -43,11 +43,10 @@ const nextConfig: NextConfig = {
       { source: "/faqs", destination: "/faq", permanent: true },          // 자주 묻는 질문
       { source: "/policy", destination: "/privacy", permanent: true },    // 개인정보 취급방침
       { source: "/contacts", destination: "/business", permanent: true }, // 컨설팅 문의 → B2B
-      // 워드프레스 시스템 주소들 — 새 사이트엔 없는 개념이라 홈으로.
-      // ⚠️ 아래 두 줄은 이제 실행되지 않는다 — middleware.ts 가 워드프레스 탐색 주소를
-      //    먼저 404 로 끊는다(2026-08-15, 로봇이 서버를 깨우는 걸 막으려고).
-      { source: "/wp-admin/:path*", destination: "/", permanent: true },
-      { source: "/wp-login.php", destination: "/", permanent: true },
+      /* 🔴 2026-08-15 — 워드프레스 주소(wp-admin·wp-login)를 홈으로 넘기던 두 줄을 **뺐다.**
+         이 설정(redirects)이 middleware 보다 먼저 돌아서, 로봇이 두드릴 때마다
+         "홈으로 가라"고 답하고 → 로봇이 홈까지 또 부른다(요청 2배).
+         지금은 middleware.ts 가 404 한 줄로 끊는다. 사람은 이 주소를 칠 일이 없다. */
       { source: "/feed", destination: "/", permanent: true },
 
       /* ─── 매장 QR(히든페이지) 살리기 (2026-08-13) ───
