@@ -1610,7 +1610,7 @@ function daysAgoLabel(iso: string | null) {
 const MANUAL_COLOR = "#B02A6B";
 
 type ManualRefund = {
-  id: string; name: string; phone: string | null; amount: number;
+  id: string; name: string; amount: number;
   bank: string; account: string; holder: string; reason: string;
   staff: string | null; status: string; memo: string | null;
   created_at: string; done_at: string | null;
@@ -1680,7 +1680,7 @@ function ManualRefunds() {
               <span className="rf-when">{formatStampShort(r.created_at)}</span>
               {r.staff && <span className="src-tag">접수 {r.staff}</span>}
             </div>
-            <div className="rf-who"><b>{r.name}</b>{r.phone ? <> · <Phone v={r.phone} /></> : null}</div>
+            <div className="rf-who"><b>{r.name}</b></div>
             <div className="acct">
               <span className="bank">{r.bank}</span>
               <b>{r.account}</b>
@@ -1742,7 +1742,7 @@ function ManualRefunds() {
 
 /* 접수 폼 — 현장 직원이 적는다. 필요한 것만 묻고, 헷갈릴 칸엔 예시를 넣는다. */
 function ManualRefundForm({ onDone }: { onDone: () => void }) {
-  const [f, setF] = useState({ name: "", phone: "", amount: "", bank: "", account: "", holder: "", reason: "", staff: "" });
+  const [f, setF] = useState({ name: "", amount: "", bank: "", account: "", holder: "", reason: "", staff: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -1763,8 +1763,6 @@ function ManualRefundForm({ onDone }: { onDone: () => void }) {
       <div className="acct-form">
         <div className="field"><label>손님 이름 *</label>
           <input value={f.name} onChange={set("name")} placeholder="홍길동" maxLength={40} /></div>
-        <div className="field"><label>연락처</label>
-          <input value={f.phone} onChange={set("phone")} placeholder="010-1234-5678 (선택)" maxLength={20} /></div>
         <div className="field"><label>환불 금액 *</label>
           <input value={f.amount} onChange={set("amount")} placeholder="25000" inputMode="numeric" maxLength={12} /></div>
       </div>

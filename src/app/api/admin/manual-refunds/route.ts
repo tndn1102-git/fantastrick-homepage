@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase, DB_NOT_CONFIGURED } from "@/lib/supabase";
 import { isAdmin } from "@/lib/admin";
-import { sanitizeText, normalizePhone } from "@/lib/util";
+import { sanitizeText } from "@/lib/util";
 
 /* 매장에서 손으로 접수한 환불 — 관리자 › 입금·환불 › 환불 처리 탭이 쓴다.
  *
@@ -18,7 +18,7 @@ function isMissingTable(code?: string) {
   return code === "PGRST205" || code === "42P01";
 }
 
-const COLS = "id, name, phone, amount, bank, account, holder, reason, staff, status, memo, created_at, done_at";
+const COLS = "id, name, amount, bank, account, holder, reason, staff, status, memo, created_at, done_at";
 const STATUSES = ["pending", "done", "cancelled"];
 
 export async function GET(req: NextRequest) {
@@ -58,8 +58,6 @@ export async function POST(req: NextRequest) {
   const holder = sanitizeText(String(body.holder || "")).slice(0, 40);
   const reason = sanitizeText(String(body.reason || "")).slice(0, 200);
   const staff = sanitizeText(String(body.staff || "")).slice(0, 30) || null;
-  const phoneRaw = String(body.phone || "").trim();
-  const phone = phoneRaw ? normalizePhone(phoneRaw) : null;
   // 금액은 "25,000원" 처럼 들어올 수 있다 — 숫자만 뽑는다(직원이 편한 대로 적게).
   const amount = Number(String(body.amount ?? "").replace(/[^0-9]/g, ""));
 
@@ -73,7 +71,7 @@ export async function POST(req: NextRequest) {
 
   const { error } = await db
     .from("manual_refunds")
-    .insert({ name, phone, amount, bank, account, holder, reason, staff, status: "pending" });
+    .insert({ name, amount, bank, account, holder, reason, staff, status: "pending" });
   if (error) {
     if (isMissingTable(error.code)) return NextResponse.json({ error: NO_TABLE, needsMigration: true }, { status: 503 });
     console.error("[매장 환불 접수 실패]", error.message);

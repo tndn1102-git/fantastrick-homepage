@@ -9,7 +9,6 @@
 --
 -- 무엇이 들어오나:
 --   name    손님 이름 (필수)
---   phone   연락처 (선택 — 확인 전화용)
 --   amount  환불 금액(원) (필수)
 --   bank    은행 (필수)
 --   account 계좌번호 (필수)
@@ -29,7 +28,6 @@
 create table if not exists public.manual_refunds (
   id         uuid primary key default gen_random_uuid(),
   name       text not null,
-  phone      text,
   amount     int  not null,
   bank       text not null,
   account    text not null,
