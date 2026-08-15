@@ -241,7 +241,15 @@ export async function PATCH(req: NextRequest) {
       detail: `${formatPhone(to)} 로 예약확정 안내${sent.ok ? "" : " — 발송 실패"}`,
     }).then(({ error: e }) => { if (e) console.error("[변경이력 기록 실패]", e.message); });
     if (!sent.ok) {
-      return NextResponse.json({ error: "발송하지 못했습니다. 알림톡 탭에서 실패 사유를 확인해 주세요." }, { status: 502 });
+      /* "막힌 것(skipped)" 과 "보내려다 실패한 것" 은 사장님이 할 일이 다르다.
+         · 막힘  = 연습용 번호(010-0000-xxxx) 같은 규칙에 걸린 것 → 번호를 확인해야 한다
+         · 실패  = 통신사 쪽 문제 → 알림톡 탭에서 사유를 봐야 한다
+         한 문장으로 뭉뚱그리면 엉뚱한 데를 찾게 된다. */
+      return NextResponse.json({
+        error: sent.skipped
+          ? "이 번호로는 보낼 수 없습니다. 연습용 번호(010-0000-…)가 아닌지 확인해 주세요."
+          : "발송하지 못했습니다. 알림톡 탭에서 실패 사유를 확인해 주세요.",
+      }, { status: 502 });
     }
     return NextResponse.json({ ok: true, sentTo: formatPhone(to) });
   }
