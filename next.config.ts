@@ -44,6 +44,8 @@ const nextConfig: NextConfig = {
       { source: "/policy", destination: "/privacy", permanent: true },    // 개인정보 취급방침
       { source: "/contacts", destination: "/business", permanent: true }, // 컨설팅 문의 → B2B
       // 워드프레스 시스템 주소들 — 새 사이트엔 없는 개념이라 홈으로.
+      // ⚠️ 아래 두 줄은 이제 실행되지 않는다 — middleware.ts 가 워드프레스 탐색 주소를
+      //    먼저 404 로 끊는다(2026-08-15, 로봇이 서버를 깨우는 걸 막으려고).
       { source: "/wp-admin/:path*", destination: "/", permanent: true },
       { source: "/wp-login.php", destination: "/", permanent: true },
       { source: "/feed", destination: "/", permanent: true },

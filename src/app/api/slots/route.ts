@@ -1,9 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
 import { sweepExpiredReservations } from "@/lib/expire";
+import { rateLimit, getClientIp } from "@/lib/ratelimit";
+
+/** 이 응답을 클라우드플레어가 30초 동안 대신 돌려준다 — 같은 질문이 몰려도 서버는 한 번만 깬다.
+ *  마감 판정의 최종 책임은 서버(uq_res_slot)에 있으므로 30초 정도 낡아도 이중예약이 되지 않는다.
+ *  화면 쪽 재확인 주기(60초)보다 짧게 잡아 손님이 낡은 화면을 오래 보지 않게 한다. */
+const CACHE = { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120" };
 
 // 특정 테마·날짜의 닫힌(예약불가) 시간 조회 — 예약 화면에서 사용
 export async function GET(req: NextRequest) {
+  /* 🔴 2026-08-14~15 — 여기에 **보호장치가 없어서** 요청 한도를 넘겼다.
+     실측: 한 IP 가 1분에 이 주소를 **120번** 호출(테마 4개 × 날짜 30일 = 120, 즉 달력 전체를
+     긁어가는 프로그램). 그 1분 동안 전체 요청의 89% 를 이것이 차지했다.
+     손님이 예약 화면을 정상적으로 쓰면 1분에 몇 번을 넘지 않는다 → 60회로 넉넉히 잡아 막는다.
+     ⚠️ 다른 공개 주소(예약 접수·조회·후기)는 원래 제한이 있었는데 여기만 빠져 있었다. */
+  if (!rateLimit(`slots:${getClientIp(req)}`, 60, 60_000)) {
+    return NextResponse.json({ error: "요청이 너무 잦습니다." }, { status: 429 });
+  }
+
   const db = getSupabase();
   if (!db) return NextResponse.json({ blocked: [], dayClosed: false });
 
@@ -19,7 +34,7 @@ export async function GET(req: NextRequest) {
       db.from("blocked_slots").select("theme_id, date, time").gte("date", from),
       db.from("reservations").select("theme_id, date, time").gte("date", from).neq("status", "cancelled"),
     ]);
-    return NextResponse.json({ all: true, blockedSlots: bs || [], reservations: rv || [] });
+    return NextResponse.json({ all: true, blockedSlots: bs || [], reservations: rv || [] }, { headers: CACHE });
   }
 
   const theme = req.nextUrl.searchParams.get("theme") || "";
@@ -52,5 +67,5 @@ export async function GET(req: NextRequest) {
     dayClosed,
     blocked: Array.from(new Set([...blocked, ...takenTimes])),
     taken: Array.from(new Set(takenTimes)),
-  });
+  }, { headers: CACHE });
 }
