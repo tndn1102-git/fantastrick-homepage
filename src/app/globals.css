@@ -823,6 +823,9 @@ header.over-hero .btn.ghost:hover{background:rgba(255,255,255,.12)}
 .ev-modal-cta .btn{width:100%}
 /* 테마별 옵저버 포토카드 — 포스터 이미지 썸네일 */
 .ev-poster{object-fit:cover}
+/* 세로로 긴 포스터를 정사각 썸네일에 넣으면 가운데가 잘려 제목이 사라진다.
+   위쪽(로고·"후기 쓰면 100% 드려요")이 보이도록 붙여 자른다. (2026-08-15 리뷰 포스터 교체) */
+.ev-poster-top{object-position:top center}
 .ev-thumb .ev-poster{z-index:0}
 .ev-shade{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(4,12,32,0) 42%,rgba(4,12,32,.55) 72%,rgba(4,12,32,.92))}
 .ev-thumb-store{position:absolute;right:12px;bottom:14px;z-index:2;font-size:11px;font-weight:700;color:rgba(255,255,255,.82)}

@@ -69,7 +69,7 @@ const REVIEW = {
       "DM에 혜택 받으실 분의 성함·연락처를 함께 남겨주세요",
     ] },
     { h: "혜택 · 유의", items: [
-      "테마 5,000원 할인 + 굿즈 제공 (전 지점 원하는 테마 사용 가능, 굿즈는 TGC점 테마 키링 중 택 1)",
+      "판타스트릭 테마 중 원하는 1가지에 쓰는 5,000원 할인권 + 테마 키링 (락다운시티·시간의 영속성 중 택 1)",
       "실제 플레이하신 후기만 인정됩니다.",
     ] },
   ],
@@ -164,7 +164,7 @@ export default function EventsPage() {
           {/* 리뷰 이벤트 카드 */}
           <button type="button" className="ev-card" onClick={() => setOpen("review")} aria-label="리뷰 이벤트 자세히 보기">
             <div className="ev-thumb">
-              <Image src="/images/review-event.png" alt="리뷰 이벤트 — 테마 5,000원 할인 + 굿즈" fill sizes="(max-width:560px) 46vw, 260px" className="ev-poster" />
+              <Image src="/images/review-event.png" alt="리뷰 이벤트 — 테마 5,000원 할인 + 굿즈" fill sizes="(max-width:560px) 46vw, 260px" className="ev-poster ev-poster-top" />
               <span className="ev-badge">{REVIEW.badge}</span>
             </div>
             <div className="ev-cap">
@@ -238,7 +238,7 @@ export default function EventsPage() {
         <div className="ev-modal-overlay" onClick={close} role="dialog" aria-modal="true" aria-label={REVIEW.title}>
           <div className="ev-modal" onClick={(e) => e.stopPropagation()}>
             <button className="ev-modal-x" onClick={close} aria-label="닫기">✕</button>
-            <Image src="/images/review-event.png" alt="리뷰 이벤트 — 테마 5,000원 할인 + 굿즈" width={1080} height={1080} sizes="560px" className="ev-modal-poster" />
+            <Image src="/images/review-event.png" alt="리뷰 이벤트 — 테마 5,000원 할인 + 굿즈" width={1400} height={1980} sizes="560px" className="ev-modal-poster" />
             <div className="ev-modal-body">
               <p className="ev-modal-lead">{REVIEW.summary}</p>
               {REVIEW.body.map((sec, j) => (
@@ -260,7 +260,7 @@ export default function EventsPage() {
         <div className="ev-modal-overlay" onClick={close} role="dialog" aria-modal="true" aria-label={BIRTHDAY.title}>
           <div className="ev-modal" onClick={(e) => e.stopPropagation()}>
             <button className="ev-modal-x" onClick={close} aria-label="닫기">✕</button>
-            <Image src={BIRTHDAY.image} alt="생일 이벤트" width={1080} height={1080} sizes="560px" className="ev-modal-poster" />
+            <Image src={BIRTHDAY.image} alt="생일 이벤트" width={1400} height={1980} sizes="560px" className="ev-modal-poster" />
             <div className="ev-modal-body">
               <p className="ev-modal-lead">{BIRTHDAY.summary}</p>
               {BIRTHDAY.body.map((sec, j) => (
