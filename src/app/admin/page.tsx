@@ -180,7 +180,7 @@ function ReservationsTab() {
 
    [두 종류를 색으로 구분한다]
      · 손님이 옮김  — 손님이 [예약 조회]에서 직접 (예약 1건당 딱 1번만 가능)
-     · 사장님이 옮김 — 관리자 화면에서 (횟수 제한 없음) */
+     · 관리자 조정   — 사장님이 관리자 화면에서 옮긴 것 (횟수 제한 없음) */
 type MovedRow = {
   id: string; reservationId: string; at: string; by: "customer" | "admin";
   from: string; to: string; name: string; phone: string;
@@ -218,7 +218,7 @@ function MovedView() {
         <select value={who} onChange={(e) => setWho(e.target.value as "all" | "customer" | "admin")}>
           <option value="all">전체</option>
           <option value="customer">손님이 옮긴 것</option>
-          <option value="admin">사장님이 옮긴 것</option>
+          <option value="admin">관리자 조정</option>
         </select>
         <div className="sp" />
         <button className="btn ghost sm" onClick={load}>새로고침</button>
@@ -241,7 +241,7 @@ function MovedView() {
                 <span className="rt">
                   {/* 누가 옮겼는지가 이 화면의 핵심 — 색으로 먼저 구분되게 */}
                   <span className={"badge-st " + (r.by === "customer" ? "st-pending" : "st-confirmed")}>
-                    {r.by === "customer" ? "손님이 옮김" : "사장님이 옮김"}
+                    {r.by === "customer" ? "손님이 옮김" : "관리자 조정"}
                   </span>
                   {r.status === "cancelled" && <span className="badge-st st-cancelled">취소됨</span>}
                 </span>
