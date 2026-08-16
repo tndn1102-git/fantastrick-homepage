@@ -12,9 +12,22 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const TPL = "docs/_deck/template.html";
+/* 만들 수 있는 자료 목록. `node scripts/build-deck.mjs staff` 처럼 골라 만든다(기본: 전부) */
+const DECKS = {
+  intro: { tpl: "docs/_deck/template.html", out: "docs/새홈페이지-소개-발표자료.html" },
+  staff: { tpl: "docs/_deck/staff-template.html", out: "docs/직원교육-홈페이지-설명서.html" },
+};
+const pick = process.argv[2];
+const targets = pick ? [DECKS[pick]].filter(Boolean) : Object.values(DECKS);
+if (!targets.length) { console.log(`만들 자료를 못 찾았습니다. 쓸 수 있는 이름: ${Object.keys(DECKS).join(", ")}`); process.exit(1); }
+
 const SHOTS = "docs/_deck/shots";
-const OUT = "docs/새홈페이지-소개-발표자료.html";
+for (const { tpl: TPL, out: OUT } of targets) {
+  if (!fs.existsSync(TPL)) { console.log(`  ⚠ 원본 없음: ${TPL} — 건너뜁니다`); continue; }
+  build(TPL, OUT);
+}
+
+function build(TPL, OUT) {
 
 let html = fs.readFileSync(TPL, "utf8");
 const used = new Map();
@@ -37,5 +50,4 @@ fs.writeFileSync(OUT, html);
 const mb = (fs.statSync(OUT).size / 1024 / 1024).toFixed(2);
 console.log(`■ 만들었습니다 → ${OUT}`);
 console.log(`   사진 ${used.size}종 · ${[...used.values()].reduce((a, b) => a + b, 0)}번 사용 · 파일 ${mb}MB`);
-const unused = fs.readdirSync(SHOTS).filter((f) => f.endsWith(".webp") && !used.has(f.replace(".webp", "")));
-if (unused.length) console.log(`   (안 쓴 사진: ${unused.join(", ")})`);
+}
