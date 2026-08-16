@@ -20,9 +20,10 @@ fantastrick-homepage\   ← Next.js 웹앱 (예약·리뷰 자체 시스템)
 │  │                       `npx tsx scripts/import-from-wp.mts` (미리보기) · `--apply` (실제)
 │  ├─ images-to-webp.mjs ← 사진을 미리 줄여 webp 로. **새 사진 넣을 때마다 돌릴 것**
 │  │                       (자동 변환을 껐기 때문에 아무도 안 줄여준다) `--apply` 로 실행
-│  ├─ visual-check.mjs   ← 크롬으로 5쪽 열어 깨진 사진·실패요청·JS오류 점검 (먼저 서버 띄우고)
-│  ├─ check-deposit-ui.mjs ← 예약금 입금 안내(조회·챗봇) 점검. 조회 응답만 가로채 가짜 예약 사용
-│  │                        → **진짜 DB 는 안 건드린다**
+│  ├─ smoke-test.mjs     ← ⭐전체 점검 21항목. 13쪽 사진·실패요청·JS오류 + 예약조회 입금안내
+│  │                        + 챗봇 + 예약금 팝업 잠금·뒤로가기 차단.
+│  │                        조회·접수 응답을 가로채므로 **진짜 DB 는 안 건드린다**
+│  │                        `npx next build && npx next start -p 3457` 먼저 띄우고 실행
 │  ├─ worker-usage.mjs   ← 워커 하루 요청량 (한도 10만) · worker-hourly.mjs = 시간대별
 │  ├─ worker-cpu.mjs     ← 요청당 CPU 시간(중앙값·상위1%). 무료 상한 10ms 에 걸리는지 확인
 │  ├─ traffic-top.mjs    ← 어느 주소가 요청을 많이 먹나 ⚠️토큰에 Analytics 권한 없어 현재 실패
