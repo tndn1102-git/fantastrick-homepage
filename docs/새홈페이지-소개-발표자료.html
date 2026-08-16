@@ -1,0 +1,513 @@
+<title>판타스트릭 새 홈페이지</title>
+<style>
+/* ─────────────────────────────────────────────
+   판타스트릭 새 홈페이지 — 소개 발표 자료
+   색은 실제 사이트 토큰에서 그대로 가져왔다(globals.css):
+     Fantasy Blue #043cb2 / #2f6fe0 · Phantom Violet #622698 · Illusion Red #b20e19
+   어두운 화면 하나로 간다 — 실제 손님 화면이 어두운 남색이라 그 정체성에 맞춘다.
+   ───────────────────────────────────────────── */
+:root{
+  --ground:#080d1e;          /* 남색으로 치우친 검정 — 중성 회색을 쓰지 않는다 */
+  --ground2:#0d1428;
+  --surface:#121b38;
+  --surface2:#18234634;
+  --line:#26325c;
+  --line-soft:#1b2543;
+
+  --ink:#eef2ff;
+  --ink-mid:#a9b6dc;
+  --ink-dim:#7583ad;
+
+  --blue:#4d86f0;            /* Fantasy Blue — 어두운 바닥에서 읽히게 올림 */
+  --blue-deep:#043cb2;
+  --violet:#a366e6;          /* Phantom Violet — 올림 */
+  --red:#f2645a;             /* Illusion Red — 올림 */
+  --green:#2fc47f;
+  --amber:#e0a93a;
+
+  --mono:ui-monospace,"Cascadia Mono",Consolas,"D2Coding",monospace;
+  --sans:"Pretendard Variable",Pretendard,-apple-system,"Segoe UI","Malgun Gothic","맑은 고딕",system-ui,sans-serif;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+
+/* ── 위 띠: 브랜드 + 지금 슬라이드 ── */
+.topbar{
+  position:fixed;inset:0 0 auto 0;height:52px;z-index:50;
+  display:flex;align-items:center;gap:16px;padding:0 clamp(18px,3vw,44px);
+  background:linear-gradient(to bottom,var(--ground) 60%,transparent);
+}
+.mark{
+  font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.22em;
+  color:var(--ink);white-space:nowrap;
+}
+.mark b{color:var(--blue)}
+.topbar .sep{flex:1;height:1px;background:var(--line-soft)}
+.counter{font-family:var(--mono);font-size:12px;color:var(--ink-dim);font-variant-numeric:tabular-nums}
+.counter em{color:var(--ink);font-style:normal}
+
+/* ── 슬라이드 ── */
+.deck{height:100vh;height:100svh}
+.slide{
+  position:absolute;inset:0;
+  display:none;
+  padding:78px clamp(18px,4.5vw,72px) 66px;
+  overflow-y:auto;overflow-x:hidden;
+}
+/* 발표 화면이라 내용을 세로 가운데에 둔다.
+   flex 자식에 margin:auto 를 주는 방식이라, 내용이 화면보다 길어져도 위가 잘리지 않는다
+   (justify-content:center 는 넘칠 때 윗부분이 잘린다). */
+.slide.on{display:flex;flex-direction:column;animation:rise .42s cubic-bezier(.2,.7,.3,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slide.on{animation:none}}
+.inner{width:100%;max-width:1180px;margin:auto}
+
+.eyebrow{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--blue);margin-bottom:14px;
+}
+h1{
+  font-size:clamp(34px,5.4vw,62px);line-height:1.1;letter-spacing:-.035em;font-weight:800;
+  margin:0 0 18px;text-wrap:balance;
+}
+h2{
+  font-size:clamp(25px,3.4vw,40px);line-height:1.18;letter-spacing:-.03em;font-weight:800;
+  margin:0 0 8px;text-wrap:balance;
+}
+.sub{font-size:clamp(14.5px,1.5vw,17px);line-height:1.65;color:var(--ink-mid);margin:0 0 30px;max-width:62ch}
+.sub strong{color:var(--ink);font-weight:700}
+
+/* ── 표지 ── */
+.cover{display:flex;flex-direction:column}
+.cover .rule{width:64px;height:3px;background:var(--blue);margin:0 0 26px;border-radius:2px}
+.cover h1{font-size:clamp(40px,7.5vw,88px)}
+.cover .lede{font-size:clamp(16px,1.9vw,21px);color:var(--ink-mid);max-width:52ch;line-height:1.6}
+.cover .meta{
+  margin-top:44px;display:flex;flex-wrap:wrap;gap:10px 26px;
+  font-family:var(--mono);font-size:12.5px;color:var(--ink-dim);
+}
+.cover .meta span b{color:var(--blue);font-weight:600}
+
+/* ── 숫자 타일 ── */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:12px}
+.stat{
+  background:var(--surface);border:1px solid var(--line-soft);border-radius:12px;
+  padding:18px 18px 16px;
+}
+.stat .n{
+  font-family:var(--mono);font-size:clamp(26px,3.4vw,38px);font-weight:700;line-height:1;
+  letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--ink);
+}
+.stat .n small{font-size:.5em;color:var(--ink-mid);font-weight:600;margin-left:3px}
+.stat .k{margin-top:9px;font-size:12.5px;color:var(--ink-mid);line-height:1.45}
+.stat.hi .n{color:var(--blue)}
+.stat.win .n{color:var(--green)}
+
+/* ── 카드 격자 ── */
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(238px,1fr))}
+.card{
+  background:var(--surface);border:1px solid var(--line-soft);border-radius:12px;padding:18px 20px;
+}
+.card h3{
+  margin:0 0 8px;font-size:16px;font-weight:800;letter-spacing:-.01em;
+  display:flex;align-items:baseline;gap:9px;
+}
+.card h3 .tag{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--ink-dim);
+  border:1px solid var(--line);border-radius:5px;padding:2px 6px;font-weight:600;
+}
+.card p{margin:0;font-size:13.5px;line-height:1.62;color:var(--ink-mid)}
+.card p + p{margin-top:7px}
+.card b{color:var(--ink);font-weight:700}
+.card.accent{border-color:#2a3d7a;background:linear-gradient(180deg,#141f42,#111a36)}
+
+/* ── 흐름도 ── */
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:9px;margin-bottom:20px}
+.step{
+  flex:1 1 150px;background:var(--surface);border:1px solid var(--line-soft);
+  border-radius:11px;padding:15px 15px 14px;position:relative;
+}
+.step .i{
+  font-family:var(--mono);font-size:10.5px;color:var(--blue);letter-spacing:.12em;
+  display:block;margin-bottom:8px;font-weight:700;
+}
+.step .t{font-size:14px;font-weight:700;line-height:1.35;margin-bottom:5px}
+.step .d{font-size:12px;color:var(--ink-dim);line-height:1.5}
+.step.auto{border-color:#245a41;background:linear-gradient(180deg,#10261d,#0e1f1a)}
+.step.auto .i{color:var(--green)}
+.arrow{display:flex;align-items:center;color:var(--ink-dim);font-size:15px;flex:0 0 auto}
+@media(max-width:760px){.arrow{display:none}}
+
+.note{
+  margin-top:4px;font-size:13px;color:var(--ink-mid);line-height:1.6;
+  border-left:2px solid var(--line);padding-left:14px;
+}
+.note b{color:var(--ink)}
+.note.good{border-left-color:var(--green)}
+.note.warn{border-left-color:var(--amber)}
+
+/* ── 비교표 ── */
+.tablewrap{overflow-x:auto;border:1px solid var(--line-soft);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:600px;font-size:13.5px}
+th,td{text-align:left;padding:11px 16px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+thead th{
+  font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-dim);font-weight:600;background:#0f1730;
+}
+tbody tr:last-child td{border-bottom:none}
+td.item{font-weight:700;color:var(--ink);width:30%}
+td.old{color:var(--ink-dim)}
+td.new{color:var(--ink-mid)}
+.pill{
+  display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:700;
+  padding:2px 7px;border-radius:5px;letter-spacing:.06em;white-space:nowrap;
+}
+.pill.no{background:#33151a;color:var(--red);border:1px solid #55232a}
+.pill.yes{background:#10301f;color:var(--green);border:1px solid #1d5137}
+.pill.part{background:#332a12;color:var(--amber);border:1px solid #55461f}
+
+/* ── 목록 ── */
+ul.clean{margin:0;padding:0;list-style:none;display:grid;gap:9px}
+ul.clean li{
+  font-size:13.8px;line-height:1.6;color:var(--ink-mid);
+  padding-left:19px;position:relative;
+}
+ul.clean li::before{
+  content:"";position:absolute;left:0;top:.6em;width:6px;height:6px;border-radius:50%;
+  background:var(--blue);
+}
+ul.clean li b{color:var(--ink);font-weight:700}
+ul.clean.ok li::before{background:var(--green)}
+
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:26px}
+
+/* 노트북처럼 세로가 짧은 화면(720p)에서 표 슬라이드가 넘치던 것 — 여백만 줄여 한 장에 담는다 */
+@media (max-height:780px){
+  .slide{padding-top:68px;padding-bottom:58px}
+  .sub{margin-bottom:20px}
+  h2{font-size:clamp(23px,3vw,34px)}
+  th,td{padding:8.5px 14px}
+  .card{padding:15px 17px}
+}
+
+/* ── 아래 띠: 진행 ── */
+.botbar{
+  position:fixed;inset:auto 0 0 0;height:54px;z-index:50;
+  display:flex;align-items:center;gap:14px;padding:0 clamp(18px,3vw,44px);
+  background:linear-gradient(to top,var(--ground) 60%,transparent);
+}
+.dots{display:flex;gap:6px;flex:1;flex-wrap:wrap}
+.dot{
+  width:26px;height:4px;border-radius:2px;background:var(--line);border:0;padding:0;
+  cursor:pointer;transition:background .2s;
+}
+.dot:hover{background:#3b4b82}
+.dot.on{background:var(--blue)}
+.dot:focus-visible{outline:2px solid var(--violet);outline-offset:3px}
+.hint{font-family:var(--mono);font-size:11px;color:var(--ink-dim);white-space:nowrap}
+kbd{
+  font-family:var(--mono);font-size:10.5px;border:1px solid var(--line);border-radius:4px;
+  padding:1px 5px;color:var(--ink-mid);background:#0f1730;
+}
+@media(max-width:640px){.hint{display:none}}
+</style>
+
+<div class="topbar">
+  <span class="mark">FANTA<b>STRICK</b></span>
+  <span class="sep"></span>
+  <span class="counter"><em id="cur">1</em> / <span id="tot">10</span></span>
+</div>
+
+<main class="deck" id="deck">
+
+  <!-- 1 ─────────────────────────────── -->
+  <section class="slide on">
+    <div class="inner cover">
+      <div class="rule"></div>
+      <h1>판타스트릭 새 홈페이지</h1>
+      <p class="lede">예약을 받고, 예약금을 확인하고, 손님에게 안내하는 일을
+        <strong style="color:var(--ink)">사람 손 없이</strong> 처리하는 우리만의 시스템.</p>
+      <div class="meta">
+        <span><b>주소</b> &nbsp;fantastrick.co.kr</span>
+        <span><b>기준일</b> &nbsp;2026-08-16</span>
+        <span><b>운영</b> &nbsp;Cloudflare</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 ─────────────────────────────── -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">한눈에</p>
+      <h2>지금 홈페이지가 하고 있는 일</h2>
+      <p class="sub">아래 숫자는 전부 오늘 실제로 세어본 것입니다.</p>
+      <div class="stats">
+        <div class="stat hi"><div class="n">14<small>쪽</small></div><div class="k">손님이 보는 화면<br>(테마 상세 4개 포함)</div></div>
+        <div class="stat hi"><div class="n">6<small>개</small></div><div class="k">사장님 관리자 탭</div></div>
+        <div class="stat"><div class="n">29<small>개</small></div><div class="k">뒤에서 도는 기능<br>(예약·입금·문자 등)</div></div>
+        <div class="stat"><div class="n">118<small>건</small></div><div class="k">지금 잡혀 있는 예약</div></div>
+        <div class="stat win"><div class="n">0<small>명</small></div><div class="k">예약 확정에 필요한<br>사람 손</div></div>
+      </div>
+      <div class="note good" style="margin-top:22px">
+        <b>핵심은 하나입니다.</b> 손님이 예약을 넣고 예약금을 보내면,
+        그다음부터 <b>확정도 문자도 자동</b>으로 나갑니다. 사장님은 결과만 보시면 됩니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 ─────────────────────────────── -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">가장 큰 변화</p>
+      <h2>예약금 확인이 자동입니다</h2>
+      <p class="sub">전에는 통장을 들여다보고, 이름을 맞춰보고, 문자를 손으로 보내야 했습니다.
+        지금은 이 줄이 <strong>끊기지 않고 끝까지 흘러갑니다.</strong></p>
+
+      <div class="flow">
+        <div class="step"><span class="i">01 · 손님</span><div class="t">예약 넣기</div><div class="d">테마·날짜·시간 고르고 이름·연락처 입력</div></div>
+        <div class="arrow">→</div>
+        <div class="step"><span class="i">02 · 화면</span><div class="t">입금 안내</div><div class="d">계좌 표시 + 토스 송금 한 번에<br>(금액까지 자동으로 채워짐)</div></div>
+        <div class="arrow">→</div>
+        <div class="step auto"><span class="i">03 · 자동</span><div class="t">입금 확인</div><div class="d">카카오뱅크 입금 알림을 읽어<br>이름·금액을 맞춰봄</div></div>
+        <div class="arrow">→</div>
+        <div class="step auto"><span class="i">04 · 자동</span><div class="t">예약 확정</div><div class="d">맞으면 그 자리에서 확정 처리</div></div>
+        <div class="arrow">→</div>
+        <div class="step auto"><span class="i">05 · 자동</span><div class="t">확정 안내</div><div class="d">알림톡 발송<br>(안 가면 문자로 자동 대체)</div></div>
+      </div>
+
+      <div class="grid g2">
+        <div class="card"><h3>이름이 다르면 <span class="tag">안전장치</span></h3>
+          <p>입금자 이름이 예약자와 다르면 <b>자동 확정하지 않습니다.</b> 관리자 화면에 남겨서 사장님이 직접 판단하시게 합니다. 잘못된 확정 문자가 나가는 게 더 큰 사고이기 때문입니다.</p></div>
+        <div class="card"><h3>감시가 멈추면 알려줍니다 <span class="tag">신호등</span></h3>
+          <p>입금 감시가 조용히 멈춰 있어도 아무도 모르는 일이 실제로 있었습니다. 지금은 관리자 맨 위에 <b>신호등</b>이 있어서, 멈추면 바로 눈에 띕니다.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 ─────────────────────────────── -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">전화가 줄어드는 이유</p>
+      <h2>손님이 스스로 할 수 있는 것</h2>
+      <p class="sub">예약할 때 정한 <strong>이름 · 전화번호 · 비밀번호 4자리</strong>로 조회합니다.
+        회원가입이 없어서 손님이 부담을 안 느낍니다.</p>
+      <div class="grid g3">
+        <div class="card"><h3>예약 확인</h3><p>테마·일시·인원·예약금 상태를 직접 봅니다.</p></div>
+        <div class="card"><h3>예약 취소</h3><p>환불 금액을 <b>화면이 먼저 계산해서 보여주고</b>, 동의해야 다음으로 넘어갑니다.</p>
+          <p style="color:var(--ink-dim);font-size:12.5px">24시간 넘게 남음 <b>100%</b> · 전날까지 <b>80%</b> · 당일 <b>0%</b></p></div>
+        <div class="card"><h3>환불 계좌 입력</h3><p>손님이 직접 적습니다. 계좌를 받으려고 전화할 일이 없습니다.</p></div>
+        <div class="card"><h3>시간 변경</h3><p>입금이 확인됐고 24시간 넘게 남았으면 <b>1회</b> 옮길 수 있습니다.</p></div>
+        <div class="card accent"><h3>입금 계좌 다시 보기 <span class="tag">08-16 추가</span></h3>
+          <p>전에는 예약 직후 팝업에만 계좌가 있어서, 닫으면 다시 볼 데가 없었습니다. 이제 <b>미입금 예약에 계좌가 같이 나옵니다.</b></p></div>
+        <div class="card"><h3>후기 남기기</h3><p>다녀간 손님이 후기를 남기고, 홈에 대표 후기가 걸립니다.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 ─────────────────────────────── -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">사장님 화면</p>
+      <h2>관리자 한 곳에서 다 끝납니다</h2>
+      <p class="sub">워드프레스 관리자에 들어가 플러그인을 헤맬 필요가 없습니다.
+        <strong>매장에서 실제로 하는 일 순서대로</strong> 탭을 짰습니다.</p>
+      <div class="grid g3">
+        <div class="card"><h3>예약 <span class="tag">01</span></h3><p>오늘·다가오는 예약, 손님 정보 수정, 시간변경 내역, 예약칸 막기.</p></div>
+        <div class="card"><h3>입금·환불 <span class="tag">02</span></h3><p>입금 대기 줄, 환불 처리(계좌 복사 한 번), 매장에서 직접 받은 건 수동 접수.</p></div>
+        <div class="card"><h3>도입 문의 <span class="tag">03</span></h3><p>제어시스템 도입을 묻는 다른 매장 문의를 상태별로 관리.</p></div>
+        <div class="card"><h3>알림톡 <span class="tag">04</span></h3><p>나간 알림톡 기록과 실패 여부. 필요하면 <b>재발송</b>(비용 확인 후).</p></div>
+        <div class="card"><h3>리뷰·공지 <span class="tag">05</span></h3><p>후기 관리와 <b>팝업 공지</b>. 공지는 배포 없이 그 자리에서 바뀝니다.</p></div>
+        <div class="card"><h3>설정 <span class="tag">06</span></h3><p>테마별 예약금·시간표·문자 문구. 코드를 안 고치고 바꿉니다.</p></div>
+      </div>
+      <div class="note" style="margin-top:20px">
+        관리자 화면은 <b>일부러 캐시를 끕니다.</b> 옛 화면이 남아 있으면 사장님이 잘못된 정보로 판단하게 되기 때문입니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 ─────────────────────────────── -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">손님 질문 줄이기</p>
+      <h2>물어보기 전에 화면이 답합니다</h2>
+      <div class="grid g2">
+        <div class="card"><h3>테마 상세 페이지</h3>
+          <p>테마마다 <b>시놉시스 · 인원별 요금 · 수용 인원 · 소요 시간 · 난이도 · 주의사항</b>을 다 적어뒀습니다. 포스터 한 장만 있던 때와 다릅니다.</p></div>
+        <div class="card"><h3>예약 캘린더가 스스로 설명함</h3>
+          <p>날짜를 누르면 <b>며칠에 예약창이 열리는지</b> 그 자리에서 알려줍니다. "언제 열려요?" 문의가 줄어듭니다.</p></div>
+        <div class="card"><h3>상담 챗봇</h3>
+          <p>가격·환불·오시는 길·<b>입금 계좌</b>를 즉시 답합니다.</p>
+          <p><b>일부러 AI를 안 씁니다.</b> 환불 규정은 손님이 돈을 걸고 읽는 정보라, AI가 그럴듯하게 틀리면 실제 분쟁이 됩니다. 답은 전부 <b>실제 운영 규정</b>에서 그대로 가져옵니다.</p></div>
+        <div class="card"><h3>이벤트 · FAQ · 오시는 길</h3>
+          <p>리뷰 이벤트, 생일 이벤트, 옵저버 제도를 한 곳에. 지하철 출구·도보 시간·주차 안내까지 적혀 있습니다.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 ─────────────────────────────── -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">옛 사이트와 비교</p>
+      <h2>지적받았던 것은 다 채웠습니다</h2>
+      <p class="sub">2026년 7월 15일, 기존 사이트를 전수 조사해서 <strong>"저쪽엔 있는데 우리엔 없다"</strong>고 꼽았던 항목들입니다.
+        그 뒤 한 달 동안 채웠습니다.</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>항목</th><th>7월 15일 당시</th><th>지금</th></tr></thead>
+          <tbody>
+            <tr><td class="item">인원별 이용 금액</td><td class="old"><span class="pill no">없음</span> 예약금만 보였음</td><td class="new"><span class="pill yes">있음</span> 테마마다 인원별 요금</td></tr>
+            <tr><td class="item">테마 상세 페이지</td><td class="old"><span class="pill no">404</span> 홈 카드가 전부</td><td class="new"><span class="pill yes">있음</span> 테마 4개 각각</td></tr>
+            <tr><td class="item">시놉시스 · 주의사항</td><td class="old"><span class="pill no">없음</span></td><td class="new"><span class="pill yes">있음</span> 안전·클레임 직결 항목</td></tr>
+            <tr><td class="item">오시는 길</td><td class="old"><span class="pill part">주소만</span></td><td class="new"><span class="pill yes">있음</span> 출구·도보·주차</td></tr>
+            <tr><td class="item">계좌 사전 안내</td><td class="old"><span class="pill part">예약 후에만</span></td><td class="new"><span class="pill yes">있음</span> 챗봇·예약조회에서도</td></tr>
+            <tr><td class="item">자주 묻는 질문</td><td class="old"><span class="pill no">없음</span></td><td class="new"><span class="pill yes">있음</span></td></tr>
+            <tr><td class="item">도입(컨설팅) 문의</td><td class="old"><span class="pill part">메뉴만</span></td><td class="new"><span class="pill yes">있음</span> 접수 + 관리자 관리</td></tr>
+            <tr><td class="item">실시간 채팅</td><td class="old"><span class="pill part">플러그인</span></td><td class="new"><span class="pill yes">대체</span> 규정 기반 챗봇(비용 0원)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note warn" style="margin-top:18px">
+        아직 안 한 것: <b>테마 갤러리(사진 여러 장)</b>와 <b>인스타그램 피드</b>. 급하지 않다고 보고 미뤄둔 것입니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 ─────────────────────────────── -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">눈에 안 보이는 강점</p>
+      <h2>안 꺼지고, 안 잃습니다</h2>
+      <div class="split">
+        <div>
+          <h3 style="font-size:15px;margin:0 0 12px;color:var(--blue);font-family:var(--mono);letter-spacing:.1em">자료를 잃지 않기</h3>
+          <ul class="clean ok">
+            <li><b>매주 전체 자동 백업.</b> 사람이 기억할 필요가 없습니다.</li>
+            <li><b>취소해도 기록이 남습니다.</b> 누가 언제 왜 바꿨는지 이력이 쌓입니다.</li>
+            <li><b>예약칸 중복 방지.</b> 같은 시간에 두 팀이 들어가는 일을 서버가 막습니다.</li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="font-size:15px;margin:0 0 12px;color:var(--blue);font-family:var(--mono);letter-spacing:.1em">멈추지 않기</h3>
+          <ul class="clean ok">
+            <li><b>알림톡이 안 가면 문자로 자동 대체.</b> 안내가 끊기지 않습니다.</li>
+            <li><b>입금 감시 신호등.</b> 감시가 멈추면 관리자 맨 위에 뜹니다.</li>
+            <li><b>조회 실패 횟수 기록.</b> 남의 예약을 찍어보는 시도를 막습니다.</li>
+            <li><b>연습용 번호 발송 차단.</b> 테스트하다 실제 문자가 나가는 사고를 막습니다.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note" style="margin-top:24px">
+        이 항목들은 <b>평소엔 티가 안 납니다.</b> 사고가 한 번 났을 때 비로소 값을 합니다 —
+        실제로 겪은 사고를 하나씩 막아가며 붙인 것들입니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 ─────────────────────────────── -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">속도와 비용</p>
+      <h2>가볍게 돌아갑니다</h2>
+      <p class="sub">아래는 <strong>2026년 8월 16일 실측값</strong>입니다.</p>
+      <div class="stats" style="margin-bottom:22px">
+        <div class="stat win"><div class="n">−93<small>%</small></div><div class="k">사진 용량<br>8,579KB → 614KB</div></div>
+        <div class="stat win"><div class="n">6,700<small>건</small></div><div class="k">하루 절감<br>(사진을 미리 줄여서)</div></div>
+        <div class="stat win"><div class="n">4,200<small>건</small></div><div class="k">하루 절감<br>(쓰레기 요청 차단)</div></div>
+        <div class="stat"><div class="n">0.47<small>초</small></div><div class="k">예약 시간표 전체를<br>받아오는 시간</div></div>
+      </div>
+      <div class="grid g2">
+        <div class="card"><h3>전 세계에 흩어져 돌아갑니다</h3>
+          <p>서버 한 대가 아니라 <b>Cloudflare</b> 위에서 돕니다. 손님과 가까운 곳에서 응답해 빠르고, 한 곳이 죽어도 안 멈춥니다.</p></div>
+        <div class="card"><h3>고정비가 거의 없습니다</h3>
+          <p>홈페이지 자체는 <b>무료 요금제</b>로 돌고 있습니다. 실제로 돈이 나가는 건 <b>문자·알림톡 발송비</b>와 도메인 정도입니다.</p>
+          <p style="color:var(--ink-dim);font-size:12.5px">요청이 한도에 다시 닿으면 월 $5(약 7,000원)로 올리면 됩니다.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 ─────────────────────────────── -->
+  <section class="slide">
+    <div class="inner">
+      <p class="eyebrow">정리</p>
+      <h2>한 줄로 말하면</h2>
+      <p class="sub" style="font-size:clamp(17px,2.1vw,23px);color:var(--ink);max-width:26ch;line-height:1.45;font-weight:700;letter-spacing:-.02em">
+        예약을 <span style="color:var(--blue)">받는 것</span>에서 끝나지 않고,
+        <span style="color:var(--green)">확정까지 스스로 하는</span> 홈페이지.
+      </p>
+      <div class="grid g3" style="margin-top:8px">
+        <div class="card accent"><h3>손님</h3><p>예약·취소·시간변경·환불계좌·후기를 <b>전화 없이</b> 혼자 끝냅니다.</p></div>
+        <div class="card accent"><h3>사장님</h3><p>통장 확인도, 확정 문자도 <b>손으로 안 합니다.</b> 관리자에서 결과만 봅니다.</p></div>
+        <div class="card accent"><h3>매장</h3><p>중복 예약·잘못된 문자·자료 유실을 <b>시스템이 먼저 막습니다.</b></p></div>
+      </div>
+      <div class="note good" style="margin-top:26px">
+        <b>다음으로 할 만한 것</b> — 테마 갤러리(사진 여러 장) · 인스타그램 연동 · 방문 후기 유도.
+        기능은 충분히 갖췄고, 이제는 <b>알리는 쪽</b>이 남았습니다.
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="botbar">
+  <div class="dots" id="dots"></div>
+  <span class="hint"><kbd>←</kbd> <kbd>→</kbd> 넘기기 · <kbd>F</kbd> 전체화면</span>
+</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var dots = document.getElementById('dots');
+  var cur = document.getElementById('cur');
+  document.getElementById('tot').textContent = slides.length;
+  var i = 0;
+
+  slides.forEach(function(s, n){
+    var b = document.createElement('button');
+    b.className = 'dot' + (n === 0 ? ' on' : '');
+    b.type = 'button';
+    b.setAttribute('aria-label', (n + 1) + '번 슬라이드');
+    b.addEventListener('click', function(){ go(n); });
+    dots.appendChild(b);
+  });
+  var dotEls = Array.prototype.slice.call(dots.children);
+
+  function go(n){
+    n = Math.max(0, Math.min(slides.length - 1, n));
+    if (n === i) return;
+    slides[i].classList.remove('on');
+    dotEls[i].classList.remove('on');
+    i = n;
+    slides[i].classList.add('on');
+    slides[i].scrollTop = 0;
+    dotEls[i].classList.add('on');
+    cur.textContent = i + 1;
+  }
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(i + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(i - 1); }
+    else if (e.key === 'Home') { go(0); }
+    else if (e.key === 'End') { go(slides.length - 1); }
+    else if (e.key === 'f' || e.key === 'F') {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen().catch(function(){});
+    }
+  });
+
+  // 화면 좌우를 눌러도 넘어간다 (발표 중 마우스만 쓸 때)
+  document.getElementById('deck').addEventListener('click', function(e){
+    if (e.target.closest('a, button')) return;
+    go(e.clientX < window.innerWidth * 0.28 ? i - 1 : i + 1);
+  });
+})();
+</script>
