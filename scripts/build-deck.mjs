@@ -16,6 +16,7 @@ import path from "node:path";
 const DECKS = {
   intro: { tpl: "docs/_deck/template.html", out: "docs/새홈페이지-소개-발표자료.html" },
   staff: { tpl: "docs/_deck/staff-template.html", out: "docs/직원교육-홈페이지-설명서.html" },
+  mobile: { tpl: "docs/_deck/mobile-template.html", out: "docs/직원교육-설명서-모바일.html" },
 };
 const pick = process.argv[2];
 const targets = pick ? [DECKS[pick]].filter(Boolean) : Object.values(DECKS);
@@ -40,7 +41,11 @@ html = html.replace(/\{\{img:([a-z0-9-]+)\}\}/gi, (_, name) => {
   }
   const b64 = fs.readFileSync(file).toString("base64");
   used.set(name, (used.get(name) || 0) + 1);
-  return `<img src="data:image/webp;base64,${b64}" alt="${name} 화면" loading="lazy">`;
+  /* m- 로 시작하면 폰으로 찍은 사진(그대로 봐도 읽힌다).
+     그 밖은 PC 화면이라 폰에서 작다 → `pc` 를 붙여 **눌러서 크게 보기** 대상으로 만든다.
+     (슬라이드판 자료는 이 class 를 쓰지 않으므로 붙어 있어도 무해하다) */
+  const cls = name.startsWith("m-") ? "shot" : "shot pc";
+  return `<img class="${cls}" src="data:image/webp;base64,${b64}" alt="${name} 화면" loading="lazy">`;
 });
 
 if (/\{\{/.test(html)) console.log("  ⚠ 아직 안 채워진 자리표시자가 남아 있습니다");

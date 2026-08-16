@@ -1,0 +1,494 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>직원용 홈페이지 설명서</title>
+<style>
+/* ⚠️ 위 viewport 한 줄이 없으면 **실제 폰에서 페이지가 980px 로 그려진 뒤 축소**된다.
+      글씨가 좁쌀만 해져서 폰용 자료가 무의미해진다. 지우지 말 것. */
+/* ─────────────────────────────────────────────
+   판타스트릭 — 직원 교육용 설명서 (폰으로 보는 판)
+   ⚠️ 원본(템플릿)이다. 사진은 "img:이름"(중괄호 두 겹) 자리표시자.
+      `node scripts/build-deck.mjs mobile` 로 docs/직원교육-설명서-모바일.html 을 만든다.
+
+   [PC 판(staff-template.html)과 무엇이 다른가]
+     · 슬라이드가 아니라 **위아래로 내리는 한 장짜리 문서**다. 폰에서 넘기기 버튼은 불편하다.
+     · 손님 화면 사진을 **폰으로 다시 찍은 것**(m-*)으로 바꿨다. PC 사진은 폰에서 글씨가 안 보인다.
+     · 관리자 사진만 PC 것을 쓰되 **눌러서 크게 보기**를 붙였다.
+     · 표는 폰에서 가로로 삐져나가므로 **카드로 쌓는다**.
+   ───────────────────────────────────────────── */
+:root{
+  --ground:#080d1e; --surface:#121b38; --surface2:#0f1730;
+  --line:#26325c; --line-soft:#1b2543;
+  --ink:#eef2ff; --ink-mid:#a9b6dc; --ink-dim:#7583ad;
+  --blue:#4d86f0; --violet:#a366e6; --red:#f2645a; --green:#2fc47f; --amber:#e0a93a;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,"D2Coding",monospace;
+  --sans:"Pretendard Variable",Pretendard,-apple-system,"Segoe UI","Malgun Gothic","맑은 고딕",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;line-height:1.6}
+
+/* 위에 붙어 다니는 띠 */
+.top{position:sticky;top:0;z-index:40;background:rgba(8,13,30,.94);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line-soft);padding:11px 16px;display:flex;align-items:center;gap:10px}
+.top .m{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.18em;white-space:nowrap}
+.top .m b{color:var(--blue)} .top .m span{color:var(--amber)}
+.top .sp{flex:1}
+.top a.toc{font-size:12px;color:var(--ink-mid);text-decoration:none;border:1px solid var(--line);
+  border-radius:8px;padding:5px 10px;white-space:nowrap}
+
+.wrap{max-width:600px;margin:0 auto;padding:0 16px 72px}
+
+/* 표지 */
+.hero{padding:30px 0 26px;border-bottom:1px solid var(--line-soft)}
+.hero .rule{width:44px;height:3px;background:var(--amber);border-radius:2px;margin-bottom:16px}
+.hero .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--amber);margin:0 0 8px}
+.hero h1{font-size:30px;line-height:1.15;letter-spacing:-.035em;font-weight:800;margin:0 0 12px}
+.hero p{margin:0;color:var(--ink-mid);font-size:14.5px}
+.hero p b{color:var(--ink)}
+.hero .meta{margin-top:16px;font-family:var(--mono);font-size:11px;color:var(--ink-dim)}
+
+/* 목차 */
+.toclist{margin:20px 0 4px;padding:14px 16px;background:var(--surface);border:1px solid var(--line-soft);border-radius:12px}
+.toclist h2{margin:0 0 10px;font-size:12px;font-family:var(--mono);letter-spacing:.14em;color:var(--ink-dim);font-weight:600}
+.toclist ol{margin:0;padding-left:20px;display:grid;gap:7px}
+.toclist a{color:var(--ink-mid);text-decoration:none;font-size:14px}
+.toclist a:hover,.toclist a:focus-visible{color:var(--blue);text-decoration:underline}
+
+/* 섹션 */
+section{padding:30px 0 6px;border-top:1px solid var(--line-soft);scroll-margin-top:52px}
+section:first-of-type{border-top:0}
+.no{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--blue);margin:0 0 7px}
+h2{font-size:22px;line-height:1.25;letter-spacing:-.03em;font-weight:800;margin:0 0 10px;text-wrap:balance}
+.lead{margin:0 0 16px;color:var(--ink-mid);font-size:14.5px}
+.lead b{color:var(--ink)}
+
+/* 사진 */
+figure{margin:0 0 14px}
+.shot{width:100%;display:block;border-radius:12px;border:1px solid var(--line);background:var(--surface2)}
+.shot.pc{cursor:zoom-in}
+figcaption{font-size:12.5px;color:var(--ink-dim);margin-top:7px;line-height:1.5}
+figcaption b{color:var(--ink-mid)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.pair figcaption{font-size:11.5px}
+/* 폰에서 2단으로 넣으면 사진 속 글씨가 안 읽힌다 → **중요한 화면은 한 줄에 하나씩**.
+   훑어만 보면 되는 것(.pair.small)만 2단으로 남긴다. */
+@media(max-width:560px){
+  .pair{grid-template-columns:1fr;gap:14px}
+  .pair.small{grid-template-columns:1fr 1fr;gap:11px}
+  .pair figcaption{font-size:12.5px}
+  .pair.small figcaption{font-size:11.5px}
+}
+.zoomhint{font-family:var(--mono);font-size:10px;color:var(--blue);border:1px solid var(--line);
+  border-radius:5px;padding:2px 6px;margin-left:5px;white-space:nowrap}
+
+/* 상자들 */
+.card{background:var(--surface);border:1px solid var(--line-soft);border-radius:12px;padding:14px 16px;margin-bottom:11px}
+.card h3{margin:0 0 6px;font-size:15px;font-weight:800}
+.card p{margin:0;font-size:14px;color:var(--ink-mid)}
+.card p+p{margin-top:6px}
+.card b{color:var(--ink)}
+
+.warn{border:1px solid #5a3a12;background:linear-gradient(180deg,#251a08,#1c1508);border-radius:12px;
+  padding:14px 16px;margin-bottom:11px}
+.warn .h{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.warn .ic{font-family:var(--mono);font-size:11px;font-weight:800;color:#0d1020;background:var(--amber);
+  border-radius:5px;padding:3px 8px;letter-spacing:.06em}
+.warn .h b{font-size:15px;color:#fff}
+.warn p{margin:0;font-size:14px;color:#f0dfbb}
+.warn p+p{margin-top:6px}
+.warn b{color:#fff}
+/* 작게 다는 단서 */
+.fine{display:block;margin-top:8px;font-size:11.5px;color:#c3ab7d;line-height:1.5}
+
+.note{font-size:13.5px;color:var(--ink-mid);border-left:3px solid var(--line);padding-left:13px;margin:0 0 12px}
+.note b{color:var(--ink)}
+.note.good{border-left-color:var(--green)}
+.note.bad{border-left-color:var(--red)}
+
+/* 순서 */
+ol.steps{margin:0 0 14px;padding:0;list-style:none;display:grid;gap:9px;counter-reset:s}
+ol.steps li{counter-increment:s;position:relative;padding:12px 14px 12px 44px;background:var(--surface);
+  border:1px solid var(--line-soft);border-radius:11px;font-size:14px;color:var(--ink-mid)}
+ol.steps li::before{content:counter(s);position:absolute;left:13px;top:12px;width:21px;height:21px;
+  border-radius:6px;background:#1b2a52;color:var(--blue);font-family:var(--mono);font-size:11.5px;
+  font-weight:700;display:grid;place-items:center}
+ol.steps li b{color:var(--ink)}
+ol.steps li.auto{border-color:#245a41;background:linear-gradient(180deg,#10261d,#0e1f1a)}
+ol.steps li.auto::before{background:#123a29;color:var(--green)}
+
+ul.plain{margin:0 0 12px;padding:0;list-style:none;display:grid;gap:8px}
+ul.plain li{font-size:14px;color:var(--ink-mid);padding-left:17px;position:relative}
+ul.plain li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--blue)}
+ul.plain.ok li::before{background:var(--green)}
+ul.plain.no li::before{background:var(--red)}
+ul.plain li b{color:var(--ink)}
+
+/* 폰에서는 표 대신 카드 */
+.rows{display:grid;gap:9px;margin-bottom:12px}
+.row{background:var(--surface);border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px}
+.row .q{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:5px}
+.row .a{font-size:13.5px;color:var(--ink-mid)}
+.row .a b{color:var(--ink)}
+.tag{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:700;padding:2px 7px;
+  border-radius:5px;letter-spacing:.05em;margin-right:6px}
+.tag.no{background:#33151a;color:var(--red);border:1px solid #55232a}
+.tag.yes{background:#10301f;color:var(--green);border:1px solid #1d5137}
+.rate{font-family:var(--mono);font-weight:800;font-size:17px}
+.rate.f{color:var(--green)} .rate.p{color:var(--amber)} .rate.z{color:var(--red)}
+
+/* 문자 전문 */
+.msgbox{background:#0b1226;border:1px solid var(--line);border-radius:12px;padding:15px 16px;
+  font-size:13.5px;line-height:1.75;color:#dfe6ff;white-space:pre-line;margin-bottom:12px}
+.msgbox .hl{color:var(--amber);font-weight:700}
+.msghead{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10.5px;
+  color:var(--ink-dim);letter-spacing:.1em;margin-bottom:8px}
+.msghead .d{width:6px;height:6px;border-radius:50%;background:var(--green)}
+
+/* 눌러서 크게 보기 */
+.lb{position:fixed;inset:0;z-index:100;background:rgba(4,7,18,.96);display:none;
+  align-items:center;justify-content:center;padding:12px}
+.lb.on{display:flex}
+.lb img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
+.lb .x{position:absolute;top:12px;right:14px;font-size:14px;color:#fff;background:rgba(255,255,255,.14);
+  border:0;border-radius:9px;padding:9px 14px;font-family:var(--sans);font-weight:700}
+
+.up{position:fixed;right:14px;bottom:14px;z-index:45;background:var(--surface);border:1px solid var(--line);
+  color:var(--ink-mid);border-radius:11px;padding:10px 13px;font-size:12.5px;font-weight:700;
+  text-decoration:none;box-shadow:0 8px 24px -8px rgba(0,0,0,.7)}
+
+.end{margin-top:26px;padding-top:18px;border-top:1px solid var(--line-soft);
+  font-size:12px;color:var(--ink-dim);text-align:center}
+
+@media(min-width:700px){
+  .wrap{max-width:640px}
+  h2{font-size:25px}
+}
+</style>
+
+<div class="top">
+  <span class="m">FANTA<b>STRICK</b> <span>· 직원용</span></span>
+  <span class="sp"></span>
+  <a class="toc" href="#toc">목차</a>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="rule"></div>
+    <p class="kicker">직원 교육용</p>
+    <h1>홈페이지 설명서</h1>
+    <p>손님이 <b>무엇을 보고</b>, <b>무엇을 받고</b>, <b>어디서 바꾸는지</b>.
+      그리고 우리가 관리자에서 어떻게 확인하는지.</p>
+    <p class="meta">2026-08-17 기준 · 위아래로 넘겨 보세요</p>
+  </div>
+
+  <div class="toclist" id="toc">
+    <h2>목차</h2>
+    <ol>
+      <li><a href="#s1">먼저 이 셋만 기억하세요</a></li>
+      <li><a href="#s2">예약 한 건이 지나가는 길</a></li>
+      <li><a href="#s3">손님이 보는 화면</a></li>
+      <li><a href="#s4">예약할 때 — 30분 안에 입금</a></li>
+      <li><a href="#s5">손님이 받는 단 하나의 문자</a></li>
+      <li><a href="#s6">이럴 땐 문자가 안 나갑니다</a></li>
+      <li><a href="#s7">취소는 이 길로 갑니다</a></li>
+      <li><a href="#s8">100%냐 80%냐 0%냐</a></li>
+      <li><a href="#s9">시간 변경</a></li>
+      <li><a href="#s10">관리자에서 확인하기</a></li>
+      <li><a href="#s11">챗봇</a></li>
+      <li><a href="#s12">손님이 이렇게 물으면</a></li>
+      <li><a href="#s13">꼭 기억할 다섯 가지</a></li>
+    </ol>
+  </div>
+
+  <!-- 1 ─────────────────────── -->
+  <section id="s1">
+    <p class="no">01</p>
+    <h2>먼저 이 셋만 기억하세요</h2>
+    <p class="lead">나머지를 다 잊어도 이 셋은 알고 계셔야 손님에게 틀린 안내를 안 합니다.</p>
+
+    <div class="warn">
+      <div class="h"><span class="ic">1</span><b>문자는 「확정문자」 하나뿐</b></div>
+      <p>예약 접수 문자, 취소 문자, 시간변경 문자는 <b>보내지 않습니다.</b>
+        손님은 그 내용을 <b>화면에 뜨는 안내창</b>으로 봅니다.</p>
+    </div>
+
+    <div class="warn">
+      <div class="h"><span class="ic">2</span><b>취소·시간변경은 손님이 직접</b></div>
+      <p>환불 계좌도 그 화면에서 받습니다. <b>전화로 계좌를 받아 적지 않으셔도 됩니다.</b>
+        손님이 전화하면 <b>[예약 조회·취소]</b> 로 안내해 주세요.</p>
+    </div>
+
+    <div class="warn">
+      <div class="h"><span class="ic">3</span><b>30분 안에 입금 없으면 자동 취소</b></div>
+      <p>예약금을 <b>30분 안에</b> 안 넣으면 그 예약은 <b>자동으로 취소</b>됩니다.
+        (자정 이후 접수분은 <b>다음 날 오전 10시</b>까지)</p>
+      <p>손님이 "조금 늦게 입금했는데요" 하면 <b>이미 취소됐을 수 있습니다.</b>
+        관리자에서 확인하고, 자리가 남아 있으면 다시 잡아드리세요.</p>
+      <span class="fine">※ 테스트 기간 동안은 30분이 지나도 자동으로 취소되지 않습니다. 미입금 건은 사장님이 직접 정리합니다.</span>
+    </div>
+  </section>
+
+  <!-- 2 ─────────────────────── -->
+  <section id="s2">
+    <p class="no">02</p>
+    <h2>예약 한 건이 지나가는 길</h2>
+    <p class="lead">초록칸은 <b>사람 손이 안 닿는 곳</b>입니다. 나머지에서만 우리가 개입합니다.</p>
+    <ol class="steps">
+      <li><b>손님 — 예약 넣기</b><br>테마·날짜·시간·인원, 이름·전화·<b>비밀번호 4자리</b></li>
+      <li><b>화면 — 예약금 안내창</b><br>계좌·금액이 뜹니다. <b>[확인했습니다]</b> 를 체크해야 닫힙니다</li>
+      <li class="auto"><b>자동 — 입금 확인</b><br>카카오뱅크 입금 알림에서 <b>이름·금액</b>을 맞춰봅니다</li>
+      <li class="auto"><b>자동 — 확정 + 문자</b><br>확정 처리 후 <b>확정문자(알림톡)</b> 발송</li>
+      <li><b>손님 — 시간 변경 (선택)</b><br>조건 맞으면 <b>1회</b>. 문자는 안 나갑니다</li>
+      <li><b>손님 — 취소 (선택)</b><br>환불율 안내 → 계좌 입력 → 완료. 문자는 안 나갑니다</li>
+      <li><b>매장 — 환불 송금</b><br>관리자 <b>[입금·환불 › 환불 처리]</b> 에서 계좌 복사 → 이체</li>
+    </ol>
+  </section>
+
+  <!-- 3 ─────────────────────── -->
+  <section id="s3">
+    <p class="no">03</p>
+    <h2>손님이 보는 화면</h2>
+    <p class="lead">손님이 "그 페이지 어디예요?" 하면 바로 짚어줄 수 있게 한 번 훑어보세요.</p>
+    <div class="pair small">
+      <figure>{{img:m-home}}<figcaption><b>홈</b> — [예약하기]·[예약 조회·취소]</figcaption></figure>
+      <figure>{{img:m-rooms}}<figcaption><b>테마 상세</b> — 시놉시스·인원별 요금·주의사항</figcaption></figure>
+      <figure>{{img:m-faq}}<figcaption><b>자주 묻는 질문</b> — 가격표가 여기</figcaption></figure>
+      <figure>{{img:m-events}}<figcaption><b>이벤트</b> — 리뷰·생일·옵저버</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- 4 ─────────────────────── -->
+  <section id="s4">
+    <p class="no">04</p>
+    <h2>예약할 때 — 30분 안에 입금</h2>
+    <figure>{{img:m-reserve}}<figcaption><b>날짜 고르기</b> — 아직 안 열린 날은 <b>며칠에 열리는지</b> 화면이 알려줍니다</figcaption></figure>
+    <div class="pair">
+      <figure>{{img:m-slots}}<figcaption><b>시간 고르기</b> — 찬 시간은 못 고릅니다</figcaption></figure>
+      <figure>{{img:m-deposit}}<figcaption><b>예약금 안내창</b> — 계좌·금액 + 토스 송금</figcaption></figure>
+    </div>
+    <div class="card"><h3>입금 기한</h3>
+      <p><b>30분</b> 안에 안 넣으면 자동 취소됩니다. 자정 이후 접수분은 <b>다음 날 오전 10시</b>까지 기다립니다.</p></div>
+    <div class="card"><h3>입금자 이름</h3>
+      <p><b>예약자 이름과 같아야</b> 자동으로 확인됩니다. 다르면 확정이 멈추고 관리자에 남습니다.</p></div>
+    <div class="card"><h3>계좌를 또 물으면</h3>
+      <p><b>[예약 조회·취소]</b> 나 <b>챗봇</b>에서 다시 볼 수 있습니다.</p></div>
+    <figure>{{img:m-lookup-unpaid}}<figcaption>입금 전 예약을 조회하면 <b>계좌가 같이 나옵니다</b></figcaption></figure>
+  </section>
+
+  <!-- 5 ─────────────────────── -->
+  <section id="s5">
+    <p class="no">05</p>
+    <h2>손님이 받는 단 하나의 문자</h2>
+    <p class="lead">카카오톡 <b>알림톡</b>으로 먼저 나가고, 안 가면 <b>문자로 자동 대체</b>됩니다.</p>
+    <div class="msghead"><span class="d"></span>예약 확정문자 · 실제 문구</div>
+    <div class="msgbox">입금이 확인되어 예약이 확정되셨습니다.
+
+예약자명: <span class="hl">{이름}</span>님
+예약시간: <span class="hl">{날짜} {시간}</span>
+테마명: <span class="hl">{테마}</span>
+
+정시 입장을 위해 예약시간 10분 전 내방해주시기 바랍니다.
+지각 시 플레이 시간이 차감됨을 알려드립니다.
+15분 이상 지각 시 테마특성상 이용이 불가할 수 있습니다.
+(당일 취소처리가 됨에 따라 예약금 환불이 어렵다는 점 양해부탁드립니다.)
+
+예약 취소·시간 변경은 홈페이지
+[예약 조회·취소] 에서 직접 하실 수 있습니다.
+(예약자 이름 · 전화번호 · 예약 비밀번호 4자리)
+환불 계좌도 그 화면에서 받으니
+따로 문자 주지 않으셔도 됩니다.
+
+예약하신 테마 시작 시간을 기준으로
+- 24시간 전 취소 : [전액환불]
+- 24시간 이내, 하루 전 취소 : [80% 환불]
+임을 안내해 드립니다.
+
+게임 당일 취소/변경/미방문의 경우
+예약금이 전액 위약금으로 발생함을 알려드립니다.
+감사합니다.</div>
+    <div class="note good"><b>이 문자 안에 취소 방법과 환불 규정이 다 들어 있습니다.</b>
+      손님이 "규정 못 들었다"고 하면 이 문자를 확인해 달라고 안내하세요.</div>
+  </section>
+
+  <!-- 6 ─────────────────────── -->
+  <section id="s6">
+    <p class="no">06</p>
+    <h2>이럴 땐 문자가 안 나갑니다</h2>
+    <p class="lead">일부러 없앤 것입니다. 손님은 <b>그 자리에서 뜨는 안내창</b>으로 봅니다.</p>
+    <div class="rows">
+      <div class="row"><div class="q"><span class="tag no">안 감</span>예약 접수 (입금 전)</div><div class="a">예약금 안내창(계좌·금액)이 대신합니다</div></div>
+      <div class="row"><div class="q"><span class="tag yes">보냄</span>입금 확인 → 확정</div><div class="a">알림톡 · 안 가면 문자로 대체</div></div>
+      <div class="row"><div class="q"><span class="tag no">안 감</span>예약 취소</div><div class="a">취소 완료 안내창(환불 예정액까지)</div></div>
+      <div class="row"><div class="q"><span class="tag no">안 감</span>시간 변경</div><div class="a">변경 완료 안내창(변경 전·후 시간)</div></div>
+      <div class="row"><div class="q"><span class="tag no">안 감</span>환불 송금 완료</div><div class="a">손님이 입금 내역으로 확인합니다</div></div>
+    </div>
+    <div class="warn">
+      <div class="h"><span class="ic">응대</span><b>"취소했는데 문자가 안 와요"</b></div>
+      <p>취소 문자는 원래 보내지 않습니다. 취소가 됐는지는 <b>[예약 조회·취소]</b> 에서
+        다시 조회하면 <b>「취소됨」</b> 으로 보입니다.</p>
+    </div>
+    <figure>{{img:m-lookup-cancelled}}<figcaption>위가 <b>취소된 예약</b>(흐리게 + 빨간 「취소됨」), 아래가 살아 있는 예약</figcaption></figure>
+    <div class="note"><b>"환불이 아직 안 왔어요"</b> → 환불까지 <b>최대 24시간</b>이 걸릴 수 있다고 안내창에 적혀 있습니다.</div>
+  </section>
+
+  <!-- 7 ─────────────────────── -->
+  <section id="s7">
+    <p class="no">07</p>
+    <h2>취소는 이 길로 갑니다</h2>
+    <p class="lead">손님이 <b>이름 · 전화번호 · 비밀번호 4자리</b>로 조회한 뒤 [예약 취소] 를 누르면 시작됩니다.</p>
+    <div class="pair">
+      <figure>{{img:m-lookup-form}}<figcaption><b>1. 본인 확인</b></figcaption></figure>
+      <figure>{{img:m-cancel-100}}<figcaption><b>2. 환불 규정 안내</b> — 얼마 돌려받는지 먼저</figcaption></figure>
+      <figure>{{img:m-cancel-account}}<figcaption><b>3. 환불 계좌 입력</b></figcaption></figure>
+      <figure>{{img:m-cancel-done}}<figcaption><b>4. 완료 안내</b> — 체크해야 닫힘</figcaption></figure>
+    </div>
+    <div class="card"><h3>순서를 일부러 이렇게 짰습니다</h3>
+      <p>전에는 계좌부터 받았습니다. 그러면 손님이 <b>"80%만 환불"을 못 보고</b> 취소해 버립니다.
+        지금은 <b>규정에 동의해야</b> 계좌 입력으로 넘어갑니다.</p></div>
+    <div class="card"><h3>입금 전 예약이면</h3>
+      <p>돌려줄 돈이 없으므로 <b>계좌를 묻지 않고 바로 취소</b>됩니다. 당일 취소(0원)도 마찬가지입니다.</p></div>
+  </section>
+
+  <!-- 8 ─────────────────────── -->
+  <section id="s8">
+    <p class="no">08</p>
+    <h2>100%냐 80%냐 0%냐</h2>
+    <p class="lead">기준은 <b>테마 시작 시각</b>입니다. 예약한 날이 아니라
+      <b>시작까지 얼마나 남았는지</b>로 따집니다.</p>
+    <div class="rows">
+      <div class="row"><div class="q"><span class="rate f">100%</span></div>
+        <div class="a">시작까지 <b>24시간 보다 많이</b> 남았을 때 — 전액</div></div>
+      <div class="row"><div class="q"><span class="rate p">80%</span></div>
+        <div class="a">24시간 미만인데 <b>예약일 전날</b>일 때</div></div>
+      <div class="row"><div class="q"><span class="rate z">0%</span></div>
+        <div class="a"><b>예약 당일</b>이면 몇 시든 환불 불가. 이미 시작·지난 예약도 0%</div></div>
+    </div>
+    <div class="note"><b>예시 — 8월 20일(목) 19:00 예약</b><br>
+      · 8/19(수) 14:00 취소 → 29시간 남음 → <b style="color:var(--green)">100%</b><br>
+      · 8/19(수) 21:00 취소 → 22시간 남음(전날) → <b style="color:var(--amber)">80%</b><br>
+      · 8/20(목) 아무 때나 → <b style="color:var(--red)">0%</b></div>
+    <div class="warn">
+      <div class="h"><span class="ic">주의</span><b>"하루 전"이 아니라 24시간</b></div>
+      <p>20일 19시 예약을 19일 20시에 취소하면 <b>하루 전인데도 80%</b> 입니다.
+        화면이 알아서 계산해 주니 <b>직원이 암산하지 마세요.</b></p>
+    </div>
+    <div class="pair">
+      <figure>{{img:m-cancel-80}}<figcaption><b>80%</b> — 동의 체크가 있어야 넘어갑니다</figcaption></figure>
+      <figure>{{img:m-cancel-0}}<figcaption><b>0%</b> — "환불되지 않습니다"</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- 9 ─────────────────────── -->
+  <section id="s9">
+    <p class="no">09</p>
+    <h2>시간 변경</h2>
+    <p class="lead">세 조건을 <b>모두</b> 만족해야 [시간 변경] 버튼이 보입니다.</p>
+    <ul class="plain ok">
+      <li><b>예약금 입금이 확인</b>된 예약일 것</li>
+      <li>시작까지 <b>24시간 보다 많이</b> 남았을 것</li>
+      <li><b>아직 한 번도 안 바꿨을 것</b> (변경은 1회)</li>
+    </ul>
+    <div class="pair">
+      <figure>{{img:m-change-modal}}<figcaption><b>날짜·시간 고르기</b> — 매진·지난 시간은 못 고릅니다</figcaption></figure>
+      <figure>{{img:m-change-done}}<figcaption><b>완료 안내</b> — 변경 전/후를 나란히</figcaption></figure>
+    </div>
+    <div class="warn">
+      <div class="h"><span class="ic">주의</span><b>확정문자에는 옛 시간이 남습니다</b></div>
+      <p>시간을 바꿔도 <b>문자는 다시 나가지 않습니다.</b> 손님이 헷갈려하면
+        <b>[예약 조회·취소] 화면의 시간이 맞다</b>고 안내하세요.</p>
+    </div>
+    <div class="card"><h3>예약금은 그대로</h3><p>다시 입금하지 않습니다. 취소 후 재예약이 아니라 <b>그 예약을 옮기는 것</b>입니다.</p></div>
+    <div class="card"><h3>두 번째 변경은</h3><p>화면에서 안 됩니다. <b>매장으로 연락</b>받아 관리자에서 처리합니다.</p></div>
+  </section>
+
+  <!-- 10 ────────────────────── -->
+  <section id="s10">
+    <p class="no">10</p>
+    <h2>관리자에서 확인하기</h2>
+    <p class="lead">아래는 <b>PC 화면</b>입니다. 폰에서는 <b>사진을 눌러</b> 크게 보세요.
+      손님 이름·연락처는 교육 자료용으로 가렸습니다.</p>
+    <figure>{{img:admin-res}}<figcaption><b>예약</b> — 달력에서 날짜를 누르면 그날 예약이 시간순으로<span class="zoomhint">눌러서 확대</span></figcaption></figure>
+    <figure>{{img:admin-money}}<figcaption><b>입금·환불</b> — 맨 위 초록 줄이 <b>입금 감시 신호등</b><span class="zoomhint">눌러서 확대</span></figcaption></figure>
+    <figure>{{img:admin-refund}}<figcaption><b>› 환불 처리</b> — <b>[계좌 복사]</b> → 은행앱 이체 → <b>[환불 완료]</b><span class="zoomhint">눌러서 확대</span></figcaption></figure>
+    <figure>{{img:admin-detail}}<figcaption><b>예약 상세</b> — 이름·연락처 수정, <b>비밀번호 4자리 재발급</b><span class="zoomhint">눌러서 확대</span></figcaption></figure>
+    <div class="card"><h3>입금 감시 신호등</h3>
+      <p>[입금·환불] 맨 위가 <b>초록이 아니면</b> 입금이 자동으로 안 잡히는 상태입니다 — 사장님께 알리세요.</p></div>
+    <div class="card"><h3>알림톡을 못 받았다면</h3>
+      <p>[알림톡] 탭에서 <b>재발송</b>할 수 있습니다. <b>비용이 드니</b> 사장님 확인 후에.</p></div>
+  </section>
+
+  <!-- 11 ────────────────────── -->
+  <section id="s11">
+    <p class="no">11</p>
+    <h2>챗봇</h2>
+    <p class="lead">홈페이지 <b>오른쪽 아래 말풍선</b>을 누르면 열립니다.
+      전화 응대 중에 <b>직원이 대신 열어보고 읽어드려도</b> 됩니다.</p>
+    <figure>{{img:m-chatbot}}<figcaption><b>[예약금 입금 계좌]</b> 를 누르면 계좌·예금주·입금자명 주의까지 답합니다</figcaption></figure>
+    <ul class="plain">
+      <li><b>예약금 입금 계좌</b></li>
+      <li><b>가격·예약금</b> — 테마별 + 가격표 링크</li>
+      <li><b>환불 규정</b> — 우리 규정 원문 그대로</li>
+      <li><b>예약은 언제 열리나요</b> — 7일 전 저녁 9시</li>
+      <li><b>오시는 길·주차</b></li>
+    </ul>
+    <div class="note good">답은 전부 <b>실제 운영 규정에서 그대로</b> 가져옵니다.
+      지어내지 않으므로 <b>그대로 믿고 안내하셔도 됩니다.</b></div>
+  </section>
+
+  <!-- 12 ────────────────────── -->
+  <section id="s12">
+    <p class="no">12</p>
+    <h2>손님이 이렇게 물으면</h2>
+    <div class="rows">
+      <div class="row"><div class="q">계좌번호가 어디 있나요?</div><div class="a"><b>[예약 조회·취소]</b> 에서 조회하면 입금 안 한 예약에 계좌가 같이 나옵니다. 챗봇 <b>[예약금 입금 계좌]</b> 로도 볼 수 있습니다.</div></div>
+      <div class="row"><div class="q">입금했는데 확정이 안 됐어요</div><div class="a"><b>보내는 분 이름</b>이 예약자와 같은지 확인. 다르면 자동 확인이 안 되고 사장님이 직접 처리합니다.</div></div>
+      <div class="row"><div class="q">조금 늦게 입금했는데요</div><div class="a">30분이 지났으면 <b>이미 자동 취소</b>됐을 수 있습니다. 관리자에서 확인하고 자리가 있으면 다시 잡아드리세요.</div></div>
+      <div class="row"><div class="q">취소했는데 문자가 안 와요</div><div class="a">취소 문자는 <b>원래 보내지 않습니다.</b> 다시 조회하면 <b>「취소됨」</b> 으로 나옵니다.</div></div>
+      <div class="row"><div class="q">환불이 언제 오나요?</div><div class="a"><b>최대 24시간</b>. 취소 완료 안내창에도 같은 내용이 적혀 있습니다.</div></div>
+      <div class="row"><div class="q">시간을 또 바꾸고 싶어요</div><div class="a">화면에서는 <b>1회만</b> 됩니다. 두 번째부터는 매장에서 관리자로 처리합니다.</div></div>
+      <div class="row"><div class="q">예약 비밀번호를 잊었어요</div><div class="a">본인 확인 후 관리자에서 <b>새 4자리를 만들어</b> 알려드립니다.</div></div>
+      <div class="row"><div class="q">몇 시부터 예약할 수 있어요?</div><div class="a">이용일 <b>7일 전 저녁 9시</b>. 예약 캘린더에서 날짜를 누르면 며칠에 열리는지 화면이 알려줍니다.</div></div>
+      <div class="row"><div class="q">얼마예요?</div><div class="a">테마마다 다릅니다. <b>테마 상세</b> 또는 <b>자주 묻는 질문</b>에 인원별 요금표가 있습니다.</div></div>
+    </div>
+  </section>
+
+  <!-- 13 ────────────────────── -->
+  <section id="s13">
+    <p class="no">13</p>
+    <h2>꼭 기억할 다섯 가지</h2>
+    <div class="card"><h3>1. 문자는 확정문자 하나뿐</h3><p>접수·취소·변경 문자는 없습니다. 손님은 <b>화면 안내창</b>으로 봅니다.</p></div>
+    <div class="card"><h3>2. 취소·변경은 손님이 직접</h3><p>환불 계좌까지 그 화면에서 받습니다. <b>전화로 계좌를 받아 적지 마세요.</b></p></div>
+    <div class="card"><h3>3. 환불은 24시간 기준</h3><p>초과 100% · 전날 80% · 당일 0%. <b>암산하지 말고 화면을 보세요.</b></p></div>
+    <div class="card"><h3>4. 시간 변경은 1회, 문자 없음</h3><p>확정문자에는 <b>옛 시간</b>이 남습니다. 화면 시간이 맞습니다.</p></div>
+    <div class="card"><h3>5. 30분 안에 입금 없으면 자동 취소</h3><p>늦게 입금한 손님은 <b>이미 취소됐을 수 있습니다.</b> 관리자에서 확인하세요.
+      <span class="fine">※ 테스트 기간 동안은 자동으로 취소되지 않습니다.</span></p></div>
+    <div class="note good">헷갈리면 <b>손님과 같은 화면을 직접 열어보세요.</b>
+      [예약 조회·취소] 는 손님이 보는 것과 똑같이 보입니다 — 그 화면에 적힌 내용이 언제나 정답입니다.</div>
+  </section>
+
+  <p class="end">판타스트릭 · 직원용 홈페이지 설명서<br>내용이 바뀌면 새 파일을 받아 보세요</p>
+</div>
+
+<a class="up" href="#toc">↑ 목차</a>
+
+<div class="lb" id="lb"><button class="x" id="lbx" type="button">닫기</button><img id="lbimg" alt=""></div>
+
+<script>
+(function(){
+  /* PC 화면 사진은 폰에서 작다 → 눌러서 크게 보기 */
+  var lb = document.getElementById('lb'), lbimg = document.getElementById('lbimg');
+  document.querySelectorAll('img.shot.pc').forEach(function(im){
+    im.addEventListener('click', function(){
+      lbimg.src = im.src;
+      lbimg.alt = im.alt || '';
+      lb.classList.add('on');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+  function close(){ lb.classList.remove('on'); lbimg.src = ''; document.body.style.overflow = ''; }
+  document.getElementById('lbx').addEventListener('click', close);
+  lb.addEventListener('click', function(e){ if (e.target === lb) close(); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && lb.classList.contains('on')) close(); });
+})();
+</script>
