@@ -21,6 +21,8 @@ fantastrick-homepage\   ← Next.js 웹앱 (예약·리뷰 자체 시스템)
 │  ├─ images-to-webp.mjs ← 사진을 미리 줄여 webp 로. **새 사진 넣을 때마다 돌릴 것**
 │  │                       (자동 변환을 껐기 때문에 아무도 안 줄여준다) `--apply` 로 실행
 │  ├─ visual-check.mjs   ← 크롬으로 5쪽 열어 깨진 사진·실패요청·JS오류 점검 (먼저 서버 띄우고)
+│  ├─ check-deposit-ui.mjs ← 예약금 입금 안내(조회·챗봇) 점검. 조회 응답만 가로채 가짜 예약 사용
+│  │                        → **진짜 DB 는 안 건드린다**
 │  ├─ worker-usage.mjs   ← 워커 하루 요청량 (한도 10만) · worker-hourly.mjs = 시간대별
 │  ├─ worker-cpu.mjs     ← 요청당 CPU 시간(중앙값·상위1%). 무료 상한 10ms 에 걸리는지 확인
 │  ├─ traffic-top.mjs    ← 어느 주소가 요청을 많이 먹나 ⚠️토큰에 Analytics 권한 없어 현재 실패
@@ -51,10 +53,13 @@ fantastrick-homepage\   ← Next.js 웹앱 (예약·리뷰 자체 시스템)
 │  │  └─ api\           ← 서버 처리 (예약 생성/조회/취소, 리뷰 목록/작성, admin\*)
 │  │     └─ bank\deposit ← 태블릿이 카톡 입금알림을 보내는 곳. 이름+금액 맞는 예약 찾아
 │  │                       자동 입금확인. 입금확인 처리는 admin\reservations 를 그대로 호출(규칙 중복 금지)
-│  ├─ components\       ← Header.tsx, Footer.tsx, NoticeModal.tsx(팝업 공지)
+│  ├─ components\       ← Header.tsx, Footer.tsx, NoticeModal.tsx(팝업 공지),
+│  │                       DepositPay.tsx(예약금 계좌 칸 + 토스·카뱅·복사·QR 버튼 —
+│  │                       예약하기 팝업·예약조회가 같이 쓴다)
 │  ├─ lib\bank\         ← 입금 자동매칭 (bank-auto 에서 이식). parser.ts(알림글자→이름·금액),
 │  │                       matcher.ts(이름+금액 정확일치 1건만), types.ts
-│  └─ lib\              ← data.ts(매장·테마·THEME_SLOTS 테마별 시간표), settings.ts(관리자 설정·공지),
+│  └─ lib\              ← pay.ts(⭐예약금 입금 계좌 — 예약·조회·챗봇 세 곳의 **유일한 출처**),
+│                          data.ts(매장·테마·THEME_SLOTS 테마별 시간표), settings.ts(관리자 설정·공지),
 │                          sms.ts(문자발송 + ⚠️연습용번호 010-0000-XXXX 발송차단 가드),
 │                          theme-content.ts(테마별 가격·시놉시스·주의사항 + 계좌·환불규정·사업자정보 — 기존 사이트 원문),
 │                          expire.ts(미입금 30분 자동취소 + 자정 이후 예약은 오전 10시까지 유예),

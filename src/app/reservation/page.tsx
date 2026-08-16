@@ -5,6 +5,7 @@ import { formatDate, formatPhone } from "@/lib/util";
 import { STORES } from "@/lib/data";
 import { refundRateFor, hasStarted } from "@/lib/money";
 import { IconWarn, IconClose } from "@/components/Icon";
+import { PayAccount, PayActions } from "@/components/DepositPay";
 import ChangeModal from "./ChangeModal";
 
 type Reservation = {
@@ -222,6 +223,25 @@ export default function ReservationLookup() {
                       <div className="r"><span>예약자</span><b>{r.name} ({formatPhone(phone)})</b></div>
                       <div className="r"><span>예약금</span><b>{r.deposit.toLocaleString()}원 {r.deposit_paid ? "(결제완료)" : "(미결제)"}</b></div>
                     </div>
+                    {/* 💸 아직 입금 안 한 예약에는 **계좌를 여기서도 보여준다** (2026-08-16 사장님 지시).
+                        전에는 계좌가 예약하기 화면의 접수 직후 팝업에만 있어서, 그 팝업을 닫으면
+                        손님이 계좌를 다시 볼 방법이 없었다. 문자에도 계좌는 안 들어간다
+                        (우리가 보내는 문자는 입금 확인 뒤의 확정문자뿐). → 전화하는 수밖에 없었다.
+                        조회는 본인 전화번호·이름·비밀번호로만 되므로 새로 노출되는 정보는 없다. */}
+                    {!cancelled && !r.deposit_paid && !hasStarted(r.date, r.time) && (
+                      <div className="pay-box">
+                        <div className="pay-box-h">예약금 입금 안내</div>
+                        <p className="pay-box-amt">보내실 금액 <b>{r.deposit.toLocaleString()}원</b></p>
+                        <PayAccount />
+                        {/* 입금자명이 예약자 이름과 다르면 자동 확인이 안 되고 사장님이 손으로 찾아야 한다.
+                            그래서 "아무 이름"이 아니라 이 예약의 실제 이름을 박아서 보여준다. */}
+                        <p className="pay-box-note">
+                          보내는 분 이름을 <b>{r.name}</b> 으로 해주셔야 자동으로 확인됩니다.
+                        </p>
+                        <PayActions amount={r.deposit} />
+                      </div>
+                    )}
+
                     {/* 이미 이용이 끝난 예약은 취소할 게 없다(환불 0%). 버튼을 두면 손님이
                         "취소하면 환불되나?" 하고 눌러보게 되고, 쓸데없는 취소 기록만 남는다. */}
                     {!cancelled && (hasStarted(r.date, r.time)

@@ -2,7 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import QRCode from "qrcode";
+import { PayAccount, PayActions } from "@/components/DepositPay";
 import { THEMES, TIME_SLOTS, THEME_SLOTS, STORES, slotsForThemeDate, isPastSlot, type StoreSlots, type SlotSchedule, type Theme } from "@/lib/data";
 import { formatDate, formatPhone, isValidPhone, reservationDateState } from "@/lib/util";
 import { depositOf } from "@/lib/settings";
@@ -10,14 +10,8 @@ import { THEME_CONTENT } from "@/lib/theme-content";
 import { IconCheck, IconWarn, IconBan, IconClock } from "@/components/Icon";
 import { ReserveCalendar, openDateLabel } from "@/components/ReserveCalendar";
 
-// 예약금 입금 계좌 (한 곳에서 관리 — 딥링크·복사·표시가 항상 같은 값을 쓰도록)
-const PAY_BANK = "카카오뱅크";
-const PAY_ACCT = "3333-09-7175706";   // 화면 표시용
-const PAY_ACCT_NO = "3333097175706";  // 복사·딥링크용(숫자만)
-const PAY_HOLDER = "승현수";
-// 토스 송금 딥링크 — 앱이 받는 계좌·금액을 미리 채운 송금화면으로 열린다(모바일 전용).
-const tossSendLink = (amount: number) =>
-  `supertoss://send?bank=${encodeURIComponent(PAY_BANK)}&accountNo=${PAY_ACCT_NO}&amount=${amount}&origin=link`;
+/* 예약금 계좌·송금 버튼은 components/DepositPay.tsx 하나가 출처다.
+   예약조회(미입금 예약)도 같은 부품을 쓴다 — 계좌가 바뀌면 그 파일만 고치면 된다. */
 
 type Cfg = { timeSlots: string[]; storeSlots?: Record<string, StoreSlots>; themeSlots?: Record<string, SlotSchedule>;
   // 사장님이 관리자에서 바꾼 테마별 예약금. 이걸 안 쓰면 화면만 옛 금액이 남아
@@ -55,9 +49,7 @@ export default function ReserveClient({ preset }: { preset: string }) {
   const [showDeposit, setShowDeposit] = useState(false); // 접수 후 예약금 안내 팝업
   const [depositAck, setDepositAck] = useState(false);    // "확인했습니다" 체크 여부
   const [paidDeposit, setPaidDeposit] = useState<number | null>(null); // 서버가 실제로 저장한 예약금
-  const [copied, setCopied] = useState(false);   // 계좌번호 복사됨 표시
-  const [isMobile, setIsMobile] = useState(false); // 휴대폰이면 은행앱 딥링크, PC면 QR
-  const [qrUrl, setQrUrl] = useState("");          // PC용 토스 송금 QR 이미지(data URL)
+  // (복사·기기판별·QR 상태는 DepositPay 부품이 스스로 들고 있다)
 
   // 시간표 기본값은 서버(settings.ts 의 DEFAULT_CONFIG)와 똑같은 값으로 시작한다.
   //   전에는 timeSlots(전 매장 공통 fallback)만 갖고 시작해서, /api/config 가 도착하기 전에는
@@ -157,31 +149,38 @@ export default function ReserveClient({ preset }: { preset: string }) {
     if (pt) setThemeId(pt.id);
   }, [preset]);
 
-  // 손님 기기가 휴대폰인지 (휴대폰이면 은행앱 딥링크, PC면 QR 안내)
-  useEffect(() => {
-    setIsMobile(/android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent));
-  }, []);
+  /* 기기 판별·QR 생성·계좌 복사·토스/카뱅 열기는 전부 <PayActions> 안으로 옮겼다.
+     예약조회 화면도 같은 버튼을 써야 해서 부품으로 뺐다(2026-08-16). */
 
-  // PC에서 예약금 팝업이 뜨면 토스 송금 QR을 만들어 둔다(폰으로 스캔 → 토스 송금 열림)
+  /* 🔴 계좌를 못 본 채 화면을 떠나는 것을 막는다 (2026-08-16 사장님 지시)
+   *
+   * 조건: [예약금 입금 안내] 팝업이 떠 있고 **아직 [확인했습니다] 체크를 안 했을 때만**.
+   *       체크하는 순간 아래 감시가 전부 풀린다.
+   *
+   * [뒤로가기] 가짜 이력을 하나 쌓아 두고, 손님이 뒤로 가면 즉시 다시 쌓아 제자리로 돌린다.
+   *           → 사실상 막힌다.
+   * [새로고침·탭닫기] **브라우저가 허용하는 건 경고창까지다.** 완전 차단은 어떤 사이트도 못 한다
+   *           (규격상 금지 — 악성 사이트가 사람을 가둘 수 있어서다).
+   *           "변경사항이 저장되지 않을 수 있습니다" 류의 확인창이 뜨고, 손님이 [나가기] 를
+   *           고르면 나가진다. 문구도 브라우저가 정하는 것이라 우리가 못 바꾼다.
+   *
+   * ⚠️ 체크를 하고 나면 위에서 쌓아 둔 가짜 이력 한 칸이 남는다 — 손님이 뒤로가기를 한 번
+   *    더 눌러야 이전 페이지로 간다. 이력을 강제로 지우면 그 자체가 페이지 이동이라
+   *    팝업이 사라져 버려서, 한 칸 남기는 쪽을 택했다. */
   useEffect(() => {
-    if (showDeposit && !isMobile && deposit > 0) {
-      QRCode.toDataURL(tossSendLink(deposit), { margin: 1, width: 220 })
-        .then(setQrUrl)
-        .catch(() => setQrUrl(""));
-    }
-  }, [showDeposit, isMobile, deposit]);
+    if (!showDeposit || depositAck) return;
 
-  // 계좌번호를 복사한다(딥링크가 실패해도 손님이 붙여넣을 수 있게 항상 먼저 복사).
-  async function copyAcct() {
-    try { await navigator.clipboard.writeText(PAY_ACCT_NO); }
-    catch { prompt("계좌번호를 복사하세요", PAY_ACCT_NO); } // http·구형 브라우저 폴백
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2200);
-  }
-  // 토스로 바로 송금 — 계좌·금액이 채워진 송금화면이 열린다. 안 열려도 계좌는 복사돼 있다.
-  function openToss() { copyAcct(); window.location.href = tossSendLink(deposit); }
-  // 카카오뱅크 앱 열기 — 앱만 열리므로 계좌를 미리 복사해 붙여넣게 한다.
-  function openKakaoBank() { copyAcct(); window.location.href = "kakaobank://"; }
+    const onBeforeUnload = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ""; };
+    const onPopState = () => { history.pushState(null, "", location.href); };
+
+    history.pushState(null, "", location.href);
+    window.addEventListener("beforeunload", onBeforeUnload);
+    window.addEventListener("popstate", onPopState);
+    return () => {
+      window.removeEventListener("beforeunload", onBeforeUnload);
+      window.removeEventListener("popstate", onPopState);
+    };
+  }, [showDeposit, depositAck]);
 
   // 관리자 설정 불러오기 (예약금·시간대)
   // 실패해도 위 기본값(THEME_SLOTS)으로 동작하므로 finally 에서 반드시 열어준다 —
@@ -301,13 +300,7 @@ export default function ReserveClient({ preset }: { preset: string }) {
               <h3 id="deposit-title">예약금 입금 안내</h3>
               <div className="modal-policy">
                 <p>예약금은 <b>{deposit.toLocaleString()}원</b>입니다.</p>
-                <div className="pay-acct">
-                  <div className="pay-acct-info">
-                    <span className="pay-bank">{PAY_BANK}</span>
-                    <b>{PAY_ACCT}</b>
-                    <span className="pay-holder">{PAY_HOLDER}</span>
-                  </div>
-                </div>
+                <PayAccount />
                 <p>예약금 입금이 확인되어야 비로소 예약이 확정 처리됩니다.</p>
                 <p>입금하실 때 <b>보내는 분(예금주)을 예약자 이름과 동일하게</b><br />해주셔야 정상 처리됩니다.</p>
                 <p><b>30분 내 예약금 미입금 시 예약은 자동 취소</b>됩니다.</p>
@@ -322,34 +315,19 @@ export default function ReserveClient({ preset }: { preset: string }) {
 
               {/* 체크하면 송금 방법이 열린다. 어떤 버튼을 눌러도 계좌번호는 항상 먼저 복사돼
                   앱이 안 열려도 손님이 붙여넣을 수 있다(손해 없음). */}
-              {depositAck && (isMobile ? (
-                <div className="pay-actions">
-                  <button className="btn primary pay-toss" onClick={openToss}>
-                    토스로 바로 송금<span className="pay-sub">계좌·금액 자동</span>
-                  </button>
-                  <div className="pay-two">
-                    <button className="btn ghost" onClick={openKakaoBank}>카카오뱅크 앱</button>
-                    <button className="btn ghost" onClick={copyAcct}>{copied ? "복사됨" : "계좌 복사"}</button>
-                  </div>
-                </div>
-              ) : (
-                <div className="pay-actions">
-                  {qrUrl && (
-                    <div className="pay-qr">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={qrUrl} alt="토스 송금 QR 코드" width={140} height={140} />
-                      <span>휴대폰으로 스캔하면 토스 송금이 열려요</span>
-                    </div>
-                  )}
-                  <button className="btn primary" onClick={copyAcct}>
-                    {copied ? "계좌번호 복사됨" : "계좌번호 복사"}
-                  </button>
-                </div>
-              ))}
+              {depositAck && <PayActions amount={deposit} />}
 
+              {/* 🔴 체크해야만 닫힌다 (2026-08-16 사장님 지적으로 복구).
+                  안 걸려 있어서 손님이 계좌를 못 본 채 팝업을 닫을 수 있었다 —
+                  계좌를 다시 볼 곳이 없으니(문자에도 없음) 그대로 미입금으로 새는 길이었다. */}
               <div className="modal-btns" style={{ marginTop: 10 }}>
-                <button className="btn ghost" onClick={() => setShowDeposit(false)}>닫기</button>
+                <button className="btn ghost" onClick={() => setShowDeposit(false)} disabled={!depositAck}>닫기</button>
               </div>
+              {!depositAck && (
+                <p className="pay-box-note" style={{ textAlign: "center", marginTop: 8 }}>
+                  위 <b>[확인했습니다]</b> 를 체크하시면 송금 방법이 열리고 창을 닫을 수 있어요.
+                </p>
+              )}
             </div>
           </div>
         )}

@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { THEMES } from "@/lib/data";
 import { BOOKING_INFO } from "@/lib/theme-content";
+import { PAY_BANK, PAY_ACCT, PAY_HOLDER } from "@/lib/pay";
 
 /* 오른쪽 아래 상담 챗봇 (2026-08-13)
  *
@@ -26,6 +27,7 @@ type Msg = { who: "bot" | "me"; text?: string; jsx?: React.ReactNode };
 const TOPICS = [
   { id: "open", label: "예약은 언제 열리나요?" },
   { id: "price", label: "가격·예약금" },
+  { id: "deposit", label: "예약금 입금 계좌" },
   { id: "refund", label: "환불 규정" },
   { id: "themes", label: "테마 안내" },
   { id: "way", label: "오시는 길·주차" },
@@ -38,8 +40,11 @@ type TopicId = (typeof TOPICS)[number]["id"];
 function route(text: string): TopicId | null {
   const t = text.replace(/\s/g, "");
   if (/환불|취소수수료|위약/.test(t)) return "refund";
+  /* "계좌" 는 두 가지 뜻이라 순서가 중요하다 —
+     환불 계좌(위에서 refund 로 빠짐) vs 입금할 계좌(여기). 입금 쪽을 manage 보다 먼저 본다. */
+  if (/입금|송금|계좌번호|어느계좌|어디로보내|보낼계좌|은행/.test(t)) return "deposit";
   if (/취소|변경|확인|비밀번호|계좌/.test(t)) return "manage";
-  if (/가격|얼마|비용|요금|예약금|입금|결제/.test(t)) return "price";
+  if (/가격|얼마|비용|요금|예약금|결제/.test(t)) return "price";
   if (/오픈|열려|열리|언제부터|9시|자정|선착순/.test(t)) return "open";
   if (/주차|오시|위치|찾아|지하철|신논현|어디|길/.test(t)) return "way";
   if (/테마|추천|공포|난이도|인원|몇명|몇인|장르/.test(t)) return "themes";
@@ -76,6 +81,31 @@ function answer(id: TopicId): Msg[] {
           ),
         },
         { who: "bot", jsx: <a className="cw-link" href="/faq">인원별 가격표 보기 →</a> },
+      ];
+    /* 💸 예약금 입금 계좌 (2026-08-16 사장님 지시)
+       접수 직후 팝업을 닫아버린 손님이 계좌를 다시 찾을 곳이 없어 전화가 왔다.
+       계좌 값은 lib/pay.ts 하나에서 가져오므로 예약·조회 화면과 절대 어긋나지 않는다. */
+    case "deposit":
+      return [
+        {
+          who: "bot",
+          jsx: (
+            <div>
+              예약금은 아래 계좌로 보내주세요.
+              <div className="cw-acct">
+                <b>{PAY_BANK} {PAY_ACCT}</b>
+                <span>예금주 {PAY_HOLDER}</span>
+              </div>
+              보내는 분 이름을 <b>예약자 이름과 똑같이</b> 해주셔야 자동으로 확인돼요.
+              <br />입금이 확인되면 확정 안내 문자를 보내드립니다.
+            </div>
+          ),
+        },
+        {
+          who: "bot",
+          text: "예약금은 테마마다 달라요. 예약조회에서 내 예약을 열면 정확한 금액과 계좌가 함께 나오고, [토스로 바로 송금] 버튼으로 금액까지 채워서 보낼 수 있어요.",
+        },
+        { who: "bot", jsx: <a className="cw-link" href="/reservation">내 예약 열고 입금하기 →</a> },
       ];
     case "refund":
       return [
