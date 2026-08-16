@@ -1,0 +1,472 @@
+<title>판타스트릭 새 홈페이지</title>
+<style>
+/* ─────────────────────────────────────────────
+   판타스트릭 새 홈페이지 — 소개 발표 자료 (사진판)
+   ⚠️ 이 파일은 원본(템플릿)이다. 사진은 "img:이름" 자리표시자(중괄호 두 겹)로 들어 있고,
+      `node scripts/build-deck.mjs` 가 사진을 파일 안에 박아 넣어
+      docs/새홈페이지-소개-발표자료.html 을 만든다. 그 결과물은 직접 고치지 말 것.
+   색은 실제 사이트 토큰(globals.css)에서 가져왔다:
+      Fantasy Blue #043cb2/#2f6fe0 · Phantom Violet #622698 · Illusion Red #b20e19
+   ───────────────────────────────────────────── */
+:root{
+  --ground:#080d1e; --surface:#121b38; --surface2:#0f1730;
+  --line:#26325c; --line-soft:#1b2543;
+  --ink:#eef2ff; --ink-mid:#a9b6dc; --ink-dim:#7583ad;
+  --blue:#4d86f0; --violet:#a366e6; --red:#f2645a; --green:#2fc47f; --amber:#e0a93a;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,"D2Coding",monospace;
+  --sans:"Pretendard Variable",Pretendard,-apple-system,"Segoe UI","Malgun Gothic","맑은 고딕",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;overflow:hidden}
+
+.topbar{position:fixed;inset:0 0 auto 0;height:48px;z-index:50;display:flex;align-items:center;
+  gap:16px;padding:0 clamp(16px,3vw,40px);background:linear-gradient(to bottom,var(--ground) 62%,transparent)}
+.mark{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.22em;white-space:nowrap}
+.mark b{color:var(--blue)}
+.topbar .sep{flex:1;height:1px;background:var(--line-soft)}
+.counter{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);font-variant-numeric:tabular-nums}
+.counter em{color:var(--ink);font-style:normal}
+
+.deck{height:100vh;height:100svh}
+.slide{position:absolute;inset:0;display:none;padding:64px clamp(16px,3.6vw,60px) 56px;overflow-y:auto}
+.slide.on{display:flex;flex-direction:column;animation:rise .4s cubic-bezier(.2,.7,.3,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slide.on{animation:none}}
+.inner{width:100%;max-width:1320px;margin:auto}
+
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--blue);margin:0 0 10px}
+h1{font-size:clamp(32px,5vw,58px);line-height:1.1;letter-spacing:-.035em;font-weight:800;margin:0 0 16px;text-wrap:balance}
+h2{font-size:clamp(23px,3.1vw,37px);line-height:1.18;letter-spacing:-.03em;font-weight:800;margin:0 0 8px;text-wrap:balance}
+.sub{font-size:clamp(13.5px,1.4vw,16px);line-height:1.62;color:var(--ink-mid);margin:0 0 22px;max-width:64ch}
+.sub strong{color:var(--ink);font-weight:700}
+
+/* ── 화면 사진 ── */
+.browser{border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--surface2);
+  box-shadow:0 18px 44px -18px rgba(0,0,0,.8)}
+.browser .bar{display:flex;align-items:center;gap:7px;padding:7px 11px;
+  background:#0c132a;border-bottom:1px solid var(--line-soft)}
+.browser .bar i{width:7px;height:7px;border-radius:50%;background:#2b3868;display:block;flex:0 0 auto}
+.browser .bar .url{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);margin-left:6px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.browser img{display:block;width:100%;height:auto}
+.phone{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#000;
+  box-shadow:0 18px 44px -18px rgba(0,0,0,.8)}
+.phone img{display:block;width:100%;height:auto}
+.cap{font-size:12px;color:var(--ink-dim);line-height:1.5;margin-top:8px}
+.cap b{color:var(--ink-mid);font-weight:700}
+
+/* ── 배치 ── */
+.two{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(20px,3vw,40px);align-items:center}
+.two.flip{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)}
+@media(max-width:900px){.two,.two.flip{grid-template-columns:1fr}}
+.gal{display:grid;gap:12px}
+.gal3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.gal2{grid-template-columns:repeat(2,minmax(0,1fr))}
+/* 폰 사진은 세로가 길다(430×940). 칸 너비를 묶어두지 않으면 슬라이드를 뚫고 나간다 —
+   1440×900 에서 321px 넘쳤던 자리다(2026-08-16). 잘라내지 않고 **너비를 묶어** 줄인다. */
+.phones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,2vw,26px);align-items:start}
+.phones .phone{max-width:212px;margin-inline:auto}
+.shot-sm{max-width:560px}
+@media(max-width:820px){.gal3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ── 조각들 ── */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line-soft);border-radius:11px;padding:15px 16px}
+.stat .n{font-family:var(--mono);font-size:clamp(22px,2.9vw,33px);font-weight:700;line-height:1;
+  letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat .n small{font-size:.5em;color:var(--ink-mid);font-weight:600;margin-left:3px}
+.stat .k{margin-top:8px;font-size:12px;color:var(--ink-mid);line-height:1.45}
+.stat.hi .n{color:var(--blue)} .stat.win .n{color:var(--green)}
+
+.card{background:var(--surface);border:1px solid var(--line-soft);border-radius:11px;padding:15px 17px}
+.card h3{margin:0 0 7px;font-size:15px;font-weight:800;display:flex;align-items:baseline;gap:8px}
+.card h3 .tag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink-dim);
+  border:1px solid var(--line);border-radius:5px;padding:2px 6px;font-weight:600}
+.card p{margin:0;font-size:13px;line-height:1.58;color:var(--ink-mid)}
+.card p+p{margin-top:6px}
+.card b{color:var(--ink);font-weight:700}
+.grid{display:grid;gap:11px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+
+.flow{display:flex;flex-wrap:wrap;gap:8px}
+.step{flex:1 1 140px;background:var(--surface);border:1px solid var(--line-soft);border-radius:10px;padding:13px 13px 12px}
+.step .i{font-family:var(--mono);font-size:10px;color:var(--blue);letter-spacing:.12em;display:block;margin-bottom:6px;font-weight:700}
+.step .t{font-size:13.5px;font-weight:700;line-height:1.3;margin-bottom:4px}
+.step .d{font-size:11.5px;color:var(--ink-dim);line-height:1.45}
+.step.auto{border-color:#245a41;background:linear-gradient(180deg,#10261d,#0e1f1a)}
+.step.auto .i{color:var(--green)}
+
+.note{font-size:12.8px;color:var(--ink-mid);line-height:1.58;border-left:2px solid var(--line);padding-left:13px}
+.note b{color:var(--ink)} .note.good{border-left-color:var(--green)} .note.warn{border-left-color:var(--amber)}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line-soft);border-radius:11px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:580px;font-size:13px}
+th,td{text-align:left;padding:9px 15px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+thead th{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-dim);font-weight:600;background:var(--surface2)}
+tbody tr:last-child td{border-bottom:none}
+td.item{font-weight:700;color:var(--ink);width:28%}
+td.old{color:var(--ink-dim)} td.new{color:var(--ink-mid)}
+.pill{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:700;padding:2px 6px;
+  border-radius:5px;letter-spacing:.05em;white-space:nowrap}
+.pill.no{background:#33151a;color:var(--red);border:1px solid #55232a}
+.pill.yes{background:#10301f;color:var(--green);border:1px solid #1d5137}
+.pill.part{background:#332a12;color:var(--amber);border:1px solid #55461f}
+
+ul.clean{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+ul.clean li{font-size:13px;line-height:1.55;color:var(--ink-mid);padding-left:18px;position:relative}
+ul.clean li::before{content:"";position:absolute;left:0;top:.58em;width:6px;height:6px;border-radius:50%;background:var(--blue)}
+ul.clean.ok li::before{background:var(--green)}
+ul.clean li b{color:var(--ink);font-weight:700}
+
+.botbar{position:fixed;inset:auto 0 0 0;height:48px;z-index:50;display:flex;align-items:center;gap:14px;
+  padding:0 clamp(16px,3vw,40px);background:linear-gradient(to top,var(--ground) 62%,transparent)}
+.dots{display:flex;gap:5px;flex:1;flex-wrap:wrap}
+.dot{width:24px;height:4px;border-radius:2px;background:var(--line);border:0;padding:0;cursor:pointer;transition:background .2s}
+.dot:hover{background:#3b4b82} .dot.on{background:var(--blue)}
+.dot:focus-visible{outline:2px solid var(--violet);outline-offset:3px}
+.hint{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);white-space:nowrap}
+kbd{font-family:var(--mono);font-size:10px;border:1px solid var(--line);border-radius:4px;padding:1px 5px;
+  color:var(--ink-mid);background:var(--surface2)}
+@media(max-width:640px){.hint{display:none}}
+
+/* 세로가 짧은 노트북에서 한 장에 담기게 */
+@media (max-height:940px){
+  .slide{padding-top:58px;padding-bottom:50px}
+  .sub{margin-bottom:15px} h2{font-size:clamp(21px,2.7vw,31px)}
+  .card{padding:12px 14px} th,td{padding:7px 13px}
+  .stat{padding:12px 14px}
+  .gal{gap:10px} .cap{margin-top:6px;font-size:11.5px}
+  .phones .phone{max-width:190px}
+}
+@media (max-height:800px){
+  .gal3 .cap{font-size:11px}
+  .phones .phone{max-width:172px}
+  .flow .step{padding:10px 11px}
+}
+/* 720p 노트북·빔프로젝터 — 여기서도 스크롤 없이 한 장에 담기게 */
+@media (max-height:790px){
+  .slide{padding-top:52px;padding-bottom:44px}
+  .eyebrow{margin-bottom:7px}
+  h2{font-size:clamp(19px,2.4vw,28px);margin-bottom:6px}
+  .sub{font-size:12.5px;margin-bottom:12px}
+  .gal{gap:8px} .cap{margin-top:5px;font-size:10.8px;line-height:1.4}
+  .flow{gap:6px} .flow .step .d{font-size:11px}
+  .grid{gap:9px} .card p{font-size:12.3px}
+  .note{font-size:12px}
+}
+@media (max-height:730px){ .shot-sm{max-width:470px} .flow .step{flex-basis:120px} }
+</style>
+
+<div class="topbar">
+  <span class="mark">FANTA<b>STRICK</b></span>
+  <span class="sep"></span>
+  <span class="counter"><em id="cur">1</em> / <span id="tot">12</span></span>
+</div>
+
+<main class="deck" id="deck">
+
+<!-- 1 표지 ─────────────────────────── -->
+<section class="slide on"><div class="inner">
+  <div class="two">
+    <div>
+      <div style="width:56px;height:3px;background:var(--blue);border-radius:2px;margin-bottom:22px"></div>
+      <h1>판타스트릭<br>새 홈페이지</h1>
+      <p class="sub" style="font-size:clamp(15px,1.7vw,19px);max-width:34ch">
+        예약을 받고, 예약금을 확인하고, 손님에게 안내하는 일을
+        <strong>사람 손 없이</strong> 처리하는 우리만의 시스템.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px 22px;font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);margin-top:26px">
+        <span><b style="color:var(--blue)">주소</b> fantastrick.co.kr</span>
+        <span><b style="color:var(--blue)">기준</b> 2026-08-16</span>
+      </div>
+    </div>
+    <div class="browser">
+      <div class="bar"><i></i><i></i><i></i><span class="url">fantastrick.co.kr</span></div>
+      {{img:home}}
+    </div>
+  </div>
+</div></section>
+
+<!-- 2 한눈에 ─────────────────────────── -->
+<section class="slide"><div class="inner">
+  <p class="eyebrow">한눈에</p>
+  <h2>지금 홈페이지가 하고 있는 일</h2>
+  <p class="sub">아래 숫자는 전부 오늘 실제로 세어본 것입니다.</p>
+  <div class="stats" style="margin-bottom:20px">
+    <div class="stat hi"><div class="n">14<small>쪽</small></div><div class="k">손님이 보는 화면<br>(테마 상세 4개 포함)</div></div>
+    <div class="stat hi"><div class="n">6<small>개</small></div><div class="k">사장님 관리자 탭</div></div>
+    <div class="stat"><div class="n">29<small>개</small></div><div class="k">뒤에서 도는 기능<br>(예약·입금·문자 등)</div></div>
+    <div class="stat"><div class="n">118<small>건</small></div><div class="k">지금 잡혀 있는 예약</div></div>
+    <div class="stat win"><div class="n">0<small>명</small></div><div class="k">예약 확정에 필요한<br>사람 손</div></div>
+  </div>
+  <div class="note good"><b>핵심은 하나입니다.</b> 손님이 예약을 넣고 예약금을 보내면,
+    그다음부터 <b>확정도 문자도 자동</b>으로 나갑니다. 사장님은 결과만 보시면 됩니다.</div>
+</div></section>
+
+<!-- 3 손님 화면 갤러리 ─────────────────── -->
+<section class="slide"><div class="inner">
+  <p class="eyebrow">손님이 보는 화면</p>
+  <h2>여섯 개의 화면이 각자 할 일을 합니다</h2>
+  <div class="gal gal3">
+    <div><div class="browser">{{img:home}}</div><p class="cap"><b>홈</b> — 테마 소개와 예약 진입</p></div>
+    <div><div class="browser">{{img:rooms}}</div><p class="cap"><b>테마 상세</b> — 시놉시스·가격·주의사항</p></div>
+    <div><div class="browser">{{img:events}}</div><p class="cap"><b>이벤트</b> — 리뷰·생일·옵저버</p></div>
+    <div><div class="browser">{{img:faq}}</div><p class="cap"><b>자주 묻는 질문</b> — 인원별 가격표</p></div>
+    <div><div class="browser">{{img:reviews}}</div><p class="cap"><b>후기</b> — 손님이 직접 남김</p></div>
+    <div><div class="browser">{{img:about}}</div><p class="cap"><b>소개·오시는 길</b> — 출구·도보·주차</p></div>
+  </div>
+</div></section>
+
+<!-- 4 테마 상세 ─────────────────────── -->
+<section class="slide"><div class="inner">
+  <div class="two flip">
+    <div class="browser">
+      <div class="bar"><i></i><i></i><i></i><span class="url">fantastrick.co.kr/rooms/ldc</span></div>
+      {{img:rooms}}
+    </div>
+    <div>
+      <p class="eyebrow">물어보기 전에 답하기</p>
+      <h2>테마마다 다 적혀 있습니다</h2>
+      <p class="sub">전에는 포스터 한 장이 전부였습니다. 지금은 손님이 궁금해할 것을 화면이 먼저 답합니다.</p>
+      <ul class="clean">
+        <li><b>시놉시스</b> — 어떤 이야기인지</li>
+        <li><b>인원별 이용 금액</b> — 2인·3인·4인 이상</li>
+        <li><b>수용 인원 · 소요 시간 · 난이도</b></li>
+        <li><b>주의사항</b> — 복장·음주·인원 (안전과 클레임에 직결)</li>
+        <li><b>다른 테마</b>로 바로 넘어가기</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<!-- 5 예약 흐름(폰) ─────────────────── -->
+<section class="slide"><div class="inner">
+  <p class="eyebrow">손님이 예약하는 순서</p>
+  <h2>세 번 누르면 끝납니다</h2>
+  <p class="sub">실제 화면입니다. <strong>회원가입이 없습니다</strong> — 이름·전화번호·비밀번호 4자리면 됩니다.</p>
+  <div class="two">
+    <div>
+      <div class="browser">
+        <div class="bar"><i></i><i></i><i></i><span class="url">fantastrick.co.kr/reserve</span></div>
+        {{img:reserve-calendar}}
+      </div>
+      <p class="cap"><b>① 날짜 고르기</b> — 아직 안 열린 날은 <b>며칠에 열리는지</b> 그 자리에서 알려줍니다</p>
+    </div>
+    <div class="phones">
+      <div><div class="phone">{{img:phone-slots}}</div>
+        <p class="cap"><b>② 시간 고르기</b><br>찬 시간은 못 고르게 막습니다</p></div>
+      <div><div class="phone">{{img:phone-deposit}}</div>
+        <p class="cap"><b>③ 예약금 보내기</b><br><b>토스 한 번</b>이면 계좌·금액이 자동</p></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 6 자동 확인 ─────────────────────── -->
+<section class="slide"><div class="inner">
+  <p class="eyebrow">가장 큰 변화</p>
+  <h2>예약금 확인이 자동입니다</h2>
+  <p class="sub">통장을 들여다보고, 이름을 맞춰보고, 문자를 손으로 보내던 일이
+    <strong>끊기지 않고 끝까지 흘러갑니다.</strong></p>
+  <div class="flow" style="margin-bottom:18px">
+    <div class="step"><span class="i">01 · 손님</span><div class="t">예약 넣기</div><div class="d">테마·날짜·시간·연락처</div></div>
+    <div class="step"><span class="i">02 · 화면</span><div class="t">입금 안내</div><div class="d">계좌 + 토스 송금 한 번에</div></div>
+    <div class="step auto"><span class="i">03 · 자동</span><div class="t">입금 확인</div><div class="d">카카오뱅크 알림을 읽어 이름·금액 대조</div></div>
+    <div class="step auto"><span class="i">04 · 자동</span><div class="t">예약 확정</div><div class="d">맞으면 그 자리에서 확정</div></div>
+    <div class="step auto"><span class="i">05 · 자동</span><div class="t">확정 안내</div><div class="d">알림톡 발송<br>(안 가면 문자로 대체)</div></div>
+  </div>
+  <div class="two">
+    <div class="grid" style="gap:10px">
+      <div class="card"><h3>이름이 다르면 <span class="tag">안전장치</span></h3>
+        <p>입금자 이름이 예약자와 다르면 <b>자동 확정하지 않습니다.</b> 사장님이 직접 판단하시게 남겨둡니다.</p></div>
+      <div class="card"><h3>감시가 멈추면 알려줍니다 <span class="tag">신호등</span></h3>
+        <p>입금 감시가 조용히 멈춰도 아무도 모르던 일이 있었습니다. 지금은 관리자 맨 위에 <b>초록 신호등</b>이 있습니다.</p></div>
+    </div>
+    <div><div class="browser shot-sm">
+      <div class="bar"><i></i><i></i><i></i><span class="url">/admin · 입금·환불</span></div>
+      {{img:admin-money}}</div>
+      <p class="cap">맨 위 초록 줄이 <b>입금 감시 신호등</b>. 손님 이름·연락처는 발표용으로 가렸습니다.</p></div>
+  </div>
+</div></section>
+
+<!-- 7 예약조회 ─────────────────────── -->
+<section class="slide"><div class="inner">
+  <div class="two">
+    <div>
+      <p class="eyebrow">전화가 줄어드는 이유</p>
+      <h2>손님이 스스로 합니다</h2>
+      <p class="sub">이름 · 전화번호 · 비밀번호 4자리로 조회합니다.</p>
+      <ul class="clean">
+        <li><b>예약 확인</b> — 일시·인원·입금 여부</li>
+        <li><b>예약 취소</b> — 환불 금액을 화면이 먼저 계산<br>
+          <span style="color:var(--ink-dim);font-size:12px">24시간 초과 100% · 전날 80% · 당일 0%</span></li>
+        <li><b>환불 계좌 직접 입력</b> — 계좌 받으려 전화할 일 없음</li>
+        <li><b>시간 변경</b> — 조건 맞으면 1회</li>
+        <li><b>입금 계좌 다시 보기</b> — 미입금 예약에 계좌가 같이 나옴</li>
+      </ul>
+    </div>
+    <div><div class="browser">
+      <div class="bar"><i></i><i></i><i></i><span class="url">fantastrick.co.kr/reservation</span></div>
+      {{img:lookup-deposit}}</div>
+      <p class="cap">미입금 예약에만 <b>계좌·금액·입금자명 안내</b>가 붙습니다. 결제완료 건에는 안 나옵니다.</p></div>
+  </div>
+</div></section>
+
+<!-- 8 챗봇 ─────────────────────────── -->
+<section class="slide"><div class="inner">
+  <div class="two flip">
+    <div class="browser">
+      <div class="bar"><i></i><i></i><i></i><span class="url">상담 챗봇</span></div>
+      {{img:chatbot}}
+    </div>
+    <div>
+      <p class="eyebrow">24시간 대신 답하기</p>
+      <h2>규정을 그대로 답하는 챗봇</h2>
+      <p class="sub">가격·환불·오시는 길·<strong>입금 계좌</strong>를 즉시 답합니다.</p>
+      <div class="card" style="margin-bottom:11px"><h3>일부러 AI를 안 씁니다</h3>
+        <p>환불 규정은 손님이 <b>돈을 걸고 읽는 정보</b>입니다. AI가 그럴듯하게 틀리면 실제 분쟁이 됩니다.</p>
+        <p>그래서 답은 전부 <b>실제 운영 규정에서 그대로</b> 가져오고, 모르는 건 솔직하게 전화로 넘깁니다.</p></div>
+      <div class="note">덤으로 <b>API 비용이 0원</b>입니다. 손님이 아무리 많이 물어봐도 요금이 안 늘어납니다.</div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 9 관리자 ─────────────────────── -->
+<section class="slide"><div class="inner">
+  <p class="eyebrow">사장님 화면</p>
+  <h2>관리자 한 곳에서 다 끝납니다</h2>
+  <p class="sub">워드프레스 관리자에서 플러그인을 헤맬 필요가 없습니다.
+    <strong>매장에서 실제로 하는 일 순서대로</strong> 탭을 짰습니다.
+    (아래 사진의 손님 이름·연락처는 발표용으로 가린 것입니다)</p>
+  <div class="gal gal3">
+    <div><div class="browser">{{img:admin-res}}</div><p class="cap"><b>예약</b> — 달력·오늘 예약·시간변경 내역</p></div>
+    <div><div class="browser">{{img:admin-talk}}</div><p class="cap"><b>알림톡</b> — 나간 기록·실패 여부·재발송</p></div>
+    <div><div class="browser">{{img:admin-set}}</div><p class="cap"><b>설정</b> — 예약금·시간표·문자 문구</p></div>
+  </div>
+  <div class="grid g3" style="margin-top:14px">
+    <div class="card"><h3>입금·환불</h3><p>입금 대기 줄, 환불 처리(계좌 복사 한 번), 매장 수동 접수.</p></div>
+    <div class="card"><h3>도입 문의</h3><p>제어시스템 도입을 묻는 다른 매장 문의를 상태별로.</p></div>
+    <div class="card"><h3>리뷰·공지</h3><p>후기 관리 + <b>팝업 공지</b>는 배포 없이 그 자리에서 바뀝니다.</p></div>
+  </div>
+</div></section>
+
+<!-- 10 비교표 ─────────────────────── -->
+<section class="slide"><div class="inner">
+  <p class="eyebrow">옛 사이트와 비교</p>
+  <h2>지적받았던 것은 다 채웠습니다</h2>
+  <p class="sub">2026년 7월 15일, 기존 사이트를 전수 조사해서
+    <strong>"저쪽엔 있는데 우리엔 없다"</strong>고 꼽았던 항목들입니다.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>항목</th><th>7월 15일 당시</th><th>지금</th></tr></thead>
+      <tbody>
+        <tr><td class="item">인원별 이용 금액</td><td class="old"><span class="pill no">없음</span> 예약금만 보였음</td><td class="new"><span class="pill yes">있음</span> 테마마다 인원별 요금</td></tr>
+        <tr><td class="item">테마 상세 페이지</td><td class="old"><span class="pill no">404</span> 홈 카드가 전부</td><td class="new"><span class="pill yes">있음</span> 테마 4개 각각</td></tr>
+        <tr><td class="item">시놉시스 · 주의사항</td><td class="old"><span class="pill no">없음</span></td><td class="new"><span class="pill yes">있음</span> 안전·클레임 직결</td></tr>
+        <tr><td class="item">오시는 길</td><td class="old"><span class="pill part">주소만</span></td><td class="new"><span class="pill yes">있음</span> 출구·도보·주차</td></tr>
+        <tr><td class="item">계좌 사전 안내</td><td class="old"><span class="pill part">예약 후에만</span></td><td class="new"><span class="pill yes">있음</span> 챗봇·예약조회에서도</td></tr>
+        <tr><td class="item">자주 묻는 질문</td><td class="old"><span class="pill no">없음</span></td><td class="new"><span class="pill yes">있음</span></td></tr>
+        <tr><td class="item">도입(컨설팅) 문의</td><td class="old"><span class="pill part">메뉴만</span></td><td class="new"><span class="pill yes">있음</span> 접수 + 관리자 관리</td></tr>
+        <tr><td class="item">실시간 채팅</td><td class="old"><span class="pill part">플러그인</span></td><td class="new"><span class="pill yes">대체</span> 규정 기반 챗봇(0원)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note warn" style="margin-top:14px">아직 안 한 것: <b>테마 갤러리(사진 여러 장)</b>와 <b>인스타그램 피드</b>. 급하지 않다고 보고 미뤄둔 것입니다.</div>
+</div></section>
+
+<!-- 11 안전·속도 ─────────────────── -->
+<section class="slide"><div class="inner">
+  <p class="eyebrow">눈에 안 보이는 강점</p>
+  <h2>안 꺼지고, 안 잃고, 가볍습니다</h2>
+  <div class="two" style="align-items:start;margin-bottom:18px">
+    <div>
+      <h3 style="font-size:13px;margin:0 0 10px;color:var(--blue);font-family:var(--mono);letter-spacing:.1em">자료를 잃지 않기</h3>
+      <ul class="clean ok">
+        <li><b>매주 전체 자동 백업</b> — 사람이 기억할 필요 없음</li>
+        <li><b>바뀐 이력이 남습니다</b> — 누가 언제 왜</li>
+        <li><b>중복 예약 차단</b> — 서버가 막습니다</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="font-size:13px;margin:0 0 10px;color:var(--blue);font-family:var(--mono);letter-spacing:.1em">멈추지 않기</h3>
+      <ul class="clean ok">
+        <li><b>알림톡 실패 → 문자 자동 대체</b></li>
+        <li><b>입금 감시 신호등</b> — 멈추면 바로 보임</li>
+        <li><b>조회 실패 횟수 기록</b> — 남의 예약 찍어보기 차단</li>
+        <li><b>연습용 번호 발송 차단</b> — 테스트 문자 사고 방지</li>
+      </ul>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat win"><div class="n">−93<small>%</small></div><div class="k">사진 용량<br>8,579KB → 614KB</div></div>
+    <div class="stat win"><div class="n">6,700<small>건</small></div><div class="k">하루 절감<br>(사진 미리 줄이기)</div></div>
+    <div class="stat win"><div class="n">4,200<small>건</small></div><div class="k">하루 절감<br>(쓰레기 요청 차단)</div></div>
+    <div class="stat"><div class="n">0.47<small>초</small></div><div class="k">예약 시간표 전체<br>받아오는 시간</div></div>
+    <div class="stat"><div class="n">0<small>원</small></div><div class="k">홈페이지 운영비<br>(문자비·도메인 제외)</div></div>
+  </div>
+</div></section>
+
+<!-- 12 정리 ─────────────────────── -->
+<section class="slide"><div class="inner">
+  <p class="eyebrow">정리</p>
+  <h2 style="max-width:22ch">예약을 <span style="color:var(--blue)">받는 것</span>에서 끝나지 않고,
+    <span style="color:var(--green)">확정까지 스스로 하는</span> 홈페이지</h2>
+  <div class="grid g3" style="margin:22px 0 20px">
+    <div class="card"><h3>손님</h3><p>예약·취소·시간변경·환불계좌·후기를 <b>전화 없이</b> 혼자 끝냅니다.</p></div>
+    <div class="card"><h3>사장님</h3><p>통장 확인도, 확정 문자도 <b>손으로 안 합니다.</b> 결과만 봅니다.</p></div>
+    <div class="card"><h3>매장</h3><p>중복 예약·잘못된 문자·자료 유실을 <b>시스템이 먼저 막습니다.</b></p></div>
+  </div>
+  <div class="note good"><b>다음으로 할 만한 것</b> — 테마 갤러리(사진 여러 장) · 인스타그램 연동 · 방문 후기 유도.
+    기능은 충분히 갖췄고, 이제는 <b>알리는 쪽</b>이 남았습니다.</div>
+</div></section>
+
+</main>
+
+<div class="botbar">
+  <div class="dots" id="dots"></div>
+  <span class="hint"><kbd>←</kbd> <kbd>→</kbd> 넘기기 · <kbd>F</kbd> 전체화면</span>
+</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var dots = document.getElementById('dots');
+  var cur = document.getElementById('cur');
+  document.getElementById('tot').textContent = slides.length;
+  var i = 0;
+  slides.forEach(function(s, n){
+    var b = document.createElement('button');
+    b.className = 'dot' + (n === 0 ? ' on' : '');
+    b.type = 'button';
+    b.setAttribute('aria-label', (n + 1) + '번 슬라이드');
+    b.addEventListener('click', function(){ go(n); });
+    dots.appendChild(b);
+  });
+  var dotEls = Array.prototype.slice.call(dots.children);
+  function go(n){
+    n = Math.max(0, Math.min(slides.length - 1, n));
+    if (n === i) return;
+    slides[i].classList.remove('on'); dotEls[i].classList.remove('on');
+    i = n;
+    slides[i].classList.add('on'); slides[i].scrollTop = 0; dotEls[i].classList.add('on');
+    cur.textContent = i + 1;
+  }
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(i + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(i - 1); }
+    else if (e.key === 'Home') { go(0); }
+    else if (e.key === 'End') { go(slides.length - 1); }
+    else if (e.key === 'f' || e.key === 'F') {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen().catch(function(){});
+    }
+  });
+  document.getElementById('deck').addEventListener('click', function(e){
+    if (e.target.closest('a, button')) return;
+    go(e.clientX < window.innerWidth * 0.28 ? i - 1 : i + 1);
+  });
+})();
+</script>
