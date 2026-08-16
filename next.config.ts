@@ -3,12 +3,23 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // 정적 이미지는 public/ 아래에서 직접 서빙 (외부 도메인 없음)
   reactStrictMode: true,
-  // ⚠️ minimumCacheTTL 은 "**Vercel 서버**가 최적화된 이미지를 얼마나 보관할지"만 정한다.
-  //    손님 폰(브라우저)이 얼마나 보관할지는 **원본 파일의 Cache-Control 을 그대로 물려받는다**.
-  //    그래서 이것만으로는 재방문 때마다 포스터를 다시 받는 문제가 안 고쳐진다
-  //    (2차 점검 실측: x-vercel-cache: HIT 인데 손님에게 가는 값은 max-age=0).
-  //    → 실제 해결은 아래 headers() 의 /images, /fonts 규칙이다. 이건 서버 보관용으로 유지.
-  images: { minimumCacheTTL: 60 * 60 * 24 * 30 },
+  /* 🔴 2026-08-16 — 사진 자동 변환을 **끈다**(unoptimized).
+   *
+   * [왜]
+   *   켜져 있으면 손님이 사진을 볼 때마다 `/_next/image` 가 **워커를 깨워서** 그 자리에서
+   *   크기를 줄여 준다. 실측 하루 6,700번 — 클라우드플레어 무료 한도(하루 10만 요청)를
+   *   갉아먹는 3위였다. 끄면 사진이 **정적 파일**이 되고, 정적 파일 요청은 **공짜·무제한**이다.
+   *   (Workers static assets: "Requests to static assets are free and unlimited")
+   *
+   * [끄기 전에 한 일 — 이게 없으면 끄면 안 된다]
+   *   자동 변환이 하던 일을 미리 해 뒀다. `scripts/images-to-webp.mjs` 로 포스터·마스코트·
+   *   지도를 화면에 실제로 쓰이는 크기의 webp 로 미리 줄였다(8.6MB → 614KB, -93%).
+   *   그래서 손님이 받는 용량은 전과 비슷하다. 원본은 backups/images-원본-20260816 에 있다.
+   *
+   * ⚠️ 새 사진을 public/images 에 넣을 때는 **미리 줄여서** 넣어야 한다.
+   *    큰 파일을 그대로 넣으면 아무도 안 줄여주고 손님이 그 크기 그대로 받는다.
+   *    위 스크립트의 PLAN 에 한 줄 추가하고 돌리면 된다. */
+  images: { unoptimized: true },
   // 상위 폴더(D:\test3)의 다른 lockfile 을 루트로 잘못 잡지 않도록 이 프로젝트로 고정
   outputFileTracingRoot: import.meta.dirname,
   // 태블릿 앱(BankNotify)이 보내는 주소를 받아준다.

@@ -31,7 +31,7 @@ function ThemeCard({ t, no }: { t: Theme; no: number }) {
     <Link prefetch={false} className="tcard" data-cat={t.cat} href={`/rooms/${t.id}`} draggable={false}>
       <div className="thumb">
         {/* ⚠️ CSS 배경(backgroundImage)으로 넣으면 next/image 최적화를 통째로 건너뛴다.
-            예전엔 그렇게 해서 poster-ldc.png 1MB 원본이 그대로 내려갔음(화면엔 266px로 보이는데).
+            예전엔 그렇게 해서 poster-ldc.webp 1MB 원본이 그대로 내려갔음(화면엔 266px로 보이는데).
             <Image fill> 로 넣으면 화면 크기에 맞게 줄이고 WebP 로 바꿔서 보냄 → 4장 합계 2,014KB → 187KB.
             (예전에 배경으로 바꾼 이유였던 '호버 확대가 카드 밖으로 삐져나옴'은 .tcard{overflow:clip} 으로 이미 해결됨) */}
         <Image
@@ -270,14 +270,14 @@ export default function Home() {
           <div className="ht-mascot-in">
             <span className="ht-name ht-name-blue">판타</span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/mascot-fanta-v4.png" alt="" />
+            <img src="/images/mascot-fanta-v4.webp" alt="" />
           </div>
         </div>
         <div className="ht-mascot ht-m-tricky" aria-hidden="true">
           <div className="ht-mascot-in">
             <span className="ht-name ht-name-red">트리키</span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/mascot-tricky-v4.png" alt="" />
+            <img src="/images/mascot-tricky-v4.webp" alt="" />
           </div>
         </div>
         <div className="ht-stack">
@@ -419,7 +419,7 @@ export default function Home() {
             >
               <Image
                 className="store-map-img"
-                src="/images/stores-map.png"
+                src="/images/stores-map.webp"
                 alt="판타스트릭 매장 위치 지도 (TGC·1호점·2호점)"
                 fill
                 sizes="(max-width:760px) 100vw, 620px"

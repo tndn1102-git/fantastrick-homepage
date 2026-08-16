@@ -34,29 +34,29 @@ function StatusBadge({ schedule }: { schedule: Schedule }) {
 
 const OBSERVER_THEMES: Theme[] = [
   {
-    theme: "태초의 신부", store: "1호점", roomId: "firstfoundbride", poster: "/images/poster-bride.jpg",
+    theme: "태초의 신부", store: "1호점", roomId: "firstfoundbride", poster: "/images/poster-bride.webp",
     rule: "신규 2인과 함께 오면 옵저버 인원 무료 플레이",
     notes: ["주말·공휴일에는 적용되지 않아요.", "옵저버는 같이 플레이해도 되고 관전만 해도 괜찮습니다."],
   },
   {
-    theme: "사자의 서", store: "2호점", roomId: "bookofduat", poster: "/images/poster-duat.png",
+    theme: "사자의 서", store: "2호점", roomId: "bookofduat", poster: "/images/poster-duat.webp",
     rule: "신규 2인과 함께 오면 옵저버 인원 무료 플레이",
     notes: ["주말·공휴일에는 적용되지 않아요.", "옵저버는 같이 플레이해도 되고 관전만 해도 괜찮습니다."],
   },
   {
-    theme: "락다운시티", store: "3호점 · TGC", roomId: "ldc", poster: "/images/poster-ldc.png",
+    theme: "락다운시티", store: "3호점 · TGC", roomId: "ldc", poster: "/images/poster-ldc.webp",
     rule: "인원과 상관없이 무조건 3인 가격 (4인·5인이 와도 3인 가격)",
     notes: ["주말·공휴일에도 적용돼요.", "옵저버는 같이 플레이해도 되고 관전만 해도 괜찮습니다."],
   },
   {
-    theme: "시간의 영속성", store: "3호점 · TGC", roomId: "time", poster: "/images/poster-time.jpg",
+    theme: "시간의 영속성", store: "3호점 · TGC", roomId: "time", poster: "/images/poster-time.webp",
     rule: "신규 3인과 함께 오면 본인은 무료 입장",
     notes: ["주말·공휴일에도 적용돼요.", "다른 사람의 추리 플레이를 옆에서 관전할 수 있어요."],
   },
 ];
 
 const REVIEW = {
-  title: "리뷰 이벤트", badge: "진행 중", mascot: "/images/mascot-tricky-v4.png",
+  title: "리뷰 이벤트", badge: "진행 중", mascot: "/images/mascot-tricky-v4.webp",
   summary: "후기 남기고 테마 5,000원 할인 + 굿즈 받아가세요!",
   body: [
     { h: "이런 이벤트예요", items: [
@@ -77,7 +77,7 @@ const REVIEW = {
 };
 
 const BIRTHDAY = {
-  title: "생일 이벤트", badge: "진행 중", image: "/images/event-birthday.png",
+  title: "생일 이벤트", badge: "진행 중", image: "/images/event-birthday.webp",
   summary: "생일 달엔 원하는 테마 1가지에 쓰는 5,000원 할인 쿠폰을 문자로 보내드려요!",
   body: [
     { h: "이런 이벤트예요", items: [
@@ -164,7 +164,7 @@ export default function EventsPage() {
           {/* 리뷰 이벤트 카드 */}
           <button type="button" className="ev-card" onClick={() => setOpen("review")} aria-label="리뷰 이벤트 자세히 보기">
             <div className="ev-thumb">
-              <Image src="/images/review-event.png" alt="리뷰 이벤트 — 테마 5,000원 할인 + 굿즈" fill sizes="(max-width:560px) 46vw, 260px" className="ev-poster ev-poster-top" />
+              <Image src="/images/review-event.webp" alt="리뷰 이벤트 — 테마 5,000원 할인 + 굿즈" fill sizes="(max-width:560px) 46vw, 260px" className="ev-poster ev-poster-top" />
               <span className="ev-badge">{REVIEW.badge}</span>
             </div>
             <div className="ev-cap">
@@ -238,7 +238,7 @@ export default function EventsPage() {
         <div className="ev-modal-overlay" onClick={close} role="dialog" aria-modal="true" aria-label={REVIEW.title}>
           <div className="ev-modal" onClick={(e) => e.stopPropagation()}>
             <button className="ev-modal-x" onClick={close} aria-label="닫기">✕</button>
-            <Image src="/images/review-event.png" alt="리뷰 이벤트 — 테마 5,000원 할인 + 굿즈" width={1400} height={1980} sizes="560px" className="ev-modal-poster" />
+            <Image src="/images/review-event.webp" alt="리뷰 이벤트 — 테마 5,000원 할인 + 굿즈" width={1400} height={1980} sizes="560px" className="ev-modal-poster" />
             <div className="ev-modal-body">
               <p className="ev-modal-lead">{REVIEW.summary}</p>
               {REVIEW.body.map((sec, j) => (

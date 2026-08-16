@@ -15,9 +15,16 @@ fantastrick-homepage\   ← Next.js 웹앱 (예약·리뷰 자체 시스템)
 ├─ vitest.config.ts     ← 테스트 설정 (입금 파서·매처 검증용. `npm test`)
 ├─ tests\               ← parser.test.ts · matcher.test.ts (bank-auto 에서 함께 가져온 검증된 테스트 28개)
 ├─ scripts\
-│  └─ import-from-wp.mts ← 기존 사이트(fantastrick.co.kr) 예약 → 이 사이트로 복사.
-│                          ⚠️기존 사이트엔 SELECT만 / 전화번호는 가짜로 바꿔 넣음
-│                          `npx tsx scripts/import-from-wp.mts` (미리보기) · `--apply` (실제)
+│  ├─ import-from-wp.mts ← 기존 사이트(fantastrick.co.kr) 예약 → 이 사이트로 복사.
+│  │                       ⚠️기존 사이트엔 SELECT만 / 전화번호는 가짜로 바꿔 넣음
+│  │                       `npx tsx scripts/import-from-wp.mts` (미리보기) · `--apply` (실제)
+│  ├─ images-to-webp.mjs ← 사진을 미리 줄여 webp 로. **새 사진 넣을 때마다 돌릴 것**
+│  │                       (자동 변환을 껐기 때문에 아무도 안 줄여준다) `--apply` 로 실행
+│  ├─ visual-check.mjs   ← 크롬으로 5쪽 열어 깨진 사진·실패요청·JS오류 점검 (먼저 서버 띄우고)
+│  ├─ worker-usage.mjs   ← 워커 하루 요청량 (한도 10만) · worker-hourly.mjs = 시간대별
+│  ├─ worker-cpu.mjs     ← 요청당 CPU 시간(중앙값·상위1%). 무료 상한 10ms 에 걸리는지 확인
+│  ├─ traffic-top.mjs    ← 어느 주소가 요청을 많이 먹나 ⚠️토큰에 Analytics 권한 없어 현재 실패
+│  └─ scraper-report.mjs ← 외부 수집기 조사. `wrangler tail ... > t.json` 받아서 분석
 ├─ supabase\
 │  ├─ schema.sql        ← 예약·리뷰 데이터베이스 표 만드는 SQL (Supabase에 1회 실행)
 │  └─ migration_*.sql   ← 나중에 칸·표를 더한 것들 (deposits=입금알림 기록 표 등)
