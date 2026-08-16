@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties }
 import { STORES, THEMES, TIME_SLOTS, DOW_LABELS, slotsForThemeDate, themeColorInk, type StoreSlots, type SlotSchedule } from "@/lib/data";
 import { isRefundOwed, isRefundReady, refundAmount, cancelledBy, isAutoCancelled } from "@/lib/money";
 import { isActiveSmsType } from "@/lib/sms-templates";
-import { EXPIRE_MINUTES, GRACE_UNTIL_HOUR, DELETE_AFTER_DAYS } from "@/lib/expire";
+import { EXPIRE_MINUTES, DELETE_AFTER_DAYS } from "@/lib/expire";
 import { formatDate, formatPhone, formatStamp, formatStampShort, formatStampTime, kstDateOf } from "@/lib/util";
 
 type Reservation = {
@@ -1383,21 +1383,11 @@ function BankHealth() {
   );
 }
 
-/** 입금 마감 시각 — expire.ts 의 규칙 그대로.
-    보통은 접수 + 30분, 자정~오전10시 접수는 그날 10:30(KST)까지 봐준다.
+/** 입금 마감 시각 — expire.ts 의 규칙 그대로. **접수 + 30분, 시간대 예외 없음.**
+    🔴 2026-08-17 — 새벽 예약을 오전 10시 30분까지 봐주던 유예를 없앴다(사장님 지시).
     ⚠️ 손님에게 말해야 하는 기준은 **이 마감 시각**이지, 시스템이 실제로 정리한 시각이 아니다. */
-function payDeadline(createdAt: string): { at: number; grace: boolean } {
-  const c = new Date(createdAt).getTime();
-  const normal = c + EXPIRE_MINUTES * 60000;
-  const kst = new Date(c + 9 * 3600 * 1000);
-  const isMidnightBooking = kst.getUTCHours() < GRACE_UNTIL_HOUR;
-  let at = normal;
-  if (isMidnightBooking) {
-    const g = new Date(c + 9 * 3600 * 1000);
-    g.setUTCHours(GRACE_UNTIL_HOUR, EXPIRE_MINUTES, 0, 0);
-    at = Math.max(normal, g.getTime() - 9 * 3600 * 1000);
-  }
-  return { at, grace: isMidnightBooking && at > normal };
+function payDeadline(createdAt: string): number {
+  return new Date(createdAt).getTime() + EXPIRE_MINUTES * 60000;
 }
 
 /* 🚫 자동 취소된 예약 — **손님이 물어볼 때 꺼내 보는 화면.**
@@ -1450,8 +1440,7 @@ function AutoCancelled() {
                 <div className="head" style={{ cursor: "default" }}>
                   <span className="taken-at">{formatStampShort(r.created_at)} 접수</span>
                   <span className="when">
-                    {formatStampShort(new Date(dl.at).toISOString())} 입금 마감
-                    {dl.grace && <span className="src-tag" style={{ marginLeft: 6 }}>새벽 예약</span>}
+                    {formatStampShort(new Date(dl).toISOString())} 입금 마감
                   </span>
                   <span className="taken-at">{formatStampShort(r.cancelled_at)} 정리됨</span>
                   <span className="who"><b>{r.name}</b> · <Phone v={r.phone} /></span>
@@ -1503,19 +1492,18 @@ function PayQueue({ onDone }: { onDone: () => void }) {
   useEffect(() => { load(); }, [load]);
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, []);
 
-  // 남은 시간 — 자정 이후 접수 건은 그날 오전 10시 30분까지 봐주므로(expire.ts) 그 기준으로 센다.
-  // 안 그러면 새벽 예약이 "0분 남음"으로 보이는데 실제로는 안 취소돼 화면이 거짓말을 한다.
+  // 남은 시간 — 입금 마감(접수 + 30분) 기준.
   //
   // 🔴 2026-08-13 — 기한이 지나면 **"○분 지남"으로 계속 올라간다**(사장님 지시).
   //   자동취소를 꺼둔 뒤로 지난 예약이 "0분 남음"에서 멈춰 있었다. 30분이 지났는지 3시간이
   //   지났는지 화면만 봐서는 알 수가 없어, 접수 시각을 보고 사장님이 직접 빼야 했다.
   //   over > 0 이면 지난 것이고, 그 값이 곧 "몇 분 지났나"다.
-  function remainInfo(createdAt: string): { min: number; over: number; grace: boolean } {
-    const { at, grace } = payDeadline(createdAt); // 규칙은 한 곳(payDeadline)에만 둔다
+  function remainInfo(createdAt: string): { min: number; over: number } {
+    const at = payDeadline(createdAt); // 규칙은 한 곳(payDeadline)에만 둔다
     const passedMin = Math.floor((Date.now() - at) / 60000);
     // 기한 직후 1분 동안은 "0분 지남"이라는 이상한 말이 되므로 그때까지는 남음으로 둔다.
-    if (passedMin >= 1) return { min: 0, over: passedMin, grace };
-    return { min: Math.max(0, Math.ceil((at - Date.now()) / 60000)), over: 0, grace };
+    if (passedMin >= 1) return { min: 0, over: passedMin };
+    return { min: Math.max(0, Math.ceil((at - Date.now()) / 60000)), over: 0 };
   }
 
   /** 분 → "1시간 20분" / "45분". 남은 시간·지난 시간 둘 다 같은 규칙으로 읽히게 한 곳에 둔다. */
@@ -1564,14 +1552,10 @@ ${r.theme_name} ${r.date} ${r.time}
       {/* 🔴 오래 방치된 입금 대기 (2026-08-13 사장님 지시: 자동취소 대신 경고만)
           자동취소를 꺼둔 상태라 입금 안 한 예약이 자리를 영영 차지한다.
           시스템이 함부로 지우지 않되, **눈에 띄게 알려서** 사장님이 판단하게 한다.
-          ⚠️ 접수 1시간이 기준이다. 새벽 예약은 오전 10시 반까지 봐주므로(payDeadline)
-             그 유예 안에 있으면 여기 안 잡는다 — 정상 손님을 재촉하면 안 된다. */}
+          ⚠️ 접수 1시간이 기준이다(마감 30분 + 여유 30분). 새벽 예약 유예는 2026-08-17 에 없앴다. */}
       {(() => {
-        const stale = list.filter((r) => {
-          const { grace } = remainInfo(r.created_at);
-          if (grace) return false; // 새벽 유예 중인 건 제외
-          return Date.now() - new Date(r.created_at).getTime() > 60 * 60 * 1000;
-        });
+        const stale = list.filter((r) =>
+          Date.now() - new Date(r.created_at).getTime() > 60 * 60 * 1000);
         if (!stale.length) return null;
         return (
           <div className="admin-card" style={{ borderColor: "#c0392b", borderWidth: 2, marginBottom: 14 }}>
@@ -1599,7 +1583,7 @@ ${r.theme_name} ${r.date} ${r.time}
       {list.length === 0 ? (
         <div className="notice ok">입금 대기 없음 — 다 처리하셨어요.</div>
       ) : list.map((r) => {
-        const { min: m, over, grace } = remainInfo(r.created_at);
+        const { min: m, over } = remainInfo(r.created_at);
         return (
           <div key={r.id} className="rrow">
             <div className="head" style={{ cursor: "default" }}>
@@ -1609,7 +1593,6 @@ ${r.theme_name} ${r.date} ${r.time}
               <span className="taken-at">{formatStampShort(r.created_at)} 접수</span>
               <span className={"when" + (over ? " over" : m <= 5 ? " urgent" : "")}>
                 {over ? `${hm(over)} 지남` : `${hm(m)} 남음`}
-                {grace && <span className="src-tag" style={{ marginLeft: 6 }}>새벽 예약</span>}
               </span>
               {/* 이름 = 은행앱 입금자명과 맞추는 키라 굵게 */}
               <span className="who"><b>{r.name}</b> · <Phone v={r.phone} /></span>
