@@ -22,160 +22,72 @@
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --ground: #0D1312;
-      --panel: #141C1B;
-      --panel-2: #111918;
-      --ink: #E7EFED;
-      --ink-soft: #93A5A2;
-      --ink-faint: #6B7B79;
-      --rule: #243230;
-      --rule-strong: #33443F;
-      --accent: #55CFC5;
-      --accent-wash: #14312E;
-      --ok: #58C288;
-      --ok-wash: #162E23;
-      --no: #E38870;
-      --no-wash: #33201B;
-      --warn: #DFA945;
-      --warn-wash: #2E2515;
+      --ground: #0D1312; --panel: #141C1B; --panel-2: #111918;
+      --ink: #E7EFED; --ink-soft: #93A5A2; --ink-faint: #6B7B79;
+      --rule: #243230; --rule-strong: #33443F;
+      --accent: #55CFC5; --accent-wash: #14312E;
+      --ok: #58C288; --ok-wash: #162E23;
+      --no: #E38870; --no-wash: #33201B;
+      --warn: #DFA945; --warn-wash: #2E2515;
     }
   }
   :root[data-theme="dark"] {
-    --ground: #0D1312;
-    --panel: #141C1B;
-    --panel-2: #111918;
-    --ink: #E7EFED;
-    --ink-soft: #93A5A2;
-    --ink-faint: #6B7B79;
-    --rule: #243230;
-    --rule-strong: #33443F;
-    --accent: #55CFC5;
-    --accent-wash: #14312E;
-    --ok: #58C288;
-    --ok-wash: #162E23;
-    --no: #E38870;
-    --no-wash: #33201B;
-    --warn: #DFA945;
-    --warn-wash: #2E2515;
+    --ground: #0D1312; --panel: #141C1B; --panel-2: #111918;
+    --ink: #E7EFED; --ink-soft: #93A5A2; --ink-faint: #6B7B79;
+    --rule: #243230; --rule-strong: #33443F;
+    --accent: #55CFC5; --accent-wash: #14312E;
+    --ok: #58C288; --ok-wash: #162E23;
+    --no: #E38870; --no-wash: #33201B;
+    --warn: #DFA945; --warn-wash: #2E2515;
   }
 
   * { box-sizing: border-box; }
   body {
-    margin: 0;
-    background: var(--ground);
-    color: var(--ink);
-    font-family: var(--sans);
-    font-size: 16px;
-    line-height: 1.65;
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: var(--sans); font-size: 16px; line-height: 1.65;
     -webkit-font-smoothing: antialiased;
   }
-  .wrap {
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 0 20px 96px;
-    display: flex;
-    flex-direction: column;
-    gap: 56px;
-  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px 96px; display: flex; flex-direction: column; gap: 56px; }
 
-  header.doc {
-    border-bottom: 2px solid var(--ink);
-    padding: 44px 0 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-  }
+  header.doc { border-bottom: 2px solid var(--ink); padding: 44px 0 20px; display: flex; flex-direction: column; gap: 18px; }
   .eyebrow {
-    font-family: var(--mono);
-    font-size: 11.5px;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    color: var(--accent);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px 16px;
-    align-items: center;
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--accent); display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center;
   }
   .eyebrow .sep { color: var(--rule-strong); }
-  h1 {
-    margin: 0;
-    font-size: clamp(30px, 5.4vw, 46px);
-    line-height: 1.12;
-    letter-spacing: -.03em;
-    font-weight: 800;
-    text-wrap: balance;
-  }
+  h1 { margin: 0; font-size: clamp(30px, 5.4vw, 46px); line-height: 1.12; letter-spacing: -.03em; font-weight: 800; text-wrap: balance; }
   .lede { margin: 0; max-width: 62ch; color: var(--ink-soft); font-size: 16.5px; }
   .lede b { color: var(--ink); font-weight: 600; }
 
-  .meters {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1px;
-    background: var(--rule);
-    border: 1px solid var(--rule);
-  }
+  .meters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
   .meter { background: var(--panel); padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 4px; }
-  .meter .k {
-    font-family: var(--mono);
-    font-size: 10.5px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-  }
-  .meter .v {
-    font-family: var(--mono);
-    font-size: 27px;
-    font-weight: 600;
-    letter-spacing: -.02em;
-    font-variant-numeric: tabular-nums;
-  }
+  .meter .k { font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); }
+  .meter .v { font-family: var(--mono); font-size: 27px; font-weight: 600; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
   .meter .v small { font-size: 13px; color: var(--ink-soft); font-weight: 400; margin-left: 3px; }
   .meter.hi .v { color: var(--accent); }
 
   section { display: flex; flex-direction: column; gap: 22px; }
   .sec-head { display: flex; flex-direction: column; gap: 7px; }
-  .sec-head .tag {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-  }
-  h2 {
-    margin: 0;
-    font-size: 23px;
-    letter-spacing: -.02em;
-    font-weight: 750;
-    padding-bottom: 9px;
-    border-bottom: 1px solid var(--rule-strong);
-  }
+  .sec-head .tag { font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-faint); }
+  h2 { margin: 0; font-size: 23px; letter-spacing: -.02em; font-weight: 750; padding-bottom: 9px; border-bottom: 1px solid var(--rule-strong); }
   .sec-head p { margin: 0; color: var(--ink-soft); max-width: 66ch; font-size: 15px; }
 
-  /* 1차 판정 */
-  .verdicts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-  .verdict { background: var(--panel); border: 1px solid var(--rule); padding: 18px; display: flex; flex-direction: column; gap: 10px; }
-  .verdict.pass { border-left: 4px solid var(--ok); }
-  .verdict.fail { border-left: 4px solid var(--no); }
-  .verdict .top { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-  .verdict .ko { font-size: 25px; font-weight: 800; letter-spacing: -.03em; }
-  .verdict .stamp { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; padding: 2px 8px; }
-  .verdict.pass .stamp { color: var(--ok); background: var(--ok-wash); }
-  .verdict.fail .stamp { color: var(--no); background: var(--no-wash); }
-  .verdict ul { margin: 0; padding-left: 17px; display: flex; flex-direction: column; gap: 4px; }
-  .verdict li { font-size: 14.5px; color: var(--ink-soft); }
-  .verdict li b { color: var(--ink); font-weight: 600; }
+  /* 생존자 트랙 */
+  .track { display: flex; flex-direction: column; gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+  .lane { background: var(--panel); padding: 15px 18px; display: grid; grid-template-columns: 74px 1fr; gap: 16px; align-items: start; }
+  .lane .rnd { font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em; color: var(--ink-faint); padding-top: 5px; }
+  .lane .names { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .name-pill {
+    display: inline-flex; align-items: baseline; gap: 7px;
+    border: 1px solid var(--rule-strong); padding: 4px 10px; background: var(--panel-2);
+  }
+  .name-pill b { font-size: 15.5px; letter-spacing: -.02em; }
+  .name-pill span { font-family: var(--mono); font-size: 10.5px; color: var(--ink-faint); }
+  .name-pill.live { border-color: var(--ok); background: var(--ok-wash); }
+  .name-pill.dead { border-color: var(--no); background: var(--no-wash); text-decoration: line-through; opacity: .75; }
 
   .picks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-  .pick {
-    background: var(--panel);
-    border: 1px solid var(--rule);
-    border-top: 3px solid var(--accent);
-    padding: 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+  .pick { background: var(--panel); border: 1px solid var(--rule); border-top: 3px solid var(--accent); padding: 18px; display: flex; flex-direction: column; gap: 10px; }
   .pick .rank { font-family: var(--mono); font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-faint); }
   .pick .ko { font-size: 26px; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
   .pick .en { font-family: var(--mono); font-size: 12px; letter-spacing: .1em; color: var(--accent); }
@@ -185,17 +97,9 @@
   .scroll { overflow-x: auto; border: 1px solid var(--rule); background: var(--panel); }
   table { border-collapse: collapse; width: 100%; min-width: 700px; }
   thead th {
-    text-align: left;
-    font-family: var(--mono);
-    font-size: 10.5px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-    font-weight: 500;
-    padding: 11px 14px;
-    background: var(--panel-2);
-    border-bottom: 1px solid var(--rule-strong);
-    white-space: nowrap;
+    text-align: left; font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-faint); font-weight: 500; padding: 11px 14px; background: var(--panel-2);
+    border-bottom: 1px solid var(--rule-strong); white-space: nowrap;
   }
   tbody td { padding: 12px 14px; border-bottom: 1px solid var(--rule); vertical-align: baseline; font-size: 14.5px; }
   tbody tr:last-child td { border-bottom: 0; }
@@ -206,31 +110,19 @@
   td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
 
   .chip {
-    display: inline-block;
-    font-family: var(--mono);
-    font-size: 10.5px;
-    letter-spacing: .08em;
-    padding: 2px 7px;
-    border: 1px solid currentColor;
-    white-space: nowrap;
+    display: inline-block; font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em;
+    padding: 2px 7px; border: 1px solid currentColor; white-space: nowrap;
   }
   .chip.ctl { color: var(--accent); background: var(--accent-wash); }
   .chip.mon { color: var(--warn); background: var(--warn-wash); }
-  .chip.net { color: var(--ok); background: var(--ok-wash); }
+  .chip.esc { color: var(--ok); background: var(--ok-wash); }
   .chip.clear { color: var(--ok); background: var(--ok-wash); }
   .chip.caution { color: var(--warn); background: var(--warn-wash); }
   .chip.none { color: var(--ink-faint); background: transparent; border-style: dashed; }
 
   .copy {
-    appearance: none;
-    background: transparent;
-    border: 1px solid var(--rule-strong);
-    color: var(--ink-soft);
-    font-family: var(--mono);
-    font-size: 10.5px;
-    letter-spacing: .08em;
-    padding: 3px 8px;
-    cursor: pointer;
+    appearance: none; background: transparent; border: 1px solid var(--rule-strong); color: var(--ink-soft);
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; padding: 3px 8px; cursor: pointer;
   }
   .copy:hover { color: var(--accent); border-color: var(--accent); }
   .copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -253,28 +145,11 @@
   .dombox li span.x { color: var(--no); }
   .dombox .note { font-size: 12.5px; color: var(--ink-faint); font-family: var(--sans); }
 
-  footer.doc {
-    border-top: 1px solid var(--rule-strong);
-    padding-top: 18px;
-    color: var(--ink-faint);
-    font-size: 13px;
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-  }
+  footer.doc { border-top: 1px solid var(--rule-strong); padding-top: 18px; color: var(--ink-faint); font-size: 13px; display: flex; flex-direction: column; gap: 7px; }
   .toast {
-    position: fixed;
-    left: 50%;
-    bottom: 26px;
-    transform: translate(-50%, 14px);
-    background: var(--ink);
-    color: var(--ground);
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: .06em;
-    padding: 9px 16px;
-    opacity: 0;
-    pointer-events: none;
+    position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 14px);
+    background: var(--ink); color: var(--ground); font-family: var(--mono); font-size: 12px;
+    letter-spacing: .06em; padding: 9px 16px; opacity: 0; pointer-events: none;
     transition: opacity .18s ease, transform .18s ease;
   }
   .toast.on { opacity: 1; transform: translate(-50%, 0); }
@@ -282,7 +157,8 @@
 
   @media (max-width: 760px) {
     .meters { grid-template-columns: repeat(2, 1fr); }
-    .picks, .dom, .verdicts { grid-template-columns: 1fr; }
+    .picks, .dom { grid-template-columns: 1fr; }
+    .lane { grid-template-columns: 1fr; gap: 8px; }
     .wrap { gap: 44px; padding-bottom: 64px; }
   }
 </style>
@@ -293,73 +169,80 @@
     <div class="eyebrow">
       <span>FANTASTRICK</span><span class="sep">/</span>
       <span>제어시스템 사업 · 사명 선정</span><span class="sep">/</span>
-      <span>2차 · 2026-08-17</span><span class="sep">/</span>
+      <span>3차 · 2026-08-17</span><span class="sep">/</span>
       <span>사내용</span>
     </div>
     <h1>IoT 제어 사명 후보 20</h1>
     <p class="lede">
       방탈출 <b>중앙제어 시스템(32~128ch · Modbus I/O 확장)</b>과 <b>워치독 원격 모니터링 구독</b>을 파는 회사의 이름.
-      1차에서 인터락스가 상표 충돌로 탈락해, <b>1차 후보 전체를 빼고 새로 만든 38개</b>를 사업자등록 상호 DB에서 다시 전수 조회했습니다.
+      3차는 <b>방탈출 현장 어휘(큐·래치·접점·핑)</b>를 IoT 조어와 붙여 새로 만들었습니다. 1·2차에 나온 74개는 전부 제외했습니다.
     </p>
   </header>
 
   <div class="meters">
-    <div class="meter"><span class="k">2차 검토 후보</span><span class="v">38<small>개</small></span></div>
-    <div class="meter hi"><span class="k">미등록 확인</span><span class="v">26<small>개</small></span></div>
-    <div class="meter"><span class="k">최종 제안</span><span class="v">20<small>개</small></span></div>
-    <div class="meter"><span class="k">상표까지 검증</span><span class="v">3<small>개</small></span></div>
+    <div class="meter"><span class="k">누적 검토</span><span class="v">103<small>개</small></span></div>
+    <div class="meter"><span class="k">3차 검토</span><span class="v">29<small>개</small></span></div>
+    <div class="meter hi"><span class="k">3차 미등록</span><span class="v">25<small>개</small></span></div>
+    <div class="meter"><span class="k">상표까지 검증</span><span class="v">8<small>개</small></span></div>
   </div>
 
   <section>
     <div class="sec-head">
-      <span class="tag">Round 1 · closed</span>
-      <h2>1차 후보 두 개를 끝까지 판정한 결과</h2>
-      <p>사업자등록 상호가 비어 있어도 상표가 막고 있으면 못 씁니다. 실제로 하나가 여기서 걸렸습니다.</p>
+      <span class="tag">Standings</span>
+      <h2>세 라운드에서 살아남은 이름</h2>
+      <p>상표까지 확인해 <b>지금 바로 쓸 수 있다고 판정된 이름</b>만 초록입니다. 이 여섯 중에서 고르면 됩니다.</p>
     </div>
-    <div class="verdicts">
-      <article class="verdict pass">
-        <div class="top"><span class="ko">릴레이온</span><span class="stamp">사용 가능</span></div>
-        <ul>
-          <li>국내 상표 <b>「릴레이온」 0건 · 「RELAYON」 0건</b> (KIPRIS, 권리·행정상태 전체)</li>
-          <li><b>relayon.co.kr · relayon.kr 미등록</b> (KISA/KRNIC whois 직접 조회)</li>
-          <li>relayon.com은 도메인 판매 파킹(2019년 등록) — 실사용 회사 아님</li>
-        </ul>
-      </article>
-      <article class="verdict fail">
-        <div class="top"><span class="ko">인터락스</span><span class="stamp">탈락</span></div>
-        <ul>
-          <li>국내 상표 <b>5건</b> — 그중 <b>(주)일흥의 제9·11·12류 등록상표 4건이 유효</b>(1995·2006·2006·2017)</li>
-          <li><b>09류</b>가 바로 우리가 출원해야 할 제어·측정장치류입니다</li>
-          <li>해외에도 Atotech <b>Interlox®</b>, interlox.com(1971년~ 운영 중)이 이미 사용</li>
-        </ul>
-      </article>
+    <div class="track">
+      <div class="lane">
+        <span class="rnd">1차 · 36개</span>
+        <div class="names">
+          <span class="name-pill live"><b>릴레이온</b><span>RELAYON</span></span>
+          <span class="name-pill dead"><b>인터락스</b><span>09류 선등록</span></span>
+        </div>
+      </div>
+      <div class="lane">
+        <span class="rnd">2차 · 38개</span>
+        <div class="names">
+          <span class="name-pill live"><b>컨트롤덱</b><span>CONTROLDECK</span></span>
+          <span class="name-pill live"><b>릴레이노드</b><span>RELAYNODE</span></span>
+          <span class="name-pill dead"><b>텔레메트릭스</b><span>텔레매틱스 혼동</span></span>
+        </div>
+      </div>
+      <div class="lane">
+        <span class="rnd">3차 · 29개</span>
+        <div class="names">
+          <span class="name-pill live"><b>키노드</b><span>KEYNODE</span></span>
+          <span class="name-pill live"><b>핑노드</b><span>PINGNODE</span></span>
+          <span class="name-pill live"><b>래치온</b><span>LATCHON</span></span>
+        </div>
+      </div>
     </div>
   </section>
 
   <section>
     <div class="sec-head">
-      <span class="tag">Recommendation · round 2</span>
-      <h2>새 후보 중 셋은 상표까지 미리 봤습니다</h2>
-      <p>같은 사고를 반복하지 않으려고, 추천 3개는 KIPRIS 국내·해외 상표와 도메인까지 먼저 확인했습니다.</p>
+      <span class="tag">Recommendation · round 3</span>
+      <h2>이번 라운드 추천 셋</h2>
+      <p>세 개 모두 KIPRIS 국내 상표와 <code>.co.kr</code>·<code>.kr</code> 도메인까지 확인했습니다.</p>
     </div>
     <div class="picks">
       <article class="pick">
-        <span class="rank">1순위 · 상표 국내0 해외0</span>
-        <span class="ko">컨트롤덱</span>
-        <span class="en">CONTROLDECK</span>
-        <p>제어 콘솔(deck) 그 자체. <b>4음절로 짧고 조어라 상표 등록이 잘 됩니다.</b> 전화로 한 번에 알아듣고, 128ch 턴키의 마스터 콘솔 이미지가 바로 섭니다.</p>
+        <span class="rank">1순위 · 국내 상표 0</span>
+        <span class="ko">키노드</span>
+        <span class="en">KEYNODE</span>
+        <p><b>열쇠(key)와 노드(node)가 한 단어에</b> 들어갑니다. 방탈출 사장님에게는 열쇠로, 제조사에게는 핵심 노드로 읽힙니다. 3음절이라 받아쓰기도 틀리지 않습니다.</p>
       </article>
       <article class="pick">
-        <span class="rank">2순위 · 상표 국내0 해외0</span>
-        <span class="ko">릴레이노드</span>
-        <span class="en">RELAYNODE</span>
-        <p>릴레이(출력 부품) + 노드. <b>릴레이온을 쓰지 못할 때의 대체선</b>이자, 확장 모듈을 계속 붙이는 우리 구조를 그대로 말합니다.</p>
+        <span class="rank">2순위 · 국내외 상표 0</span>
+        <span class="ko">핑노드</span>
+        <span class="en">PINGNODE</span>
+        <p>핑은 <b>"살아 있냐"고 묻는 신호</b>입니다. 24시간 워치독이 하는 일 그 자체 — 월 19,900원의 근거가 이름에 박힙니다. 국내·해외 상표 모두 0건으로 가장 깨끗합니다.</p>
       </article>
       <article class="pick">
-        <span class="rank">3순위 · 국내0 / 해외 23건</span>
-        <span class="ko">텔레메트릭스</span>
-        <span class="en">TELEMETRIX</span>
-        <p>텔레메트리는 <b>원격 계측</b>의 정식 용어 — 워치독 구독을 설명하는 데 가장 정확합니다. 다만 해외 상표가 23건이라 수출·해외 상표는 막힐 수 있습니다.</p>
+        <span class="rank">3순위 · 국내 상표 0</span>
+        <span class="ko">래치온</span>
+        <span class="en">LATCHON</span>
+        <p>래치는 <b>자기유지 회로이자 걸쇠</b>입니다. 제어 용어와 잠금장치를 동시에 말하는 유일한 단어라 방탈출에 딱 붙습니다.</p>
       </article>
     </div>
   </section>
@@ -367,7 +250,7 @@
   <section>
     <div class="sec-head">
       <span class="tag">Shortlist · 20</span>
-      <h2>미등록 확인 후보 전체</h2>
+      <h2>3차 미등록 확인 후보 전체</h2>
       <p>상호 옆 <span class="chip ctl">복사</span> 를 누르면 클립보드에 담깁니다. 등기소·KIPRIS 검색창에 그대로 붙여넣으세요.</p>
     </div>
     <div class="scroll">
@@ -382,9 +265,8 @@
 
   <section>
     <div class="sec-head">
-      <span class="tag">Rejected · 18</span>
+      <span class="tag">Rejected · 9</span>
       <h2>이번 라운드에서 떨어진 이름</h2>
-      <p>같은 상호를 쓰는 사업자가 이미 있거나, 등록은 되지만 이름값을 못 하는 것들입니다.</p>
     </div>
     <div class="scroll">
       <table>
@@ -400,7 +282,7 @@
     <div class="sec-head">
       <span class="tag">Before you decide</span>
       <h2>확정 전 반드시 밟을 3단계</h2>
-      <p>표의 20개는 "사업자등록 상호가 겹치지 않는다"까지만 확인된 상태입니다(추천 3개는 상표까지). 법인과 상표는 별개의 관문입니다.</p>
+      <p>표의 20개는 "사업자등록 상호가 겹치지 않는다"까지만 확인된 상태입니다(추천 3개는 상표까지).</p>
     </div>
     <ol class="steps">
       <li>
@@ -414,7 +296,7 @@
         <span class="n">02</span>
         <div>
           <h3>특허청 KIPRIS · 상표 검색</h3>
-          <p>인터락스가 걸린 관문입니다. <code>제9류</code> 제어·측정장치, <code>제37류</code> 설치·수리, <code>제42류</code> 소프트웨어 개발 세 류를 모두 보세요. 문자상표뿐 아니라 <b>도형상표의 호칭</b>도 걸립니다 — 인터락스는 남의 로고 발음에 막혔습니다.</p>
+          <p>인터락스가 걸린 관문입니다. <code>제9류</code> 제어·측정장치, <code>제37류</code> 설치·수리, <code>제42류</code> 소프트웨어 개발 세 류를 모두 보세요. 문자상표뿐 아니라 <b>도형상표의 호칭</b>도 걸립니다.</p>
         </div>
       </li>
       <li>
@@ -430,99 +312,89 @@
   <section>
     <div class="sec-head">
       <span class="tag">Domain check · 2026-08-17</span>
-      <h2>추천 3개 도메인 실측</h2>
+      <h2>3차 추천 도메인 실측</h2>
       <p>KISA/KRNIC와 Verisign whois를 직접 조회한 결과입니다.</p>
     </div>
     <div class="dom">
       <div class="dombox">
-        <span class="t">CONTROLDECK</span>
+        <span class="t">KEYNODE</span>
         <ul>
-          <li><span>controldeck.co.kr</span><span class="ok">가능</span></li>
-          <li><span>controldeck.kr</span><span class="ok">가능</span></li>
-          <li><span>controldeck.com</span><span class="x">선점 2018</span></li>
+          <li><span>keynode.co.kr</span><span class="ok">가능</span></li>
+          <li><span>keynode.kr</span><span class="ok">가능</span></li>
+          <li><span>keynode.com</span><span class="x">선점 2004</span></li>
+        </ul>
+        <span class="note">.com은 Afternic 매물이라 값만 맞으면 매입 가능합니다.</span>
+      </div>
+      <div class="dombox">
+        <span class="t">PINGNODE</span>
+        <ul>
+          <li><span>pingnode.co.kr</span><span class="ok">가능</span></li>
+          <li><span>pingnode.kr</span><span class="ok">가능</span></li>
+          <li><span>pingnode.com</span><span class="x">선점 2019</span></li>
         </ul>
       </div>
       <div class="dombox">
-        <span class="t">RELAYNODE</span>
+        <span class="t">LATCHON</span>
         <ul>
-          <li><span>relaynode.co.kr</span><span class="ok">가능</span></li>
-          <li><span>relaynode.kr</span><span class="ok">가능</span></li>
-          <li><span>relaynode.com</span><span class="x">선점 2022</span></li>
+          <li><span>latchon.co.kr</span><span class="ok">가능</span></li>
+          <li><span>latchon.kr</span><span class="ok">가능</span></li>
+          <li><span>latchon.com</span><span class="x">선점 2003</span></li>
         </ul>
-        <span class="note">.com은 Dan.com 마켓에 올라와 있어 값만 맞으면 매입 가능합니다.</span>
-      </div>
-      <div class="dombox">
-        <span class="t">TELEMETRIX</span>
-        <ul>
-          <li><span>telemetrix.co.kr</span><span class="ok">가능</span></li>
-          <li><span>telemetrix.kr</span><span class="ok">가능</span></li>
-          <li><span>telemetrix.com</span><span class="x">선점 1995</span></li>
-        </ul>
-        <span class="note">.com은 1995년부터 실사용 중 — 협상 여지가 사실상 없습니다.</span>
+        <span class="note">.com은 실사용 중으로 보여 협상 여지가 적습니다.</span>
       </div>
     </div>
   </section>
 
   <footer class="doc">
-    <div><b>검증 방법</b> — 2차 후보 38개를 bizno.net(국세청 사업자등록 상호 DB, 1,196만 건)에서 개별 조회. 추천 3개는 KIPRIS 국내·해외 상표(권리구분·행정상태 전체)와 whois를 추가 확인.</div>
-    <div><b>한계</b> — 하루 4,500건 이상이 신규 등록됩니다. 조회 결과는 2026-08-17 기준이며 등기 신청 직전 재확인하세요. 표의 나머지 17개는 상표 미확인 상태입니다.</div>
+    <div><b>검증 방법</b> — 후보를 bizno.net(국세청 사업자등록 상호 DB, 1,196만 건)에서 개별 조회. 추천 이름은 KIPRIS 국내·해외 상표(권리구분·행정상태 전체)와 KISA/Verisign whois를 추가 확인.</div>
+    <div><b>한계</b> — 하루 4,500건 이상이 신규 등록됩니다. 결과는 2026-08-17 기준이며 등기 신청 직전 재확인하세요. 표의 나머지 17개는 상표 미확인 상태입니다.</div>
   </footer>
 </div>
 
 <div class="toast" id="toast">복사됨</div>
 
 <script>
-  // [한글, 영문, 성격클래스, 성격, 상표상태클래스, 상표표기, 근거]
+  // [한글, 영문, 성격클래스, 성격, 상표클래스, 상표, 근거]
   const PICKS = [
-    ["컨트롤덱","CONTROLDECK","ctl","제어","clear","국내0 해외0","제어 콘솔(deck) 그 자체. 짧고 조어라 상표 등록이 잘 됩니다."],
-    ["릴레이노드","RELAYNODE","ctl","제어","clear","국내0 해외0","릴레이 + 노드. 모듈을 계속 붙이는 확장 구조를 그대로 말합니다."],
-    ["텔레메트릭스","TELEMETRIX","mon","감시","caution","국내0 해외23","텔레메트리 = 원격 계측의 정식 용어. 구독 설명에 가장 정확합니다."],
-    ["엣지컨트롤","EDGECONTROL","ctl","제어","none","미확인","현장(엣지)에서 직접 제어. 직관적이지만 보통명사 결합이라 상표 식별력은 약합니다."],
-    ["워치릭스","WATCHRIX","mon","감시","none","미확인","24시간 워치독 감시 — 구독료를 받는 근거를 이름에 담습니다."],
-    ["모니트릭스","MONITRIX","mon","감시","none","미확인","모니터링 전면. 관제 서비스로 확장할 때 자연스럽습니다."],
-    ["콘솔릭스","CONSOLIX","ctl","제어","none","미확인","마스터 콘솔에서. 턴키 상품의 중심 장비 이름과 맞물립니다."],
-    ["로직노드","LOGICNODE","ctl","제어","none","미확인","제어 로직 + 노드. 소프트웨어 역량까지 담는 이름."],
-    ["모드노드","MODNODE","net","연결","none","미확인","Modbus 모듈에서. 업계 사람이 들으면 바로 알아듣습니다."],
-    ["텔레노드","TELENODE","mon","감시","none","미확인","원격(tele) + 노드. 텔레메트릭스보다 짧은 대안."],
-    ["노드박스","NODEBOX","ctl","제어","none","미확인","현장에 설치되는 제어함 이미지. 하드웨어 회사 느낌이 강합니다."],
-    ["파일럿노드","PILOTNODE","ctl","제어","none","미확인","파일럿 램프·시운전에서. 도입 초기 고객에게 부담이 적은 인상."],
-    ["필드릭스","FIELDRIX","ctl","제어","none","미확인","필드 디바이스(현장 장치). 산업 자동화 어휘 그대로."],
-    ["스위치릭스","SWITCHRIX","ctl","제어","none","미확인","스위치·접점. 출력 제어를 파는 회사라는 신호."],
-    ["액트릭스","ACTRIX","ctl","제어","none","미확인","액추에이터(구동)에서. 장치를 움직인다는 뜻이 남습니다."],
-    ["액추온","ACTUON","ctl","제어","none","미확인","액추에이터 + ON. 3음절로 짧습니다."],
-    ["링크릭스","LINKRIX","net","연결","none","미확인","연결 중심. 타 업종 확장 때 제약이 가장 적습니다."],
-    ["허브릭스","HUBRIX","net","연결","none","미확인","중앙 허브 = 32ch 마스터가 모든 장치를 물고 있는 구조."],
-    ["옴틱스","OHMTIX","ctl","제어","none","미확인","전기 단위 옴(Ω)에서. 전기·전자 회사임이 즉시 전달됩니다."],
-    ["캐스케이드랩","CASCADELAB","net","연결","none","미확인","캐스케이드 = +32ch씩 연쇄로 붙는 확장 방식 그 자체."]
+    ["키노드","KEYNODE","esc","방탈출","clear","국내0","열쇠(key)와 노드(node)가 한 단어에. 고객과 업계 양쪽에 통합니다."],
+    ["핑노드","PINGNODE","mon","감시","clear","국내0 해외0","핑 = 살아 있냐고 묻는 신호. 워치독 구독의 정의 그 자체."],
+    ["래치온","LATCHON","ctl","제어","clear","국내0","래치 = 자기유지 회로이자 걸쇠. 제어와 잠금을 동시에 말합니다."],
+    ["타임릭스","TIMERIX","esc","방탈출","none","미확인","제한시간 타이머 — 방탈출에서 시간은 곧 상품입니다."],
+    ["래치웍스","LATCHWORKS","ctl","제어","none","미확인","래치온의 제조·공방 톤. 장비 회사 인상이 더 강합니다."],
+    ["컨택트릭스","CONTACTRIX","ctl","제어","none","미확인","릴레이 접점(contact). 출력 제어를 파는 회사라는 신호."],
+    ["센티넥스","SENTINEX","mon","감시","none","미확인","센티넬 = 보초. 24시간 지켜보는 구독 서비스와 맞물립니다."],
+    ["커맨딕스","COMMANDIX","ctl","제어","none","미확인","명령을 내리는 쪽. 마스터 콘솔의 위치를 이름이 말합니다."],
+    ["시그널덱","SIGNALDECK","ctl","제어","none","미확인","신호를 다루는 제어대. 컨트롤덱과 형제 이름."],
+    ["채널덱","CHANNELDECK","ctl","제어","none","미확인","ch(채널)이 견적 단위 + 제어대. 업계 용어 두 개의 결합."],
+    ["로직덱","LOGICDECK","ctl","제어","none","미확인","제어 로직을 올리는 판. 소프트웨어 역량까지 담습니다."],
+    ["씬릭스","SCENERIX","esc","방탈출","none","미확인","씬(scene) = 연출 장면. 테마 연출 튜닝이 우리 상품입니다."],
+    ["미션노드","MISSIONNODE","esc","방탈출","none","미확인","방탈출 미션 그대로. 다만 타 업종 확장 때는 걸림돌이 됩니다."],
+    ["와이어릭스","WIRERIX","ctl","제어","none","미확인","현장 배선. 설치 시공까지 파는 구조를 담습니다."],
+    ["서보릭스","SERVORIX","ctl","제어","none","미확인","서보 = 장치를 실제로 움직이는 구동부."],
+    ["스텝릭스","STEPRIX","ctl","제어","none","미확인","스텝 = 순차 제어. 연출 시퀀스가 단계로 돌아갑니다."],
+    ["소켓릭스","SOCKETRIX","ctl","제어","none","미확인","소켓 = 접속구. 확장 모듈을 꽂아 늘리는 구조."],
+    ["게이지온","GAUGEON","mon","감시","none","미확인","게이지 = 계측. 상태를 숫자로 보여주는 쪽을 강조."],
+    ["볼트노드","VOLTNODE","ctl","제어","none","미확인","전압 + 노드. 전기 장비 회사임이 바로 전달됩니다."],
+    ["오퍼릭스","OPERIX","mon","감시","none","미확인","오퍼레이션(운영). 구독형 운영지원까지 포괄합니다."]
   ];
 
   const DEAD = [
-    ["채널원","100건+","방송·광고 등 동명 사업자가 대량"],
-    ["브릿지온","16건","전자상거래·건자재 등 16곳"],
-    ["오토링크","15건","중고차·정비 업종에 다수 — 업종 혼동까지 발생"],
-    ["솔레노","13건","혜성솔레노(금속가구), 솔레노(주) 등 13곳"],
-    ["시퀀트","7건","(주)시퀀트 및 수원 학원 다수"],
-    ["그리드온","7건","통신장비 도매·전기전자 R&D 등 7곳"],
-    ["센트릭스","7건","전기계측기 제조사 포함 7곳 — 업종까지 겹침"],
-    ["필드온","3건","건축사사무소·(주)필드온 등 3곳"],
-    ["플럭스온","1건","전자상거래 1곳"],
-    ["트레이스온","1건","전자상거래 1곳"],
-    ["웨이브노드","1건","동일 상호 1곳"],
-    ["시그널링크","1건","시그널링크(주) — 대전 소재 기술서비스"],
-    ["래더로직","0건","PLC 일반 용어라 상표 식별력이 없어 등록이 어렵습니다"],
-    ["인터페이즈","0건","미국 Interphase Corp.와 충돌 · 생물학 용어(간기)로도 읽힘"],
-    ["스파크노드","0건","스파크가 전기 사고를 연상시켜 제어기 회사에 역효과"],
-    ["코일릭스","0건","코일은 부품 이미지라 시스템 회사로 안 읽힘"],
-    ["콘솔노드","0건","콘솔릭스와 의미 중복 — 둘 중 하나만"],
-    ["오토메이스","0건","조어의 뜻이 전달되지 않음"]
+    ["큐릭스","33건","미용·소프트웨어 등 33곳이 사용 중"],
+    ["큐라인","12건","인쇄·통신·전기장비 등 12곳"],
+    ["큐덱","1건","큐덱스주식회사와 사실상 동일하게 읽힘"],
+    ["페이즈온","1건","동일 상호 1곳"],
+    ["비트노드","0건","등록은 가능하나 비트코인·블록체인 회사로 오인"],
+    ["패킷온","0건","통신망 느낌이라 제어 장비 회사로 안 읽힘"],
+    ["미터노드","0건","게이지온과 의미 중복 — 둘 중 하나만"],
+    ["프로브릭스","0건","발음이 걸리고 의미 전달이 약함"],
+    ["씬노드","0건","씬릭스와 중복 — 둘 중 하나만"]
   ];
 
   const rows = document.getElementById("rows");
   PICKS.forEach(([ko, en, cls, label, tmCls, tm, why]) => {
     const tr = document.createElement("tr");
     tr.innerHTML =
-      '<td class="ko"></td>' +
-      '<td class="en"></td>' +
+      '<td class="ko"></td><td class="en"></td>' +
       '<td><span class="chip ' + cls + '"></span></td>' +
       '<td><span class="chip ' + tmCls + '"></span></td>' +
       '<td class="why"></td>' +

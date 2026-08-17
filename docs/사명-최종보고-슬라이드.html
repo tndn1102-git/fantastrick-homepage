@@ -1,0 +1,422 @@
+<title>사명 최종 분석 보고</title>
+<style>
+  :root {
+    --bg: #0C1211;
+    --panel: #141D1B;
+    --panel-2: #1B2624;
+    --line: #263432;
+    --line-2: #3A4C48;
+    --ink: #EEF4F2;
+    --ink-2: #A7BAB6;
+    --ink-3: #6E827E;
+    --teal: #4FD8CB;
+    --teal-dim: #1D3F3C;
+    --amber: #F0B443;
+    --amber-dim: #3A2C11;
+    --red: #F08A6E;
+    --red-dim: #3A1F17;
+    --green: #6BD98F;
+    --green-dim: #17331F;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, "D2Coding", monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #050908; font-family: var(--sans); display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 24px 0; }
+
+  .slide {
+    width: 1920px; height: 1080px; background: var(--bg); color: var(--ink);
+    padding: 72px 88px; display: flex; flex-direction: column; position: relative; overflow: hidden;
+    flex: none;
+  }
+  .slide::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 6px;
+    background: linear-gradient(90deg, var(--teal) 0%, var(--teal) 22%, var(--line) 22%);
+  }
+  .hd { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid var(--line-2); padding-bottom: 20px; margin-bottom: 44px; }
+  .hd .t { font-size: 46px; font-weight: 800; letter-spacing: -.03em; }
+  .hd .t em { font-style: normal; color: var(--teal); }
+  .hd .n { font-family: var(--mono); font-size: 19px; letter-spacing: .18em; color: var(--ink-3); text-transform: uppercase; }
+  .ft { position: absolute; left: 88px; right: 88px; bottom: 40px; display: flex; justify-content: space-between;
+        font-family: var(--mono); font-size: 17px; color: var(--ink-3); letter-spacing: .1em; }
+
+  /* 표지 */
+  .cover { justify-content: center; gap: 34px; }
+  .cover .eyebrow { font-family: var(--mono); font-size: 24px; letter-spacing: .34em; color: var(--teal); text-transform: uppercase; }
+  .cover h1 { font-size: 128px; font-weight: 850; letter-spacing: -.045em; line-height: .98; }
+  .cover h1 span { color: var(--teal); }
+  .cover .sub { font-size: 34px; color: var(--ink-2); line-height: 1.5; max-width: 34ch; }
+  .cover .meta { margin-top: 26px; display: flex; gap: 56px; }
+  .cover .meta div { display: flex; flex-direction: column; gap: 8px; }
+  .cover .meta .k { font-family: var(--mono); font-size: 17px; letter-spacing: .16em; color: var(--ink-3); }
+  .cover .meta .v { font-size: 30px; font-weight: 700; }
+
+  /* 공통 */
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; flex: 1; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; flex: 1; }
+  .card { background: var(--panel); border: 1px solid var(--line); padding: 34px 34px 38px; display: flex; flex-direction: column; gap: 18px; }
+  .card.win { border-top: 6px solid var(--teal); }
+  .card .rank { font-family: var(--mono); font-size: 18px; letter-spacing: .18em; color: var(--ink-3); }
+  .card .nm { font-size: 66px; font-weight: 850; letter-spacing: -.045em; line-height: 1; }
+  .card .en { font-family: var(--mono); font-size: 22px; letter-spacing: .14em; color: var(--teal); }
+  .card p { font-size: 25px; line-height: 1.55; color: var(--ink-2); }
+  .card p b { color: var(--ink); font-weight: 700; }
+  .card .score { margin-top: auto; display: flex; gap: 12px; align-items: baseline; font-family: var(--mono); }
+  .card .score .big { font-size: 46px; font-weight: 700; color: var(--teal); }
+  .card .score .unit { font-size: 20px; color: var(--ink-3); }
+
+  /* 퍼널 */
+  .funnel { display: flex; align-items: stretch; gap: 0; flex: 1; }
+  .step { flex: 1; background: var(--panel); border: 1px solid var(--line); padding: 36px 30px; display: flex; flex-direction: column; gap: 14px; position: relative; }
+  .step + .step { margin-left: 26px; }
+  .step + .step::before {
+    content: "→"; position: absolute; left: -26px; top: 50%; width: 26px; text-align: center;
+    transform: translateY(-50%); color: var(--line-2); font-size: 26px;
+  }
+  .step .num { font-family: var(--mono); font-size: 62px; font-weight: 700; color: var(--teal); line-height: 1; }
+  .step .lb { font-size: 25px; font-weight: 700; }
+  .step .ds { font-size: 20px; color: var(--ink-2); line-height: 1.5; }
+  .step.last { background: var(--teal-dim); border-color: var(--teal); }
+
+  /* 표 */
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-family: var(--mono); font-size: 18px; letter-spacing: .12em; color: var(--ink-3);
+       padding: 0 20px 16px; border-bottom: 2px solid var(--line-2); text-transform: uppercase; white-space: nowrap; }
+  th.r, td.r { text-align: right; }
+  td { padding: 20px; border-bottom: 1px solid var(--line); font-size: 27px; }
+  td.nm { font-weight: 750; letter-spacing: -.02em; }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 26px; color: var(--ink-2); }
+  tr.top td { background: var(--panel); }
+  tr.top td.nm, tr.top td.num { color: var(--ink); }
+  tr.win td { background: var(--teal-dim); }
+  tr.win td.num, tr.win td.nm { color: var(--teal); font-weight: 700; }
+  tr.out td { color: var(--ink-3); }
+  .badge { display: inline-block; font-family: var(--mono); font-size: 17px; letter-spacing: .1em; padding: 4px 12px; border: 1px solid currentColor; }
+  .badge.g { color: var(--green); background: var(--green-dim); }
+  .badge.a { color: var(--amber); background: var(--amber-dim); }
+  .badge.r { color: var(--red); background: var(--red-dim); }
+
+  /* 상세 슬라이드 */
+  .detail { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; flex: 1; }
+  .box { background: var(--panel); border: 1px solid var(--line); padding: 34px 36px; display: flex; flex-direction: column; gap: 20px; }
+  .box.tm { background: var(--panel-2); }
+  .box .bt { font-family: var(--mono); font-size: 19px; letter-spacing: .16em; color: var(--teal); text-transform: uppercase; padding-bottom: 14px; border-bottom: 1px solid var(--line-2); }
+  .box.tm .bt { color: var(--amber); }
+  ul.why { display: flex; flex-direction: column; gap: 20px; }
+  ul.why li { list-style: none; font-size: 26px; line-height: 1.5; color: var(--ink-2); padding-left: 30px; position: relative; }
+  ul.why li::before { content: ""; position: absolute; left: 0; top: 15px; width: 14px; height: 2px; background: var(--teal); }
+  ul.why li b { color: var(--ink); font-weight: 700; }
+  ul.chk { display: flex; flex-direction: column; gap: 0; }
+  ul.chk li { list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 20px;
+              font-size: 24px; padding: 17px 0; border-bottom: 1px dotted var(--line-2); color: var(--ink-2); }
+  ul.chk li:last-child { border-bottom: 0; }
+  ul.chk li span.v { font-family: var(--mono); font-size: 22px; white-space: nowrap; }
+  ul.chk li span.v.ok { color: var(--green); }
+  ul.chk li span.v.no { color: var(--red); }
+  ul.chk li span.v.wr { color: var(--amber); }
+  .risk { margin-top: auto; background: var(--red-dim); border-left: 5px solid var(--red); padding: 22px 26px; font-size: 23px; line-height: 1.5; color: var(--ink-2); }
+  .risk b { color: var(--red); font-weight: 700; }
+
+  .lead { font-size: 30px; color: var(--ink-2); line-height: 1.5; margin-bottom: 34px; max-width: 90ch; }
+  .lead b { color: var(--ink); font-weight: 700; }
+  .note { margin-top: 30px; font-size: 22px; color: var(--ink-3); line-height: 1.5; }
+
+  /* 사례 */
+  .case { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; flex: 1; }
+  .case .half { background: var(--panel); border: 1px solid var(--line); padding: 38px; display: flex; flex-direction: column; gap: 22px; }
+  .case .half.bad { border-left: 6px solid var(--red); }
+  .case .half.good { border-left: 6px solid var(--green); }
+  .case .half h3 { font-size: 44px; font-weight: 800; letter-spacing: -.03em; }
+  .case .half .tagline { font-family: var(--mono); font-size: 20px; letter-spacing: .12em; color: var(--ink-3); }
+  .case .half p { font-size: 25px; line-height: 1.55; color: var(--ink-2); }
+  .case .half p b { color: var(--ink); }
+
+  /* 단계 */
+  ol.steps { display: flex; flex-direction: column; gap: 22px; flex: 1; }
+  ol.steps li { list-style: none; background: var(--panel); border: 1px solid var(--line); padding: 30px 36px;
+                display: grid; grid-template-columns: 90px 1fr; gap: 30px; align-items: start; }
+  ol.steps .n { font-family: var(--mono); font-size: 48px; font-weight: 700; color: var(--teal); line-height: 1; }
+  ol.steps h3 { font-size: 32px; font-weight: 750; letter-spacing: -.02em; margin-bottom: 10px; }
+  ol.steps p { font-size: 24px; color: var(--ink-2); line-height: 1.5; }
+  ol.steps p b { color: var(--ink); font-weight: 700; }
+</style>
+
+<!-- 01 표지 -->
+<section class="slide cover">
+  <div class="eyebrow">FANTASTRICK · 제어시스템 사업</div>
+  <h1>사명 최종 분석<br><span>TOP 3</span></h1>
+  <div class="sub">후보 103개를 상호·상표·도메인으로 걸러내고,<br>전문 에이전트 2개 팀이 교차 검증한 결과</div>
+  <div class="meta">
+    <div><span class="k">검토 후보</span><span class="v">103개</span></div>
+    <div><span class="k">미등록 확인</span><span class="v">75개</span></div>
+    <div><span class="k">상표 검증 통과</span><span class="v">6개</span></div>
+    <div><span class="k">작성일</span><span class="v">2026-08-17</span></div>
+  </div>
+  <div class="ft"><span>사내 기밀</span><span>01</span></div>
+</section>
+
+<!-- 02 결론 -->
+<section class="slide">
+  <div class="hd"><div class="t">결론 — <em>릴레이온</em>을 사명으로 권고합니다</div><div class="n">Conclusion</div></div>
+  <div class="grid3">
+    <div class="card win">
+      <span class="rank">1순위 · 두 팀 만장일치</span>
+      <span class="nm">릴레이온</span>
+      <span class="en">RELAYON</span>
+      <p>우리가 실제로 파는 <b>릴레이 출력 제어기</b>가 곧 이름입니다. 전화로 한 번에 전달되고, 코인·통신사·게임 어디로도 새지 않습니다.</p>
+      <div class="score"><span class="big">80.3</span><span class="unit">/ 100 종합</span></div>
+    </div>
+    <div class="card">
+      <span class="rank">2순위</span>
+      <span class="nm">핑노드</span>
+      <span class="en">PINGNODE</span>
+      <p>핑은 <b>"살아 있냐"고 묻는 신호</b> — 워치독 구독의 정의입니다. 국내외 상표가 모두 0건인 유일한 후보입니다.</p>
+      <div class="score"><span class="big">66.0</span><span class="unit">/ 100 종합</span></div>
+    </div>
+    <div class="card">
+      <span class="rank">3순위</span>
+      <span class="nm">래치온</span>
+      <span class="en">LATCHON</span>
+      <p>래치는 <b>자기유지 회로이자 걸쇠</b>입니다. 제어 용어와 잠금장치를 동시에 말하는 유일한 이름입니다.</p>
+      <div class="score"><span class="big">58.1</span><span class="unit">/ 100 종합</span></div>
+    </div>
+  </div>
+  <div class="ft"><span>사내 기밀</span><span>02</span></div>
+</section>
+
+<!-- 03 선정 과정 -->
+<section class="slide">
+  <div class="hd"><div class="t">103개를 어떻게 <em>3개</em>로 좁혔나</div><div class="n">Method</div></div>
+  <div class="lead">이름을 짓는 일이 아니라 <b>걸러내는 일</b>이었습니다. 각 단계에서 실제 데이터베이스를 조회했고, 통과하지 못한 이름은 사유와 함께 기록했습니다.</div>
+  <div class="funnel">
+    <div class="step">
+      <span class="num">103</span>
+      <span class="lb">후보 생성</span>
+      <span class="ds">3개 라운드에 걸쳐 IoT·산업제어·방탈출 현장 어휘로 조어</span>
+    </div>
+    <div class="step">
+      <span class="num">75</span>
+      <span class="lb">상호 미등록</span>
+      <span class="ds">국세청 사업자등록 상호 DB 1,196만 건 전수 조회 — 28개가 이미 사용 중</span>
+    </div>
+    <div class="step">
+      <span class="num">6</span>
+      <span class="lb">상표·도메인 통과</span>
+      <span class="ds">KIPRIS 국내·해외 상표, KISA whois 확인 — 인터락스는 여기서 탈락</span>
+    </div>
+    <div class="step">
+      <span class="num">2</span>
+      <span class="lb">에이전트 교차 검증</span>
+      <span class="ds">IoT 업계 네이밍 관례 분석 + 언어·인지·콜드콜 실무 평가를 독립 수행</span>
+    </div>
+    <div class="step last">
+      <span class="num">3</span>
+      <span class="lb">최종 추천</span>
+      <span class="ds">두 관점 점수를 정규화해 합산, 상위 3개 확정</span>
+    </div>
+  </div>
+  <div class="ft"><span>사내 기밀</span><span>03</span></div>
+</section>
+
+<!-- 04 점수표 -->
+<section class="slide">
+  <div class="hd"><div class="t">두 전문 관점의 <em>교차 채점</em></div><div class="n">Scoring</div></div>
+  <div class="lead">두 팀은 서로의 결과를 모르는 상태로 독립 평가했습니다. <b>릴레이온만 양쪽에서 1위</b>였고, 나머지 순위는 크게 엇갈렸습니다.</div>
+  <table>
+    <thead>
+      <tr>
+        <th>후보</th><th>영문</th>
+        <th class="r">IoT 업계 적합도</th>
+        <th class="r">언어·전달력</th>
+        <th class="r">종합</th>
+        <th>판정</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="win"><td class="nm">릴레이온</td><td class="num">RELAYON</td><td class="num r">73.8</td><td class="num r">86.7</td><td class="num r">80.3</td><td><span class="badge g">1순위</span></td></tr>
+      <tr class="top"><td class="nm">핑노드</td><td class="num">PINGNODE</td><td class="num r">58.6</td><td class="num r">73.3</td><td class="num r">66.0</td><td><span class="badge g">2순위</span></td></tr>
+      <tr class="top"><td class="nm">래치온</td><td class="num">LATCHON</td><td class="num r">66.2</td><td class="num r">50.0</td><td class="num r">58.1</td><td><span class="badge g">3순위</span></td></tr>
+      <tr class="out"><td class="nm">컨트롤덱</td><td class="num">CONTROLDECK</td><td class="num r">67.2</td><td class="num r">46.7</td><td class="num r">57.0</td><td><span class="badge a">4위 · 검색 소실</span></td></tr>
+      <tr class="out"><td class="nm">릴레이노드</td><td class="num">RELAYNODE</td><td class="num r">54.8</td><td class="num r">56.7</td><td class="num r">55.8</td><td><span class="badge r">탈락</span></td></tr>
+      <tr class="out"><td class="nm">키노드</td><td class="num">KEYNODE</td><td class="num r">55.6</td><td class="num r">43.3</td><td class="num r">49.5</td><td><span class="badge r">탈락</span></td></tr>
+    </tbody>
+  </table>
+  <div class="note">IoT 업계 적합도 = B2B 신뢰감·확장성·정체성·상표리스크·업계관례·구독설명력·구어사용성 7축 가중 100점. 언어·전달력 = 음성전달·표기안정·검색가능성·의미오독·기억·국제통용성 6축 30점을 100점으로 환산. 종합 = 두 점수의 단순 평균.</div>
+  <div class="ft"><span>사내 기밀</span><span>04</span></div>
+</section>
+
+<!-- 05 릴레이온 -->
+<section class="slide">
+  <div class="hd"><div class="t">1순위 · <em>릴레이온</em> RELAYON</div><div class="n">Pick 01</div></div>
+  <div class="detail">
+    <div class="box">
+      <span class="bt">추천 이유</span>
+      <ul class="why">
+        <li><b>이름이 곧 제품입니다.</b> 32~128채널 제어기의 출력이 실제 릴레이 출력입니다. 우리가 파는 물건을 그대로 부르는 이름입니다.</li>
+        <li><b>사장님이 몰라도 기사님은 압니다.</b> 릴레이는 전기·제어 업계 정식 용어라, 구매를 좌우하는 시공·전기 기사에게 "우리 쪽 사람"이라는 신호를 보냅니다.</li>
+        <li><b>한 문장으로 오청이 복구됩니다.</b> "릴레이 켠다 할 때 그 릴레이온입니다" — 6개 중 자기소개가 곧 업종 설명이 되는 유일한 이름입니다.</li>
+        <li><b>구독과 의미가 맞습니다.</b> ON = 항상 켜져 있음 = 워치독 24시간. 릴레이온 케어, 릴레이온 오피스로 서브브랜드가 자연히 뻗습니다.</li>
+      </ul>
+    </div>
+    <div class="box tm">
+      <span class="bt">상표 · 등록 조사 결과</span>
+      <ul class="chk">
+        <li>사업자등록 상호 「릴레이온」<span class="v ok">0건</span></li>
+        <li>국내 상표 「릴레이온」<span class="v ok">0건</span></li>
+        <li>국내 상표 「RELAYON」<span class="v ok">0건</span></li>
+        <li>마드리드 국제등록 한국지정<span class="v ok">0건</span></li>
+        <li>relayon.co.kr<span class="v ok">미등록</span></li>
+        <li>relayon.kr<span class="v ok">미등록</span></li>
+        <li>relayon.com<span class="v no">선점 2019</span></li>
+      </ul>
+      <div class="risk"><b>남은 리스크</b> — .com은 도메인 판매 파킹 상태라 매입 협상은 가능합니다. 미국에 RelayOn Comms(무전 통신 플랫폼)가 있으나 업종·국가가 달라 국내 사용에는 영향이 없습니다.</div>
+    </div>
+  </div>
+  <div class="ft"><span>KIPRIS 권리구분·행정상태 전체 조회 / KISA·Verisign whois 직접 조회 · 2026-08-17</span><span>05</span></div>
+</section>
+
+<!-- 06 핑노드 -->
+<section class="slide">
+  <div class="hd"><div class="t">2순위 · <em>핑노드</em> PINGNODE</div><div class="n">Pick 02</div></div>
+  <div class="detail">
+    <div class="box">
+      <span class="bt">추천 이유</span>
+      <ul class="why">
+        <li><b>구독료의 근거가 이름에 박힙니다.</b> 핑은 장비가 살아 있는지 찔러보는 신호 — 월 19,900원 워치독 케어가 하는 일 그 자체입니다.</li>
+        <li><b>법적으로 가장 깨끗합니다.</b> 6개 중 유일하게 국내 상표·해외 상표가 모두 0건입니다.</li>
+        <li><b>검색 선점이 가장 쉽습니다.</b> 국내에 동명 경쟁자가 없어 우리 사이트가 곧 1번 결과가 됩니다.</li>
+        <li>다만 <b>제조업 무게감은 약합니다.</b> 감시 서비스 회사로 읽히고, 1,290만원 턴키 장비를 만드는 쪽으로는 덜 들립니다.</li>
+      </ul>
+    </div>
+    <div class="box tm">
+      <span class="bt">상표 · 등록 조사 결과</span>
+      <ul class="chk">
+        <li>사업자등록 상호 「핑노드」<span class="v ok">0건</span></li>
+        <li>국내 상표 「핑노드」<span class="v ok">0건</span></li>
+        <li>국내 상표 「PINGNODE」<span class="v ok">0건</span></li>
+        <li>해외 상표 「PINGNODE」<span class="v ok">0건</span></li>
+        <li>pingnode.co.kr<span class="v ok">미등록</span></li>
+        <li>pingnode.kr<span class="v ok">미등록</span></li>
+        <li>pingnode.com<span class="v no">선점 2019</span></li>
+      </ul>
+      <div class="risk"><b>남은 리스크</b> — 해외 블록체인 IoT 프로젝트 PingNET이 <b>PingNODE</b>라는 IoT 엣지 디바이스를 씁니다. 상표권은 없지만 같은 카테고리라, 회사명을 검색한 고객에게 코인 사업으로 읽힐 수 있습니다.</div>
+    </div>
+  </div>
+  <div class="ft"><span>KIPRIS 권리구분·행정상태 전체 조회 / KISA·Verisign whois 직접 조회 · 2026-08-17</span><span>06</span></div>
+</section>
+
+<!-- 07 래치온 -->
+<section class="slide">
+  <div class="hd"><div class="t">3순위 · <em>래치온</em> LATCHON</div><div class="n">Pick 03</div></div>
+  <div class="detail">
+    <div class="box">
+      <span class="bt">추천 이유</span>
+      <ul class="why">
+        <li><b>제어 용어와 방탈출이 한 단어에 있습니다.</b> 래치는 자기유지 회로이면서 걸쇠 — 잠긴 방을 여는 사업과 정확히 겹칩니다.</li>
+        <li><b>국내 검색 오염이 가장 적습니다.</b> 한글 「래치온」을 쓰는 곳이 없어 초기 SEO 비용이 들지 않습니다.</li>
+        <li><b>경쟁 압력이 줄었습니다.</b> 미국 스마트도어락 Latch Inc.가 DOOR로 리브랜딩해 이 이름의 글로벌 압력이 낮아졌습니다.</li>
+        <li>다만 <b>확장성은 제한적입니다.</b> 잠금 이미지가 강해 공장·물류 제어로 넘어갈 때 설명이 필요해집니다.</li>
+      </ul>
+    </div>
+    <div class="box tm">
+      <span class="bt">상표 · 등록 조사 결과</span>
+      <ul class="chk">
+        <li>사업자등록 상호 「래치온」<span class="v ok">0건</span></li>
+        <li>국내 상표 「래치온」<span class="v ok">0건</span></li>
+        <li>국내 상표 「LATCHON」<span class="v ok">0건</span></li>
+        <li>해외 상표 「LATCHON」<span class="v wr">3건</span></li>
+        <li>latchon.co.kr<span class="v ok">미등록</span></li>
+        <li>latchon.kr<span class="v ok">미등록</span></li>
+        <li>latchon.com<span class="v no">선점 2003</span></li>
+      </ul>
+      <div class="risk"><b>남은 리스크</b> — 영어권에서 "latch on"의 1순위 뜻이 <b>수유(모유 물리기)</b>입니다. 미국에 LATCHON INC.(수유 컨설턴트)가 실존해, 영문 브랜딩과 해외 진출에는 부적합합니다. 국내 사용에는 문제가 없습니다.</div>
+    </div>
+  </div>
+  <div class="ft"><span>KIPRIS 권리구분·행정상태 전체 조회 / KISA·Verisign whois 직접 조회 · 2026-08-17</span><span>07</span></div>
+</section>
+
+<!-- 08 탈락 -->
+<section class="slide">
+  <div class="hd"><div class="t">떨어진 셋과 <em>그 이유</em></div><div class="n">Rejected</div></div>
+  <div class="lead">세 이름 모두 상호·상표는 비어 있었습니다. <b>등록이 되는 것과 쓸 만한 것은 다른 문제</b>였습니다.</div>
+  <div class="grid3">
+    <div class="card">
+      <span class="rank">4위 · 검색 소실</span>
+      <span class="nm">컨트롤덱</span>
+      <span class="en">CONTROLDECK</span>
+      <p>무슨 회사인지 가장 잘 전달하지만, <b>동명 제품이 최소 5개</b>입니다 — ASUS 유틸리티, FlexRadio 앱, DJI 마운트, AI 에이전트 툴, Elgato 스트림덱 도구. 고객이 회사명을 검색해도 우리가 안 나옵니다. '덱/데크' 표기도 갈립니다.</p>
+    </div>
+    <div class="card">
+      <span class="rank">5위 · 식별력 결함</span>
+      <span class="nm">릴레이노드</span>
+      <span class="en">RELAYNODE</span>
+      <p>"Relay Node"는 <b>3GPP LTE 이동통신 표준의 일반명사</b>입니다. 검색이 영원히 특허·논문에 묻히고, 상표를 등록해도 권리 범위가 극히 좁아집니다. 5음절이라 전화 전달도 가장 불리합니다.</p>
+    </div>
+    <div class="card">
+      <span class="rank">6위 · 오청 사고</span>
+      <span class="nm">키노드</span>
+      <span class="en">KEYNODE</span>
+      <p><b>"키노트(Keynote)"와 어말 자음 하나 차이</b>입니다. 앞서 텔레메트릭스가 텔레매틱스와 혼동돼 탈락한 것과 같은 사고이고, 키노트가 훨씬 대중적인 단어라 오청 위험은 더 큽니다. 크립토 업체 Keynode도 실존합니다.</p>
+    </div>
+  </div>
+  <div class="ft"><span>사내 기밀</span><span>08</span></div>
+</section>
+
+<!-- 09 인터락스 사례 -->
+<section class="slide">
+  <div class="hd"><div class="t">왜 <em>상표까지</em> 조사했나</div><div class="n">Case</div></div>
+  <div class="lead">중간에 실제로 한 번 걸렸습니다. 사업자등록만 확인하고 끝냈다면 <b>등기까지 마친 뒤에 알게 됐을 문제</b>입니다.</div>
+  <div class="case">
+    <div class="half bad">
+      <span class="tagline">사업자등록 상호 0건 → 안전해 보였음</span>
+      <h3>인터락스</h3>
+      <p>인터락(연동장치)은 방탈출·산업제어 양쪽에서 쓰는 현장 용어라 1차 라운드에서 4순위로 추천했던 이름입니다.</p>
+      <p>그런데 KIPRIS를 열어보니 <b>(주)일흥의 등록상표 4건이 제9·11·12류에서 살아 있었습니다</b>(1995·2006·2006·2017년 등록). 제9류가 바로 우리가 출원해야 할 제어·측정장치류입니다.</p>
+      <p>문자상표가 아니라 <b>도형상표인데도 특허청이 그 로고를 '인터락스'라는 호칭으로 색인</b>해 두고 있었습니다. 상호만 봐서는 절대 못 잡는 지뢰입니다.</p>
+    </div>
+    <div class="half good">
+      <span class="tagline">그래서 만든 3중 확인 절차</span>
+      <h3>상호 → 상표 → 도메인</h3>
+      <p><b>1. 상호</b> — 국세청 사업자등록 DB 1,196만 건에서 동일 상호 조회. 여기서 28개가 걸러졌습니다.</p>
+      <p><b>2. 상표</b> — KIPRIS에서 한글·영문 각각, 권리구분(상표·서비스표·마드리드 국제등록)과 행정상태(출원·공고·등록)를 전부 열고 조회. 지정상품 전문검색까지 병행했습니다.</p>
+      <p><b>3. 도메인</b> — KISA/KRNIC와 Verisign whois 서버에 직접 질의해 .co.kr·.kr·.com 등록 여부와 보유 형태(실사용/판매 파킹)를 확인했습니다.</p>
+    </div>
+  </div>
+  <div class="ft"><span>사내 기밀</span><span>09</span></div>
+</section>
+
+<!-- 10 다음 단계 -->
+<section class="slide">
+  <div class="hd"><div class="t">확정 전 <em>해야 할 일</em></div><div class="n">Next</div></div>
+  <div class="lead">여기까지는 "쓸 수 있다"의 확인입니다. <b>내 것으로 만드는 절차는 별개</b>이고, 순서가 중요합니다.</div>
+  <ol class="steps">
+    <li>
+      <span class="n">01</span>
+      <div>
+        <h3>대법원 인터넷등기소에서 관할 기준 재확인</h3>
+        <p>법인은 <b>같은 관할 등기소 안에 동일·유사 상호가 있으면 등기가 거절</b>됩니다. 이 보고서의 0건은 전국 사업자 기준이므로, 본점 소재지를 정한 뒤 그 관할로 다시 조회해야 합니다.</p>
+      </div>
+    </li>
+    <li>
+      <span class="n">02</span>
+      <div>
+        <h3>도메인은 이름 확정하는 그날 구매</h3>
+        <p><b>relayon.co.kr · relayon.kr</b>을 동시 확보하고, 전화로 불러줄 때 잘못 적기 쉬운 <b>relyon 계열도 함께 잡아 리다이렉트</b>를 겁니다. 국내 B2B에서는 .co.kr이 오히려 신뢰 신호입니다.</p>
+      </div>
+    </li>
+    <li>
+      <span class="n">03</span>
+      <div>
+        <h3>상표는 3개 류 동시 출원</h3>
+        <p><b>제9류</b> 제어·측정장치, <b>제37류</b> 설치·수리·유지보수, <b>제42류</b> 소프트웨어·원격 모니터링. 제42류를 빼먹으면 구독 사업이 무방비가 되고, 2년 뒤 매각 실사에서 IP 항목이 걸립니다.</p>
+      </div>
+    </li>
+    <li>
+      <span class="n">04</span>
+      <div>
+        <h3>법인명 · 제품명 · 구독명 3층 분리</h3>
+        <p>법인 <b>주식회사 릴레이온</b> / 제품 <b>RELAYON C32·C64·C128</b> / 구독 <b>릴레이온 케어 · 릴레이온 오피스</b>. 이 구조라야 타 업종 확장 때 제품 라인만 늘리면 되고, 매각 시 구독 사업을 독립 자산으로 제시할 수 있습니다.</p>
+      </div>
+    </li>
+  </ol>
+  <div class="ft"><span>사내 기밀 · FANTASTRICK</span><span>10</span></div>
+</section>
