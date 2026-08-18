@@ -31,7 +31,11 @@ export default function ReviewsClient({ initialReviews }: { initialReviews: Revi
       <div className="page-top" />
       <h1 className="title" style={{ margin: 0 }}>플레이 후기</h1>
       <p className="lead" style={{ margin: "6px 0 18px" }}>
-        실제 플레이하신 분들이 남겨주신 글을 <b>본인 동의를 받아</b> 옮겨온 후기예요. 카드를 누르면 전문을 볼 수 있어요.
+        실제 플레이하신 분들이 남겨주신 글을 <b>본인 동의를 받아</b> 옮겨온 후기예요.
+        {/* 두 문장은 성격이 다르다 — 앞은 "출처가 어디냐", 뒤는 "어떻게 보느냐".
+            한 줄로 붙이면 안내가 길게 늘어져 눈에 안 들어와, 줄을 나눈다(2026-08-18 사장님 지시). */}
+        <br />
+        카드를 누르면 전문을 볼 수 있어요.
       </p>
 
       {/* 필터 — aria-pressed 로 "지금 이게 눌린 상태"를 화면낭독기에도 알린다(색만으로 알리지 않기) */}
