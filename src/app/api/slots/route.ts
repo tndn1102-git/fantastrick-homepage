@@ -4,7 +4,7 @@ import { sweepExpiredReservations } from "@/lib/expire";
 import { rateLimit, getClientIp } from "@/lib/ratelimit";
 import { getConfig } from "@/lib/settings";
 import { RESERVATION_OPEN_DAYS_AHEAD, RESERVATION_OPEN_HOUR_KST } from "@/lib/util";
-import { THEMES, slotsForThemeDate } from "@/lib/data";
+import { THEMES, slotsForThemeDate, themeById } from "@/lib/data";
 
 /** 이 응답을 클라우드플레어가 30초 동안 대신 돌려준다 — 같은 질문이 몰려도 서버는 한 번만 깬다.
  *  마감 판정의 최종 책임은 서버(uq_res_slot)에 있으므로 30초 정도 낡아도 이중예약이 되지 않는다.
@@ -126,6 +126,28 @@ export async function GET(req: NextRequest) {
     .neq("status", "cancelled");
   const takenTimes = (taken || []).map((t: { time: string }) => t.time);
 
+  /* 그 테마·그 날짜에 **회차가 몇 시에 있는지**(시간표)도 같이 담는다 — 2026-08-19.
+
+     [왜] 이 응답은 오랫동안 "막힌 시간"만 알려줬다. 받는 쪽이 "남은 자리"를 그리려면
+          우리가 몇 시에 운영하는지를 알아야 하는데 그 값이 이 응답에 없었다.
+          그래서 예약 정보를 가져가는 외부 프로그램(빠방)의 목록에서
+          **우리 매장 세 곳 모두 예약 가능 시간이 빈 채로 들어가 있었다**(2026-08-19 실측:
+          그쪽 색인의 reserve_times_d0 ~ d6 이 전부 []). 그쪽은 "남은 시간"이 있는 방만
+          목록에 띄우기 때문에, 빈 값이면 우리 방은 아예 안 보인다.
+          같은 이유를 ?all=1 응답에서는 이미 해결해 뒀는데(scheduleByDate),
+          정작 그 프로그램이 주로 부르는 건 이 테마별 주소였다.
+
+     [무엇을] slots = 그날 회차 전부 · open = 그중 아직 안 막힌 것.
+          받는 쪽이 뺄셈을 안 해도 되도록 계산해서 준다.
+     ⚠️ 지난 시간은 걸러내지 않는다 — "지금 이후"의 기준은 보는 쪽 시계로 정해야 한다.
+     ⚠️ 우리 화면은 이 값을 안 쓴다(/api/config 를 따로 부른다). 늘어난 건 안 쓰는 값뿐. */
+  const cfg = await getConfig();
+  const slots = slotsForThemeDate(
+    cfg.themeSlots, cfg.storeSlots, cfg.timeSlots,
+    theme, themeById(theme)?.store, date,
+  );
+  const closedSet = new Set([...blocked, ...takenTimes]);
+
   // blocked = 손님 화면이 쓰는 "고를 수 없는 시간" 전부(마감 + 예약참).
   // taken 은 그중 **예약이 차서** 막힌 것만 따로 준다 — 관리자 화면이
   // "마감"과 "예약있음"을 구분해 보여줘야 하기 때문이다(2026-07-31).
@@ -133,5 +155,7 @@ export async function GET(req: NextRequest) {
     dayClosed,
     blocked: Array.from(new Set([...blocked, ...takenTimes])),
     taken: Array.from(new Set(takenTimes)),
+    slots,                                                        // 그날 회차 전부
+    open: dayClosed ? [] : slots.filter((t) => !closedSet.has(t)), // 남은 자리
   }, { headers: CACHE });
 }
