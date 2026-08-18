@@ -43,7 +43,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ all: true, blockedSlots: bs || [], reservations: rv || [] }, { headers: CACHE });
   }
 
-  const theme = req.nextUrl.searchParams.get("theme") || "";
+  /* 테마 이름표는 'theme' 이다. 'themeId' 도 같이 받아준다.
+     이유: 예약 정보를 가져가는 외부 프로그램이 옛 워드프레스 시절 이름인 'themeId' 로 물어본다.
+     이름이 안 맞으니 테마가 빈 값이 되어, **예약이 찬 시간을 하나도 안 알려주고 있었다**
+     (8/22 태초의 신부가 10타임 만석인데 저쪽에는 "전부 비어 있음"으로 나갔다 — 2026-08-18 실측).
+     그 사이트에 우리 방이 늘 예약 가능으로 떠서 손님이 헛걸음하는 상태였다.
+     ⚠️ 우리 화면은 전부 'theme' 을 보내므로 순서상 항상 먼저 잡힌다 — 동작이 달라지지 않는다.
+     ⚠️ 요청에 'themeId' 가 붙어 오는 것 자체는 그대로다. 나중에 그 프로그램만 골라내야 할 때
+        여전히 같은 방법으로 구분할 수 있다(값을 받아준다고 표시가 사라지지 않는다). */
+  const theme =
+    req.nextUrl.searchParams.get("theme") ||
+    req.nextUrl.searchParams.get("themeId") ||
+    "";
   const date = req.nextUrl.searchParams.get("date") || "";
   if (!date) return NextResponse.json({ blocked: [], dayClosed: false });
 
