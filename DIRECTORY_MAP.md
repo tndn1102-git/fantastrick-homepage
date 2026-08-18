@@ -20,6 +20,8 @@ fantastrick-homepage\   ← Next.js 웹앱 (예약·리뷰 자체 시스템)
 │  │                       `npx tsx scripts/import-from-wp.mts` (미리보기) · `--apply` (실제)
 │  ├─ images-to-webp.mjs ← 사진을 미리 줄여 webp 로. **새 사진 넣을 때마다 돌릴 것**
 │  │                       (자동 변환을 껐기 때문에 아무도 안 줄여준다) `--apply` 로 실행
+│  ├─ blog-photos.mjs   ← 블로그 후기에 쓸 사진 후보 내려받기 + 붙임장(_contact.jpg)
+│  │                       고르는 규칙은 CLAUDE.md 8장. 손님 단체사진은 쓰지 말 것
 │  ├─ smoke-test.mjs     ← ⭐전체 점검 21항목. 13쪽 사진·실패요청·JS오류 + 예약조회 입금안내
 │  │                        + 챗봇 + 예약금 팝업 잠금·뒤로가기 차단.
 │  │                        조회·접수 응답을 가로채므로 **진짜 DB 는 안 건드린다**

@@ -1009,6 +1009,22 @@ footer ul li{padding:3px 0}
 .rev-card:hover .rc-more{opacity:1}
 @media(max-width:520px){.rev-cards{grid-template-columns:1fr}}
 
+/* 후기 사진 (2026-08-18) — 블로거가 올린 사진 중 **사람이 안 찍힌 것**만 손으로 골라 넣는다.
+   고르는 규칙과 순서는 src/lib/review-photos.ts 주석에 있다. */
+.rev-card .rc-photo{width:100%;height:150px;object-fit:cover;display:block;
+  border-radius:var(--r) var(--r) 0 0;background:#0d1428}
+/* 사진이 카드 맨 위에 붙으므로, 사진이 있을 때는 위쪽 여백을 사진이 대신한다 */
+.rev-card .rc-photo + .rc-top{margin-top:2px}
+
+.rev-modal .rm-photos{display:grid;gap:8px;margin:14px 24px 0;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.rev-modal .rm-photos img{width:100%;max-height:340px;object-fit:cover;display:block;
+  border-radius:var(--r-sm);border:1px solid var(--line);background:#0d1428}
+@media(max-width:520px){
+  .rev-modal .rm-photos{grid-template-columns:1fr;margin-left:16px;margin-right:16px}
+  .rev-card .rc-photo{height:170px}
+}
+
 /* ── 후기 전문 팝업 ── */
 /* 팝업도 카드와 같은 결 — 제목·이름 묶음에 색띠를 깐다(C안).
    패딩을 0 으로 내리고 각 줄이 여백을 갖는다(카드와 같은 이유: 띠가 좌우 끝까지 닿아야 함). */

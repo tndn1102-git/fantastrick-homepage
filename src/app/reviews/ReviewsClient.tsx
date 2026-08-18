@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { THEMES, themeColor } from "@/lib/data";
 import { formatDate } from "@/lib/util";
+import { photosFor } from "@/lib/review-photos";
 import type { Review } from "./types";
 
 // 후기 목록은 **서버가 미리 그려서** initialReviews 로 넘겨준다(화면 튐 방지 — page.tsx 설명 참고).
@@ -71,6 +72,13 @@ export default function ReviewsClient({ initialReviews }: { initialReviews: Revi
             <button key={r.id} type="button" className="rev-card" onClick={() => setOpen(r)}
                     style={{ "--th": themeColor(r.theme_id) } as CSSProperties}
                     aria-label={`${r.name}님의 ${r.theme_name} 후기 전문 보기`}>
+              {/* 사진이 있으면 카드 맨 위에 한 장. 후기 목록이 글자만이면 밋밋해서
+                  어느 테마 후기인지 눈에 안 들어온다(2026-08-18 사장님 요청). */}
+              {photosFor(r.source_url)[0] && (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img className="rc-photo" src={photosFor(r.source_url)[0].src}
+                     alt={photosFor(r.source_url)[0].alt} loading="lazy" />
+              )}
               <div className="rc-top">
                 <span className="rc-theme">{r.theme_name}</span>
                 {/* 카드 안에서는 출처를 **글자로만** 둔다. 버튼 안에 링크를 넣으면
@@ -121,6 +129,14 @@ function ReviewModal({ r, onClose }: { r: Review; onClose: () => void }) {
         </div>
         {/* 본문은 줄바꿈을 살린다 — 블로그에서 옮겨온 글은 문단이 나뉘어 있는데
             그냥 두면 한 덩어리로 붙어 읽기 어렵다. */}
+        {photosFor(r.source_url).length > 0 && (
+          <div className="rm-photos">
+            {photosFor(r.source_url).map((ph) => (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img key={ph.src} src={ph.src} alt={ph.alt} loading="lazy" />
+            ))}
+          </div>
+        )}
         <div className="rm-body">{r.body}</div>
         {/* 출처 — 원문 주소가 있으면 **눌러서 원글로 갈 수 있게** 한다.
             글을 써주신 분께 방문이 돌아가야 인용이지, 가져오기가 아니다.
