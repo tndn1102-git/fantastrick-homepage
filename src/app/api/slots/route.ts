@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
 import { sweepExpiredReservations } from "@/lib/expire";
 import { rateLimit, getClientIp } from "@/lib/ratelimit";
+import { getConfig } from "@/lib/settings";
+import { RESERVATION_OPEN_DAYS_AHEAD, RESERVATION_OPEN_HOUR_KST } from "@/lib/util";
+import { THEMES, slotsForThemeDate } from "@/lib/data";
 
 /** 이 응답을 클라우드플레어가 30초 동안 대신 돌려준다 — 같은 질문이 몰려도 서버는 한 번만 깬다.
  *  마감 판정의 최종 책임은 서버(uq_res_slot)에 있으므로 30초 정도 낡아도 이중예약이 되지 않는다.
@@ -36,11 +39,57 @@ export async function GET(req: NextRequest) {
   if (req.nextUrl.searchParams.get("all")) {
     // 어제(KST)부터 — 오늘 지난 시간대는 화면이 알아서 걸러내므로 넉넉히 포함해도 무방.
     const from = new Date(Date.now() + 9 * 3600 * 1000 - 86400000).toISOString().slice(0, 10);
-    const [{ data: bs }, { data: rv }] = await Promise.all([
+    /* 시간표(어느 시각에 회차가 있는지)도 같이 담는다 — 2026-08-18.
+       [왜] 이 응답은 "어디가 찼는지"만 알려준다. 받는 쪽이 "남은 자리"를 계산하려면
+            **우리가 몇 시에 운영하는지**를 알아야 하는데, 그건 /api/config 에만 있었다.
+            예약 정보를 가져가는 외부 프로그램이 이 주소만 부르고 /api/config 는 안 불러서,
+            찬 자리는 알아도 빈 자리를 못 그리는 상태였다(2026-08-18 실측).
+       [무엇을] 시간표(timeSlots·themeSlots·storeSlots)와 예약 오픈 규칙만 담는다.
+            공지·예약금 같은 나머지 설정은 이 주소와 상관없으므로 넣지 않는다.
+            값의 출처는 /api/config 와 같은 getConfig() 하나다 — 두 곳이 어긋날 수 없다.
+       ⚠️ 우리 예약 화면은 /api/config 를 따로 부르므로 동작이 달라지지 않는다(그냥 안 쓰는 값이 는다). */
+    const [{ data: bs }, { data: rv }, cfg] = await Promise.all([
       db.from("blocked_slots").select("theme_id, date, time").gte("date", from),
       db.from("reservations").select("theme_id, date, time").gte("date", from).neq("status", "cancelled"),
+      getConfig(),
     ]);
-    return NextResponse.json({ all: true, blockedSlots: bs || [], reservations: rv || [] }, { headers: CACHE });
+    return NextResponse.json({
+      all: true,
+      blockedSlots: bs || [],
+      reservations: rv || [],
+      // ── 아래부터가 "빈 자리 계산"에 필요한 자료 ──
+      timeSlots: cfg.timeSlots,     // 기본 시간표
+      themeSlots: cfg.themeSlots,   // 테마별·요일별 시간표 (있으면 이게 우선)
+      storeSlots: cfg.storeSlots,   // 매장별·요일별 시간표 (테마 설정 없을 때)
+      // 예약창이 언제 열리는지 — 이용일 7일 전 21:00(KST)
+      openDaysAhead: RESERVATION_OPEN_DAYS_AHEAD,
+      openHourKst: RESERVATION_OPEN_HOUR_KST,
+      /* 위 themeSlots 를 **날짜별로 이미 계산해 둔 것**. 받는 쪽이 요일을 직접 따질 필요가 없다.
+         { "2026-08-22": { "firstfoundbride": ["10:00", ...], ... }, ... }
+
+         [왜 계산까지 해서 주나] 원본(themeSlots)만 주면 받는 쪽이 세 가지 규칙을 스스로 맞춰야 한다:
+           ① 요일은 날짜 문자열 그대로의 요일(0=일 … 6=토)
+           ② byDow 에 그 요일이 있으면 그것, 없으면 default
+           ③ 테마 시간표 > 매장 시간표 > 전역 시간표 순
+         셋 중 하나만 틀려도 엉뚱한 시간표가 나온다. 실제로 이 응답을 만들면서 테스트하다
+         요일을 하루 밀려 계산해 **8회차짜리 평일 시간표를 토요일에 적용한 적이 있다**(2026-08-18).
+         우리가 쓰는 함수(slotsForThemeDate)로 미리 풀어서 주면 그 실수가 아예 생길 수 없고,
+         우리 예약 화면과 **한 글자도 다를 수 없다**(같은 함수를 쓰므로).
+         ⚠️ 시간표 규칙이 바뀌어도 이 값은 자동으로 따라간다 — 손댈 필요 없음. */
+      scheduleByDate: (() => {
+        const out: Record<string, Record<string, string[]>> = {};
+        const base = Date.now() + 9 * 3600 * 1000 - 86400000; // 어제(KST)부터
+        for (let i = 0; i <= RESERVATION_OPEN_DAYS_AHEAD + 1; i++) {
+          const day = new Date(base + i * 86400000).toISOString().slice(0, 10);
+          const perTheme: Record<string, string[]> = {};
+          for (const t of THEMES) {
+            perTheme[t.id] = slotsForThemeDate(cfg.themeSlots, cfg.storeSlots, cfg.timeSlots, t.id, t.store, day);
+          }
+          out[day] = perTheme;
+        }
+        return out;
+      })(),
+    }, { headers: CACHE });
   }
 
   /* 테마 이름표는 'theme' 이다. 'themeId' 도 같이 받아준다.
