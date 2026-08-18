@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { THEMES, themeColor } from "@/lib/data";
 import { formatDate } from "@/lib/util";
 import { photosFor } from "@/lib/review-photos";
+import { toParagraphs, toReadableText } from "@/lib/review-text";
 import type { Review } from "./types";
 
 // 후기 목록은 **서버가 미리 그려서** initialReviews 로 넘겨준다(화면 튐 방지 — page.tsx 설명 참고).
@@ -86,7 +87,7 @@ export default function ReviewsClient({ initialReviews }: { initialReviews: Revi
                     원문으로 가는 링크는 아래 전문 팝업에 있다. */}
                 {r.source && r.source !== "자체" && <span className="rc-src">{r.source}</span>}
               </div>
-              <p className="rc-body">{r.body}</p>
+              <p className="rc-body">{toReadableText(r.body)}</p>
               <div className="rc-foot">
                 <span className="rc-who">{r.name}</span>
                 <span className="rc-date">{formatDate(r.created_at.slice(0, 10))}</span>
@@ -137,7 +138,9 @@ function ReviewModal({ r, onClose }: { r: Review; onClose: () => void }) {
             ))}
           </div>
         )}
-        <div className="rm-body">{r.body}</div>
+        <div className="rm-body">
+          {toParagraphs(r.body).map((para, i) => <p key={i}>{para}</p>)}
+        </div>
         {/* 출처 — 원문 주소가 있으면 **눌러서 원글로 갈 수 있게** 한다.
             글을 써주신 분께 방문이 돌아가야 인용이지, 가져오기가 아니다.
             rel 의 nofollow 는 "이 글의 원본은 우리가 아니다"를 검색엔진에 알리는 표시다. */}

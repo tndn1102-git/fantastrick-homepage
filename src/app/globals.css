@@ -1028,7 +1028,13 @@ footer ul li{padding:3px 0}
 /* ── 후기 전문 팝업 ── */
 /* 팝업도 카드와 같은 결 — 제목·이름 묶음에 색띠를 깐다(C안).
    패딩을 0 으로 내리고 각 줄이 여백을 갖는다(카드와 같은 이유: 띠가 좌우 끝까지 닿아야 함). */
-.rev-modal{max-width:600px;border-top:4px solid var(--th,var(--cyan));padding:0 0 20px;overflow:hidden}
+/* 폭 — 2026-08-18 사장님 지적: 좌우가 좁아 글이 답답했다.
+   읽기 좋은 한 줄 길이는 한글 기준 35~45자다. 760px + 좌우 여백 32px 이면 그 언저리가 된다.
+   화면이 작으면 화면 폭을 따라가되(92vw) 그 이상은 안 넓힌다 — 너무 길면 눈이 다음 줄을 못 찾는다. */
+/* ⚠️ 선택자를 .modal.rev-modal 로 쓴다(그냥 .rev-modal 이면 폭이 안 먹는다).
+   공통 팝업 규칙 .modal{max-width:440px} 이 이 파일 **뒤쪽**에 있어서, 같은 우선순위면 그쪽이 이긴다.
+   실제로 760px 로 적어놨는데 440px 로 나왔다(2026-08-18). 클래스를 하나 더 붙여 우선순위를 올린다. */
+.modal.rev-modal{width:min(760px,92vw);max-width:760px;border-top:4px solid var(--th,var(--cyan));padding:0 0 22px;overflow:hidden}
 .rev-modal .close-x{margin:10px 14px 0}
 .rev-modal .rm-head{background:color-mix(in srgb,var(--th,transparent) 22%,transparent);
   padding:14px 24px 13px;margin-bottom:16px;
@@ -1039,8 +1045,15 @@ footer ul li{padding:3px 0}
 .rev-modal .rm-date{font-size:12px;font-weight:400;color:var(--faint);margin-left:auto}
 /* pre-line — 원문의 줄바꿈을 살린다. 블로그에서 옮겨온 후기는 문단이 나뉘어 있는데,
    그냥 두면 전부 한 덩어리로 붙어 읽기 어렵다(연속 공백은 접어서 들여쓰기 사고는 막는다). */
-.rev-modal .rm-body{margin:0 24px;font-size:14.5px;color:var(--text);line-height:1.8;white-space:pre-line;
-  max-height:52vh;overflow:auto;padding-right:4px}
+.rev-modal .rm-body{margin:0 32px;font-size:15.5px;color:var(--text);line-height:1.85;
+  letter-spacing:-.003em;max-height:min(56vh,520px);overflow:auto;
+  word-break:keep-all;overflow-wrap:anywhere}
+/* 문단 사이 숨 쉴 자리. 줄바꿈(pre-line)이 아니라 문단(<p>)으로 그리므로 들쭉날쭉하지 않다 */
+.rev-modal .rm-body p{margin:0 0 .85em}
+.rev-modal .rm-body p:last-child{margin-bottom:0}
+@media(max-width:520px){
+  .rev-modal .rm-body{margin:0 18px;font-size:15px;line-height:1.8;max-height:60vh}
+}
 .rev-modal .rm-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;
   margin:18px 24px 0;padding-top:14px;border-top:1px solid var(--line)}
 /* 출처 링크 — 눌러서 원문으로 간다. 글을 써주신 분께 방문이 돌아가야 인용이지, 가져오기가 아니다. */
