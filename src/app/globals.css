@@ -1034,8 +1034,19 @@ footer ul li{padding:3px 0}
 /* ⚠️ 선택자를 .modal.rev-modal 로 쓴다(그냥 .rev-modal 이면 폭이 안 먹는다).
    공통 팝업 규칙 .modal{max-width:440px} 이 이 파일 **뒤쪽**에 있어서, 같은 우선순위면 그쪽이 이긴다.
    실제로 760px 로 적어놨는데 440px 로 나왔다(2026-08-18). 클래스를 하나 더 붙여 우선순위를 올린다. */
-.modal.rev-modal{width:min(760px,92vw);max-width:760px;border-top:4px solid var(--th,var(--cyan));padding:0 0 22px;overflow:hidden}
-.rev-modal .close-x{margin:10px 14px 0}
+/* ⚠️ 선택자를 .modal.rev-modal 로 쓴다(그냥 .rev-modal 이면 폭이 안 먹는다).
+   공통 팝업 규칙 .modal{max-width:440px} 이 이 파일 **뒤쪽**에 있어서, 같은 우선순위면 그쪽이 이긴다.
+   실제로 760px 로 적어놨는데 440px 로 나왔다(2026-08-18). 클래스를 하나 더 붙여 우선순위를 올린다.
+
+   🔴 2026-08-18 — **팝업 전체가 스크롤되게 바꿨다.**
+   사진이 들어가면서 팝업이 화면보다 커졌는데 overflow:hidden 이라 **아래가 잘려 나갔다.**
+   글 뒷부분은 물론 [원문 보기]·[닫기] 줄까지 손이 닿지 않았다(사장님 지적).
+   → 팝업 자체에 최대 높이와 스크롤을 주고, 안쪽 본문은 높이 제한을 없앤다.
+     본문만 스크롤시키면 사진·머리글은 고정된 채 글만 움직여, 정작 아래 버튼은 계속 안 보인다. */
+.modal.rev-modal{width:min(760px,92vw);max-width:760px;border-top:4px solid var(--th,var(--cyan));
+  padding:0 0 22px;max-height:min(88vh,900px);overflow-y:auto;overscroll-behavior:contain}
+/* 팝업이 길어져 스크롤되므로, 닫기(X)는 위에 붙어 따라다니게 한다 */
+.rev-modal .close-x{margin:10px 14px 0;position:sticky;top:10px;z-index:2}
 .rev-modal .rm-head{background:color-mix(in srgb,var(--th,transparent) 22%,transparent);
   padding:14px 24px 13px;margin-bottom:16px;
   border-bottom:1px solid color-mix(in srgb,var(--th,transparent) 26%,transparent)}
@@ -1046,13 +1057,12 @@ footer ul li{padding:3px 0}
 /* pre-line — 원문의 줄바꿈을 살린다. 블로그에서 옮겨온 후기는 문단이 나뉘어 있는데,
    그냥 두면 전부 한 덩어리로 붙어 읽기 어렵다(연속 공백은 접어서 들여쓰기 사고는 막는다). */
 .rev-modal .rm-body{margin:0 32px;font-size:15.5px;color:var(--text);line-height:1.85;
-  letter-spacing:-.003em;max-height:min(56vh,520px);overflow:auto;
-  word-break:keep-all;overflow-wrap:anywhere}
+  letter-spacing:-.003em;word-break:keep-all;overflow-wrap:anywhere}
 /* 문단 사이 숨 쉴 자리. 줄바꿈(pre-line)이 아니라 문단(<p>)으로 그리므로 들쭉날쭉하지 않다 */
 .rev-modal .rm-body p{margin:0 0 .85em}
 .rev-modal .rm-body p:last-child{margin-bottom:0}
 @media(max-width:520px){
-  .rev-modal .rm-body{margin:0 18px;font-size:15px;line-height:1.8;max-height:60vh}
+  .rev-modal .rm-body{margin:0 18px;font-size:15px;line-height:1.8}
 }
 .rev-modal .rm-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;
   margin:18px 24px 0;padding-top:14px;border-top:1px solid var(--line)}
