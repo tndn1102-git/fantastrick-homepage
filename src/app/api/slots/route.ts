@@ -107,23 +107,19 @@ export async function GET(req: NextRequest) {
   const date = req.nextUrl.searchParams.get("date") || "";
   if (!date) return NextResponse.json({ blocked: [], dayClosed: false });
 
-  // 그 날짜의 차단 슬롯 (테마 일치 또는 테마 무관 전체 차단)
-  const { data } = await db
-    .from("blocked_slots")
-    .select("theme_id, time")
-    .eq("date", date);
+  /* 세 가지를 **한꺼번에** 묻는다 — 차단 시간 · 예약된 시간 · 시간표 설정.
+     차례로 기다리면 왕복이 3번 쌓인다. 서로 상관없는 질문이라 같이 보내도 된다. */
+  const [{ data }, { data: taken }, cfg] = await Promise.all([
+    // 그 날짜의 차단 슬롯 (테마 일치 또는 테마 무관 전체 차단)
+    db.from("blocked_slots").select("theme_id, time").eq("date", date),
+    // 이미 예약된 시간도 불가 처리
+    db.from("reservations").select("time").eq("theme_id", theme).eq("date", date).neq("status", "cancelled"),
+    getConfig(),
+  ]);
 
   const rows = (data || []).filter((b: { theme_id: string | null }) => !b.theme_id || b.theme_id === theme);
   const dayClosed = rows.some((b: { time: string | null }) => !b.time);
   const blocked = rows.filter((b: { time: string | null }) => b.time).map((b: { time: string }) => b.time);
-
-  // 이미 예약된 시간도 불가 처리
-  const { data: taken } = await db
-    .from("reservations")
-    .select("time")
-    .eq("theme_id", theme)
-    .eq("date", date)
-    .neq("status", "cancelled");
   const takenTimes = (taken || []).map((t: { time: string }) => t.time);
 
   /* 그 테마·그 날짜에 **회차가 몇 시에 있는지**(시간표)도 같이 담는다 — 2026-08-19.
@@ -141,7 +137,7 @@ export async function GET(req: NextRequest) {
           받는 쪽이 뺄셈을 안 해도 되도록 계산해서 준다.
      ⚠️ 지난 시간은 걸러내지 않는다 — "지금 이후"의 기준은 보는 쪽 시계로 정해야 한다.
      ⚠️ 우리 화면은 이 값을 안 쓴다(/api/config 를 따로 부른다). 늘어난 건 안 쓰는 값뿐. */
-  const cfg = await getConfig();
+
   const slots = slotsForThemeDate(
     cfg.themeSlots, cfg.storeSlots, cfg.timeSlots,
     theme, themeById(theme)?.store, date,
