@@ -28,10 +28,10 @@ const SCOPES = [
   { id: "software", label: "매장 운영 프로그램", short: "프로그램", sub: "출퇴근, 대타 스케줄 관리, 쿠폰발행기, 홈페이지 등등" },
 ];
 
-const KINDS = ["테마 통째로 맡기기", "장치와 기계", "운영 프로그램", "그 밖에"];
+const KINDS = ["테마 전체 맡기기", "장치와 기계", "운영 프로그램", "그 밖에"];
 // 보고 있는 화면에 맞춰 문의 유형을 미리 골라 둔다
 const KIND_BY_SCOPE: Record<string, string> = {
-  turnkey: "테마 통째로 맡기기", device: "장치와 기계", software: "운영 프로그램",
+  turnkey: "테마 전체 맡기기", device: "장치와 기계", software: "운영 프로그램",
 };
 
 /* 근무표 도해용 데이터.
@@ -231,10 +231,11 @@ export default function BusinessPage() {
               "턴키 시공사 소개"로 규정됐다. 그러면 아래 선택은 셋 중 고르는 자리가 아니라
               "턴키를 보는 방법 세 가지"로 읽힌다. 그 문장은 턴키 표제로 옮겼다. */}
           <div className="kicker">방탈출 인테리어 제작, 장치, 매장 운영 프로그램까지 모든 것</div>
-          <h1>테마를 만드는 일부터<br />매장을 운영하는 일까지.</h1>
+          <h1>테마를 만드는 일부터<br />매장을 운영하는 일까지!</h1>
           <p className="sub">
-            방탈출 테마를  통째로 만드는 일부터, 테마 내 장치를 움직이는 기계 그리고 매장을 운영하는 프로그램까지. 2012년부터 방탈출 매장을 운영해온 노하우로 
-전부 설계해드립니다.
+            방탈출 테마를  통째로 만드는 일부터, 테마 내 장치를 움직이는 기계 
+그리고 매장을 운영하는 프로그램까지. 
+2012년부터 방탈출 매장을 운영해온 노하우로 전부 설계해드립니다.
           </p>
           <div className="bz-cta">
             <a className="btn primary" href="#cta">문의하기</a>
@@ -242,7 +243,6 @@ export default function BusinessPage() {
           </div>
           <div className="strip">
             <div><b>EST. 2012</b></div>
-            <div><b>강남 3곳</b></div>
             <div><b>기획부터 장치 프로그램까지 모든 것</b></div>
           </div>
         </div>
@@ -256,7 +256,7 @@ export default function BusinessPage() {
             <div className="ask reveal">매장을 새로 오픈하고 싶은데 어디서부터 문의를 해야할지 모르겠어요.</div>
             <div className="ask reveal">장치가 작동을 안 하는데 어디로 문의해야 할지 모르겠어요.</div>
             <div className="ask reveal">테마를 하나 더 만들거나 인테리어를 어디에서 상담해야할까?</div>
-            <div className="ask reveal">출퇴근 프로그램, 대타 스케줄 관리, 급여 계산,<br />홈페이지 등등 운영 프로그램을 도입하고 싶다.</div>
+            <div className="ask reveal">출퇴근 프로그램, 대타 스케줄 관리, 급여 계산,<br />홈페이지 등등 운영 프로그램을 도입하고 싶어요.</div>
           </div>
         </section>
       </div>
@@ -274,7 +274,7 @@ export default function BusinessPage() {
       <div className={`scopepick on-${here}`} id="scopebar">
         <div className="wrap">
           <div className="sp-head">
-            <h2 id="scope-q">어떤 것이 궁금하신가?</h2>
+            <h2 id="scope-q">어떤 것이 궁금하신가요?</h2>
           </div>
           <div className="sp-cards" aria-labelledby="scope-q">
             {SCOPES.map((s, i) => (
@@ -331,9 +331,9 @@ export default function BusinessPage() {
             </g>
           </svg>
           <p className="lead reveal">
-            대부분은 스토리, 인테리어, 장치를 각각 다른 데 맡깁니다. 저희는 세 가지를 다 한팀에서 진행합니다.
- 방탈출 제작을 2012년부터 쭉 한팀으로 운영해온 노하우로 
-최고의 테마를 제작해드립니다.
+            대부분은 스토리, 인테리어, 장치를 각각 다른 데 맡깁니다. 저희는 세 가지를 다 한팀에서 진행합니다. 
+방탈출 제작을 2012년부터 쭉 한팀으로 
+운영해온 노하우로 최고의 테마를 제작해드립니다.
           </p>
 
           <div className="trio">
@@ -392,11 +392,11 @@ export default function BusinessPage() {
           {/* 공정 5단계 */}
           <h3 className="reveal pn-h3">진행 순서</h3>
           <div className="rail reveal" style={{ marginTop: 18 }}>
-            <div><b>현장 방문</b><span>현장 보고 방 개수와 장치 세기</span><i>자체 인력</i></div>
-            <div><b>기획과 시나리오</b><span>스토리와 문제 설계</span><i>자체 인력</i></div>
-            <div><b>설계와 인테리어</b><span>도면, 세트, 마감</span><i>자체 인력</i></div>
-            <div><b>전기와 장치</b><span>배선, 장치 제작, 기계</span><i>자체 인력</i></div>
-            <div><b>공사와 오픈</b><span>현장 준비, 진행 담당 교육</span><i>자체 인력</i></div>
+            <div><b>현장 방문</b><span>현장 보고 컨설팅 및 설계 진행</span><i>FANTASTRICK TEAM</i></div>
+            <div><b>기획과 시나리오</b><span>스토리와 문제 설계</span><i>FANTASTRICK TEAM</i></div>
+            <div><b>설계와 인테리어</b><span>도면, 세트, 마감</span><i>FANTASTRICK TEAM</i></div>
+            <div><b>전기와 장치</b><span>배선, 장치 제작, 기계</span><i>FANTASTRICK TEAM</i></div>
+            <div><b>공사와 오픈</b><span>현장 준비, 진행 담당 교육</span><i>FANTASTRICK TEAM</i></div>
           </div>
 
           {/* 우리가 만든 방들 */}
@@ -444,11 +444,11 @@ export default function BusinessPage() {
 
             <div className="rowlab">작동을 안 할 때 전화할 곳</div>
             <div><span className="mk n">&times;</span><span className="t mut">시공사, 제작사, 부품사</span></div>
-            <div className="usc"><span className="mk y">&#10003;</span><span className="t">만든 사람이 직접 받습니다</span></div>
+            <div className="usc"><span className="mk y">&#10003;</span><span className="t">FANTASTRICK  TEAM이 직접 받습니다.</span></div>
 
             <div className="rowlab">부품 단종되면</div>
             <div><span className="mk n">&times;</span><span className="t mut">그 업체만 만드는 기판</span></div>
-            <div className="usc"><span className="mk y">&#10003;</span><span className="t">시중에서 구할 수 있는 부품</span></div>
+            <div className="usc"><span className="mk y">&#10003;</span><span className="t">시중에서 구하기 용이한 부품들</span></div>
 
             <div className="rowlab">매장 운영 프로그램</div>
             <div><span className="mk n">&times;</span><span className="t mut">없음</span></div>
@@ -456,7 +456,7 @@ export default function BusinessPage() {
 
             <div className="rowlab">만든 데가 방탈출을 하는가</div>
             <div><span className="mk n">&times;</span><span className="t mut">아니오</span></div>
-            <div className="usc"><span className="mk y">&#10003;</span><span className="t">강남 3곳 · EST. 2012</span></div>
+            <div className="usc"><span className="mk y">&#10003;</span><span className="t">EST. 2012</span></div>
           </div>
         </section>
 
@@ -470,9 +470,12 @@ export default function BusinessPage() {
         <section className="bz-sec" id="cta">
           <div className="ctabox reveal">
             <div className="kicker" style={{ justifyContent: "center" }}>CONTACT</div>
-            <h2>한번 보러 가겠습니다.</h2>
-            <p className="lead center">지금 쓰시는 게 있어도 괜찮습니다. 안 뜯고 볼 수 있는 것부터 봅니다.
-              방 몇 개인지, 장치가 몇 개 붙어 있는지, 고장 나면 지금 어떻게 하시는지. 그 정도만 보면 됩니다.</p>
+            <h2>컨설팅 문의하기</h2>
+            <p className="lead center">새로운 테마도 좋고, 현재 운영중인 테마도 괜찮습니다. 
+인테리어 리모델링, 장치, 문제. 설계, 운영 프로그램까지
+방탈출 매장에 필요한 모든 것을 편하게 문의해주세요 
+FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에 
+최적의 답변을 고객님께 전달드립니다!!</p>
             {sent ? (
               <div className="bzdone">
                 <b>문의 잘 받았습니다.</b>
@@ -513,13 +516,12 @@ export default function BusinessPage() {
                   </div>
                 </form>
                 {formErr && <div className="bzerr">{formErr}</div>}
-                <div className="micro">보고 나서 안 하셔도 됩니다.<br />연락은 한 번만 드립니다.</div>
               </>
             )}
           </div>
 
           <div className="crossline reveal" style={{ marginTop: 22 }}>
-            <p>브랜드 팝업이나 기업 교육처럼 방탈출 매장이 아닌 곳에 만드는 일도 합니다.</p>
+            <p>브랜드 팝업이나 기업 교육처럼 방탈출 매장이 아닌 곳과의 협업도 가능합니다.</p>
             <Link prefetch={false} href="/business/collab">협업 이야기 보기 →</Link>
           </div>
         </section>
@@ -851,9 +853,12 @@ export default function BusinessPage() {
         <section className="bz-sec" id="cta">
           <div className="ctabox reveal">
             <div className="kicker" style={{ justifyContent: "center" }}>CONTACT</div>
-            <h2>한번 보러 가겠습니다.</h2>
-            <p className="lead center">지금 쓰시는 게 있어도 괜찮습니다. 안 뜯고 볼 수 있는 것부터 봅니다.
-              방 몇 개인지, 장치가 몇 개 붙어 있는지, 고장 나면 지금 어떻게 하시는지. 그 정도만 보면 됩니다.</p>
+            <h2>컨설팅 문의하기</h2>
+            <p className="lead center">새로운 테마도 좋고, 현재 운영중인 테마도 괜찮습니다. 
+인테리어 리모델링, 장치, 문제. 설계, 운영 프로그램까지
+방탈출 매장에 필요한 모든 것을 편하게 문의해주세요 
+FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에 
+최적의 답변을 고객님께 전달드립니다!!</p>
             {sent ? (
               <div className="bzdone">
                 <b>문의 잘 받았습니다.</b>
@@ -894,13 +899,12 @@ export default function BusinessPage() {
                   </div>
                 </form>
                 {formErr && <div className="bzerr">{formErr}</div>}
-                <div className="micro">보고 나서 안 하셔도 됩니다.<br />연락은 한 번만 드립니다.</div>
               </>
             )}
           </div>
 
           <div className="crossline reveal" style={{ marginTop: 22 }}>
-            <p>브랜드 팝업이나 기업 교육처럼 방탈출 매장이 아닌 곳에 만드는 일도 합니다.</p>
+            <p>브랜드 팝업이나 기업 교육처럼 방탈출 매장이 아닌 곳과의 협업도 가능합니다.</p>
             <Link prefetch={false} href="/business/collab">협업 이야기 보기 →</Link>
           </div>
         </section>
@@ -1049,9 +1053,12 @@ export default function BusinessPage() {
         <section className="bz-sec" id="cta">
           <div className="ctabox reveal">
             <div className="kicker" style={{ justifyContent: "center" }}>CONTACT</div>
-            <h2>한번 보러 가겠습니다.</h2>
-            <p className="lead center">지금 쓰시는 게 있어도 괜찮습니다. 안 뜯고 볼 수 있는 것부터 봅니다.
-              방 몇 개인지, 장치가 몇 개 붙어 있는지, 고장 나면 지금 어떻게 하시는지. 그 정도만 보면 됩니다.</p>
+            <h2>컨설팅 문의하기</h2>
+            <p className="lead center">새로운 테마도 좋고, 현재 운영중인 테마도 괜찮습니다. 
+인테리어 리모델링, 장치, 문제. 설계, 운영 프로그램까지
+방탈출 매장에 필요한 모든 것을 편하게 문의해주세요 
+FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에 
+최적의 답변을 고객님께 전달드립니다!!</p>
             {sent ? (
               <div className="bzdone">
                 <b>문의 잘 받았습니다.</b>
@@ -1092,13 +1099,12 @@ export default function BusinessPage() {
                   </div>
                 </form>
                 {formErr && <div className="bzerr">{formErr}</div>}
-                <div className="micro">보고 나서 안 하셔도 됩니다.<br />연락은 한 번만 드립니다.</div>
               </>
             )}
           </div>
 
           <div className="crossline reveal" style={{ marginTop: 22 }}>
-            <p>브랜드 팝업이나 기업 교육처럼 방탈출 매장이 아닌 곳에 만드는 일도 합니다.</p>
+            <p>브랜드 팝업이나 기업 교육처럼 방탈출 매장이 아닌 곳과의 협업도 가능합니다.</p>
             <Link prefetch={false} href="/business/collab">협업 이야기 보기 →</Link>
           </div>
         </section>

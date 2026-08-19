@@ -49,26 +49,61 @@ async function ready() {
 
 /* ── ③ 저장: 화면에서 고친 글자를 소스에 적어 넣는다 ── */
 function applyEdits(edits) {
+  /* ⚠️ 무엇보다 먼저 **받은 그대로 파일에 남긴다.**
+     2026-08-19 사고: 여러 줄이 한 덩어리인 표 칸을 못 바꿔서 11곳이 실패했는데,
+     기록에 "원문"만 남기고 **사장님이 새로 쓰신 글자를 안 남겨서** 되살릴 뻔했다.
+     이제는 못 바꾸더라도 아래 파일에 그대로 남으므로 절대 안 날아간다. */
+  const backupDir = "docs/_edits";
+  fs.mkdirSync(backupDir, { recursive: true });
+  const stamp = new Date(Date.now() + 9 * 3600e3).toISOString().replace(/[:.]/g, "-").slice(0, 19);
+  const backup = path.join(backupDir, `수정-${stamp}.json`);
+  fs.writeFileSync(backup, JSON.stringify(edits, null, 1), "utf8");
+
   let src = fs.readFileSync(TARGET, "utf8");
   const done = [], failed = [];
+  const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  /** 한 조각을 소스에서 찾아 바꾼다. 바꿨으면 true. */
+  function one(from, to) {
+    if (!from || from === to) return true;
+    // ① 글자 그대로 한 곳
+    let n = src.split(from).length - 1;
+    if (n === 1) { src = src.replace(from, to); return true; }
+    // ② 줄바꿈·공백만 다른 경우
+    const loose = new RegExp(from.split(/\s+/).map(esc).join("\\s+"), "g");
+    const hit = src.match(loose) || [];
+    if (hit.length === 1) { src = src.replace(loose, to); return true; }
+    /* ③ 같은 문장이 여러 곳 — 세 범위(통째로·장치·프로그램)에 같은 문구가 나란히 쓰인 자리다.
+          한 곳만 고르는 근거가 없고, 한 곳만 바뀌면 셋이 서로 어긋나 보인다. → 전부 바꾸고 알린다. */
+    if (n > 1) { src = src.split(from).join(to); return `같은 문장 ${n}곳을 모두 바꿈`; }
+    if (hit.length > 1) { src = src.replace(loose, to); return `같은 문장 ${hit.length}곳을 모두 바꿈`; }
+    return false;
+  }
+
   for (const { original, updated } of edits) {
-    const from = String(original ?? "").trim();
-    const to = String(updated ?? "").trim();
+    const from = String(original ?? "").replace(/\r/g, "").trim();
+    const to = String(updated ?? "").replace(/\r/g, "").trim();
     if (!from || from === to) continue;
 
-    // 1차: 글자 그대로 찾기
-    let count = src.split(from).length - 1;
-    if (count === 1) { src = src.replace(from, to); done.push({ from, to }); continue; }
+    const r = one(from, to);
+    if (r) { done.push({ from, to, note: typeof r === "string" ? r : "" }); continue; }
 
-    // 2차: 줄바꿈·공백이 다를 수 있으니 공백을 느슨하게 맞춰 찾기
-    const loose = new RegExp(from.split(/\s+/).map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("\\s+"), "g");
-    const hits = src.match(loose) || [];
-    if (hits.length === 1) { src = src.replace(loose, to); done.push({ from, to }); continue; }
-
-    failed.push({ from, to, why: hits.length === 0 && count === 0 ? "소스에서 못 찾음(코드로 만들어지는 글자일 수 있음)" : `같은 문장이 ${Math.max(count, hits.length)}곳에 있음` });
+    /* 여러 줄이 한 덩어리인 칸(표의 한 행 등)은 소스에 그런 한 덩어리로 존재하지 않는다.
+       줄 수가 같으면 **줄끼리 짝지어** 한 줄씩 바꾼다. */
+    const a = from.split("\n").map((x) => x.trim()).filter(Boolean);
+    const b = to.split("\n").map((x) => x.trim()).filter(Boolean);
+    if (a.length > 1 && a.length === b.length) {
+      const sub = [];
+      for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) sub.push([a[i], b[i]]);
+      const okAll = sub.every(([x, y]) => one(x, y));
+      if (okAll) { done.push({ from: a.join(" / "), to: b.join(" / "), note: "줄 단위로 바꿈" }); continue; }
+      failed.push({ from, to, why: "여러 줄 중 일부를 못 찾음" });
+      continue;
+    }
+    failed.push({ from, to, why: a.length !== b.length && a.length > 1 ? `줄 수가 달라짐(${a.length}줄 → ${b.length}줄)` : "소스에서 못 찾음(코드로 만들어지는 글자일 수 있음)" });
   }
   if (done.length) fs.writeFileSync(TARGET, src, "utf8");
-  return { done, failed };
+  return { done, failed, backup };
 }
 
 /* ── ② 화면을 감싸 고칠 수 있게 만드는 부분 ── */
@@ -155,7 +190,12 @@ const server = http.createServer(async (req, res) => {
       try { out = applyEdits(JSON.parse(body)); }
       catch (e) { out = { done: [], failed: [{ from: "", to: "", why: String(e.message) }] }; }
       console.log(`  저장: ${out.done.length}곳 반영${out.failed.length ? ` · 못 고침 ${out.failed.length}곳` : ""}`);
-      out.failed.forEach((f) => console.log(`    ⚠️ "${f.from.slice(0, 50)}" — ${f.why}`));
+      out.failed.forEach((f) => {
+        console.log(`    ⚠️ 못 고침 — ${f.why}`);
+        console.log(`       전: ${f.from.split("\n").join(" / ")}`);
+        console.log(`       후: ${f.to.split("\n").join(" / ")}`);
+      });
+      if (out.backup) console.log(`    (고치신 내용은 ${out.backup} 에 그대로 남겨뒀습니다)`);
       res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
       res.end(JSON.stringify(out));
     });
