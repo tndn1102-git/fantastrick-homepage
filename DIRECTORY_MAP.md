@@ -29,7 +29,11 @@ fantastrick-homepage\   ← Next.js 웹앱 (예약·리뷰 자체 시스템)
 │  ├─ worker-usage.mjs   ← 워커 하루 요청량 (한도 10만) · worker-hourly.mjs = 시간대별
 │  ├─ worker-cpu.mjs     ← 요청당 CPU 시간(중앙값·상위1%). 무료 상한 10ms 에 걸리는지 확인
 │  ├─ traffic-top.mjs    ← 어느 주소가 요청을 많이 먹나 ⚠️토큰에 Analytics 권한 없어 현재 실패
-│  └─ scraper-report.mjs ← 외부 수집기 조사. `wrangler tail ... > t.json` 받아서 분석
+│  ├─ scraper-report.mjs ← 외부 수집기 조사. `wrangler tail ... > t.json` 받아서 분석
+│  ├─ slots-clients.mjs  ← 어떤 주소를 **누가** 부르는지(IP별·캐시여부). 수집기 추적용
+│  ├─ waf-events.mjs     ← 방화벽이 막은 요청의 정체(IP·UA). ⚠️막힌 요청은 wrangler tail 에 안 보임
+│  └─ peek-ajax.mjs      ← /wp-admin/admin-ajax.php 만 잠깐 열어 내용 엿보기(open/close).
+│                          ⚠️조사 끝나면 **반드시 close**
 ├─ supabase\
 │  ├─ schema.sql        ← 예약·리뷰 데이터베이스 표 만드는 SQL (Supabase에 1회 실행)
 │  └─ migration_*.sql   ← 나중에 칸·표를 더한 것들 (deposits=입금알림 기록 표 등)
