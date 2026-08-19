@@ -134,6 +134,56 @@ export function apptListHtml(date: string, times: string[], themeName: string): 
   return `<div class="booked-appt-list">${head}\n${slots}\n</div>`;
 }
 
+/** 옛 예약 페이지 통째로 — 달력 3개 + 앞으로 10일치 시간 목록.
+ *
+ *  `/booking/` 과 `/wp-admin/admin-ajax.php`(값 없는 요청) 두 곳이 같이 쓴다.
+ *
+ *  [왜 값 없는 요청에도 이걸 주나]
+ *    빠방 수집기는 **아무 값도 안 붙인 GET 만** 하루 5,900번 보낸다(2026-08-19 실측,
+ *    방화벽을 열어 5분 30초 지켜본 30건 전부 그랬다). 옛 워드프레스는 여기에 "0" 한 글자를
+ *    돌려줬으니, 그 상태로는 영영 아무 자료도 못 가져간다.
+ *    → 물어보는 방식이 바뀔 가망이 없으므로, **지금 보내는 그 요청에 답을 실어준다.**
+ *
+ *  ⚠️ 테마 3개가 한 답에 같이 담긴다. 상대가 구조를 안 보고 시간만 긁으면
+ *     세 테마 시간이 섞여 보일 수 있다. 그래서 테마마다
+ *     `booked-calendar-shortcode-wrap`(+ data-theme, 제목)으로 확실히 칸을 나눠 둔다.
+ *     그쪽 목록에 어떻게 반영되는지 보고 필요하면 나눠 주는 방식으로 바꾼다.
+ */
+export async function bookedPageHtml(db: SupabaseClient, ajaxUrl: string, daysAhead = 10): Promise<string> {
+  const from = kstToday();
+  const to = new Date(Date.now() + 9 * 3600 * 1000 + daysAhead * 86400000).toISOString().slice(0, 10);
+  const [Y, M] = from.split("-").map(Number);
+  const mm = String(M).padStart(2, "0");
+  const monthEnd = `${Y}-${mm}-${new Date(Date.UTC(Y, M, 0)).getUTCDate()}`;
+
+  const blocks = await Promise.all(CALENDARS.map(async (c) => {
+    const name = themeById(c.theme)?.name || c.theme;
+    const month = await openTimesRange(db, c.theme, `${Y}-${mm}-01`, monthEnd > to ? monthEnd : to);
+    const cal = monthHtml(c.id, `${Y}-${mm}-01`, month);
+    const lists = Object.keys(month).filter((d) => d >= from && d <= to)
+      .map((d) => apptListHtml(d, month[d], name)).join("\n");
+    return `<div class="booked-calendar-shortcode-wrap" data-calendar-id="${c.id}" data-theme="${c.theme}">
+<h3 class="booked-calendar-title">${esc(name)}</h3>
+${cal}
+${lists}
+</div>`;
+  }));
+
+  return `<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<title>예약 - 판타스트릭</title>
+<script type="text/javascript">
+/* 옛 플러그인이 심어두던 값 — 수집기가 여기서 창구 주소를 읽어간다 */
+var booked_js_vars = {"ajax_url":"${ajaxUrl}","profilePage":"https://fantastrick.co.kr/reserve","publicAppointments":""};
+</script>
+</head><body class="booked-ltr">
+<div id="booked-page-form">
+${blocks.join("\n")}
+</div>
+<!-- 예약 가능한 시간만 그려져 있습니다. 실제 예약은 https://fantastrick.co.kr/reserve -->
+</body></html>`;
+}
+
 /** 한 달 달력 표 HTML — 플러그인이 달을 넘길 때 돌려주던 조각.
  *  예약 가능한 날은 칸을 비워두고(선택 가능), 자리가 없는 날엔 booked-full 을 붙인다. */
 export function monthHtml(calId: number, monthStart: string, openByDate: Record<string, string[]>): string {
