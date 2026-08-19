@@ -23,15 +23,15 @@ const onlyNum = (s: string) => Number(String(s).replace(/[^0-9]/g, "")) || 0;
 /* short = 화면 가장자리 길잡이에 쓰는 짧은 이름.
    본이름을 그대로 쓰면 길잡이가 168px 이 넘어 본문을 가린다(1440 화면에서 56px 겹침 실측). */
 const SCOPES = [
-  { id: "turnkey", label: "통째로 만들기", short: "통째로", sub: "이야기부터 공사까지 전부" },
-  { id: "device", label: "방 안 장치와 기계", short: "장치", sub: "자물쇠와 센서, 조명을 돌리는 것" },
-  { id: "software", label: "매장 운영 프로그램", short: "프로그램", sub: "근무표와 급여, 예약을 하는 것" },
+  { id: "turnkey", label: "테마 통째로 만들기", short: "통째로", sub: "스토리부터 공사, 장치까지 전부 다" },
+  { id: "device", label: "테마 안 장치와 기계", short: "장치", sub: "컴퓨터 라인, 장치, 센서 등등" },
+  { id: "software", label: "매장 운영 프로그램", short: "프로그램", sub: "출퇴근, 대타 스케줄 관리, 쿠폰발행기, 홈페이지 등등" },
 ];
 
-const KINDS = ["방 통째로 맡기기", "장치와 기계만", "운영 프로그램만", "그 밖에"];
+const KINDS = ["테마 통째로 맡기기", "장치와 기계", "운영 프로그램", "그 밖에"];
 // 보고 있는 화면에 맞춰 문의 유형을 미리 골라 둔다
 const KIND_BY_SCOPE: Record<string, string> = {
-  turnkey: "방 통째로 맡기기", device: "장치와 기계만", software: "운영 프로그램만",
+  turnkey: "테마 통째로 맡기기", device: "장치와 기계", software: "운영 프로그램",
 };
 
 /* 근무표 도해용 데이터.
@@ -166,7 +166,7 @@ export default function BusinessPage() {
     e.preventDefault();
     if (sending) return;
     setFormErr("");
-    if (!form.storeName.trim()) { setFormErr("매장명을 입력해 주세요."); return; }
+    if (!form.storeName.trim()) { setFormErr("매장명 또는 성함을 입력해 주세요."); return; }
     if (form.phone.replace(/[^0-9]/g, "").length < 9) { setFormErr("연락처를 확인해 주세요."); return; }
     setSending(true);
     try {
@@ -233,8 +233,8 @@ export default function BusinessPage() {
           <div className="kicker">방탈출 인테리어 제작, 장치, 매장 운영 프로그램까지 모든 것</div>
           <h1>테마를 만드는 일부터<br />매장을 운영하는 일까지.</h1>
           <p className="sub">
-            방탈출을 통째로 짓는 일, 방 안 장치를 움직이는 기계, 매장을 굴리는 프로그램.
-            2012년부터 강남에서 3곳을 직접 운영하면서 하나씩 만든 것들입니다.
+            방탈출 테마를  통째로 만드는 일부터, 테마 내 장치를 움직이는 기계 그리고 매장을 운영하는 프로그램까지. 2012년부터 방탈출 매장을 운영해온 노하우로 
+전부 설계해드립니다.
           </p>
           <div className="bz-cta">
             <a className="btn primary" href="#cta">문의하기</a>
@@ -253,8 +253,8 @@ export default function BusinessPage() {
         <section className="bz-sec">
                     <h2 className="reveal">사장님들이 한번 쯤 고민해본 것</h2>
           <div className="asks">
-            <div className="ask reveal">매장을 새로 오픈하고 싶은데 어디서부터 문의를 해야할지 모르겠다.</div>
-            <div className="ask reveal">장치가 작동을 안 하는데 어디로 문의해야 할지 모르겠다.</div>
+            <div className="ask reveal">매장을 새로 오픈하고 싶은데 어디서부터 문의를 해야할지 모르겠어요.</div>
+            <div className="ask reveal">장치가 작동을 안 하는데 어디로 문의해야 할지 모르겠어요.</div>
             <div className="ask reveal">테마를 하나 더 만들거나 인테리어를 어디에서 상담해야할까?</div>
             <div className="ask reveal">출퇴근 프로그램, 대타 스케줄 관리, 급여 계산,<br />홈페이지 등등 운영 프로그램을 도입하고 싶다.</div>
           </div>
@@ -274,7 +274,7 @@ export default function BusinessPage() {
       <div className={`scopepick on-${here}`} id="scopebar">
         <div className="wrap">
           <div className="sp-head">
-            <h2 id="scope-q">어떤 것이 필요하십니까?</h2>
+            <h2 id="scope-q">어떤 것이 궁금하신가?</h2>
           </div>
           <div className="sp-cards" aria-labelledby="scope-q">
             {SCOPES.map((s, i) => (
@@ -331,8 +331,9 @@ export default function BusinessPage() {
             </g>
           </svg>
           <p className="lead reveal">
-            대부분은 이야기, 인테리어, 장치를 각각 다른 데 맡깁니다. 저희는 세 가지를 다 합니다.
-            방탈출을 2012년부터 하면서 필요해서 하나씩 갖춘 것들입니다.
+            대부분은 스토리, 인테리어, 장치를 각각 다른 데 맡깁니다. 저희는 세 가지를 다 한팀에서 진행합니다.
+ 방탈출 제작을 2012년부터 쭉 한팀으로 운영해온 노하우로 
+최고의 테마를 제작해드립니다.
           </p>
 
           <div className="trio">
@@ -344,7 +345,6 @@ export default function BusinessPage() {
                 <li>시나리오와 세계관</li>
                 <li>문제와 장치 게임 설계</li>
                 <li>연출과 사운드 디렉팅</li>
-                <li>운영 방법과 진행 담당(GM) 교육</li>
               </ul>
             </div>
             <div className="tri reveal">
@@ -375,14 +375,14 @@ export default function BusinessPage() {
           <div className="who2 reveal" style={{ marginTop: 22 }}>
             <div className="them">
               <h4>일반적으로</h4>
-              <div className="cnt">각각 전문가에게 문의 및 설계 진행</div>
+              <div className="cnt">여러 분야 전문가들에게 각각 문의 및 설계 진행 (높은 비용)</div>
               <ul>
                 <li>시나리오 작가</li><li>인테리어</li><li>전기</li><li>장치 제작</li><li>시공</li>
               </ul>
             </div>
             <div className="us">
               <h4>저희는</h4>
-              <div className="cnt">전화 한통으로 모두 해결</div>
+              <div className="cnt">한 팀으로 모두 해결 , 저렴한 비용과 높은 퀄리티 보장.</div>
               <ul>
                 <li>기획</li><li>인테리어</li><li>전기</li><li>장치</li><li>시공</li>
               </ul>
@@ -402,7 +402,7 @@ export default function BusinessPage() {
           {/* 우리가 만든 방들 */}
           <h3 className="reveal pn-h3">저희가 만들어 실제 운영중인 매장 및 테마들</h3>
           <p className="lead reveal" style={{ margin: "10px 0 18px" }}>
-            남의 매장에 넣어드리기 전에 저희 매장에서 먼저 씁니다. 아래 넷 다 저희 손으로 만들어 지금도 손님을 받고 있습니다.
+            FANTASTRICK TEAM이 만들고 현재 운영중인 매장들입니다.
           </p>
           <div className="works">
             {THEMES.map((t) => (
@@ -422,12 +422,11 @@ export default function BusinessPage() {
               </div>
             ))}
           </div>
-          <p className="note reveal">값은 방 크기랑 하시려는 연출에 따라 달라서 보고 나서 말씀드립니다.</p>
         </section>
         {/* 비교 */}
         <section className="bz-sec">
           <div className="kicker reveal">비교</div>
-          <h2 className="reveal">견적서에는 안 적히는 것들</h2>
+          <h2 className="reveal">FANTASTRICK TEAM은 다 가능합니다!</h2>
           <div className="cmp reveal">
             <div className="h">&nbsp;</div><div className="h">보통 방식</div><div className="h usc">판타스트릭</div>
 
@@ -459,8 +458,6 @@ export default function BusinessPage() {
             <div><span className="mk n">&times;</span><span className="t mut">아니오</span></div>
             <div className="usc"><span className="mk y">&#10003;</span><span className="t">강남 3곳 · EST. 2012</span></div>
           </div>
-          <p className="disc reveal">업계에서 일반적으로 쓰이는 방식과의 구조 차이를 정리한 것입니다.
-            특정 업체를 지칭하지 않으며 제품에 따라 사양은 다를 수 있습니다.</p>
         </section>
 
         {/* "경쟁사한테 사는 거 아니냐" 구역은 2026-08-13 사장님 지시로 통째로 삭제.
