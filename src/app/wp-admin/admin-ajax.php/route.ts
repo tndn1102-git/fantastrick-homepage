@@ -43,6 +43,11 @@ async function handle(req: NextRequest) {
 
   const theme = themeOfCalendar(p.get("calendar_id"));
 
+  /* 🔎 무엇을 물어보는지 한 줄 남긴다 — `npx wrangler tail` 로 실시간 확인용.
+     달력 번호(calendar_id)가 우리 짐작(17·18·19)과 맞는지 확인하려고 켜뒀다.
+     짝이 확정되면 지워도 된다. 개인정보는 하나도 안 담긴다(공개 예약 현황 요청뿐). */
+  console.log(`[ajax] ${req.method} action=${action || "(없음)"} cal=${p.get("calendar_id") || "(없음)"} date=${p.get("date") || p.get("gotoMonth") || "(없음)"} → theme=${theme || "모름"}`);
+
   /* ── 하루치 시간 목록 ──
      플러그인에서 날짜를 눌렀을 때 오던 요청. 수집기가 실제로 원하는 건 이것이다. */
   if (action === "booked_calendar_date" || action === "booked_appointment_list_date") {
