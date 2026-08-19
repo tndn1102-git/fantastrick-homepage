@@ -34,14 +34,19 @@ import { getConfig } from "@/lib/settings";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 /** 달력 번호 ↔ 우리 테마.
- *  17 은 보관본에 실제로 찍혀 있던 번호다. 나머지 둘은 이어지는 번호로 붙였다.
- *  ⚠️ 그쪽이 옛날에 받아 적어둔 번호를 그대로 쓴다면 17 만 맞고 나머지는 다를 수 있다.
- *     그때는 `/wp-admin/admin-ajax.php` 로 들어오는 calendar_id 를 보고 여기만 고치면 된다
- *     (scripts/slots-clients.mjs · wrangler tail 로 확인). */
+ *  **번호는 짐작이 아니라 실제로 들어온 값이다** — 2026-08-19 창구 기록에서 확인한
+ *  17 · 23 · 24 세 가지뿐이었다.
+ *    · 17 = 태초의 신부  (보관본 페이지에도 이 번호가 찍혀 있었다 — 확정)
+ *    · 23 · 24 = 사자의 서 / 락다운시티. 어느 쪽인지는 들어온 값만으론 알 수 없어
+ *      **만든 순서**로 정했다: 워드프레스 번호는 만든 순서대로 붙고,
+ *      그쪽에 등록된 날짜가 태초의 신부 2021 → 사자의 서 2023 → 락다운시티 2025 이다.
+ *  ✅ 맞는지 확인하는 법: 두 테마는 시간표가 확연히 다르다.
+ *      사자의 서 = 13:10 · 14:20 · 15:30 …(70분 간격) / 락다운시티 = 11:00 · 13:00 …(정각)
+ *      그쪽 목록의 방에 엉뚱한 시간표가 뜨면 아래 23·24 를 서로 바꾸면 된다. */
 export const CALENDARS: { id: number; theme: string }[] = [
-  { id: 17, theme: "firstfoundbride" }, // 태초의 신부 (1호점) — 보관본에 있던 번호
-  { id: 18, theme: "bookofduat" },      // 사자의 서 (2호점)
-  { id: 19, theme: "ldc" },             // LOCKDOWN CITY (TGC)
+  { id: 17, theme: "firstfoundbride" }, // 태초의 신부 (1호점)
+  { id: 23, theme: "bookofduat" },      // 사자의 서 (2호점)
+  { id: 24, theme: "ldc" },             // LOCKDOWN CITY (TGC)
 ];
 
 /** 달력 번호나 테마 이름표 아무거나 받아 테마 이름표로. 못 알아보면 undefined. */
