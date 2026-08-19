@@ -1867,7 +1867,19 @@ function RefundQueue({ onDone }: { onDone: () => void }) {
   const owed = rows.filter(isRefundOwed);
   const needAcct = owed.filter((r) => !isRefundReady(r));
   const todo = owed.filter(isRefundReady);
-  const done = rows.filter((r) => r.refunded).slice(0, 20);
+  /* 환불 완료 목록은 **환불을 보낸 시각** 기준으로 최근 것이 위에 온다.
+     [왜 따로 정렬하나] 서버는 예약일(date) 내림차순으로 준다 — 예약 관리 화면엔 그게 맞다.
+     그런데 이 목록은 통장 이체 기록과 맞춰보는 자리라 **처리한 순서**여야 한다.
+     그대로 쓰면 예약일 8/23 건(8/17 환불)이 예약일 8/20 건(8/19 환불)보다 위에 오는 식으로
+     뒤죽박죽이 된다(2026-08-19 사장님 지적, 9건 전수 확인).
+     ⚠️ 자르기(slice)는 **정렬 뒤에** 해야 한다. 먼저 자르면 예약일이 앞선 20건이 뽑혀
+        "최근 20건"이 아니게 된다.
+     ⚠️ 환불시각이 없는 옛 자료는 취소시각으로 대신하고, 그것도 없으면 맨 아래로 보낸다. */
+  const refundStamp = (r: Reservation) => r.refunded_at || r.cancelled_at || "";
+  const done = rows
+    .filter((r) => r.refunded)
+    .sort((a, b) => refundStamp(b).localeCompare(refundStamp(a)))
+    .slice(0, 20);
 
   async function copyAcct(r: Reservation) {
     const digits = (r.refund_account || "").replace(/[^0-9]/g, ""); // 은행앱 붙여넣기용
