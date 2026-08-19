@@ -511,7 +511,7 @@ FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에
                   </div>
                   <div className="full">
                     <button type="submit" className="btn primary" style={{ width: "100%" }} disabled={sending}>
-                      {sending ? "보내는 중…" : "한번 보러 와 달라고 하기"}
+                      {sending ? "보내는 중…" : "문의하기"}
                     </button>
                   </div>
                 </form>
@@ -894,7 +894,7 @@ FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에
                   </div>
                   <div className="full">
                     <button type="submit" className="btn primary" style={{ width: "100%" }} disabled={sending}>
-                      {sending ? "보내는 중…" : "한번 보러 와 달라고 하기"}
+                      {sending ? "보내는 중…" : "문의하기"}
                     </button>
                   </div>
                 </form>
@@ -1094,7 +1094,7 @@ FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에
                   </div>
                   <div className="full">
                     <button type="submit" className="btn primary" style={{ width: "100%" }} disabled={sending}>
-                      {sending ? "보내는 중…" : "한번 보러 와 달라고 하기"}
+                      {sending ? "보내는 중…" : "문의하기"}
                     </button>
                   </div>
                 </form>
