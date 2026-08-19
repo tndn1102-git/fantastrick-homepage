@@ -130,13 +130,13 @@ export function apptListHtml(date: string, times: string[], themeName: string): 
   const [y, m, d] = date.split("-");
   const head = `<h2><i class="booked-icon booked-icon-calendar"></i> ${Number(y)}년 ${Number(m)}월 ${Number(d)}일 · ${esc(themeName)}</h2>`;
   if (!times.length) {
-    return `<div class="booked-appt-list">${head}\n<p class="booked-no-appts">예약 가능한 시간이 없습니다.</p>\n</div>`;
+    return `<div class="booked-appt-list shown">${head}\n<p class="booked-no-appts">예약 가능한 시간이 없습니다.</p>\n</div>`;
   }
   const slots = times.map((t) => `<div class="timeslot" data-timeslot="${t}" data-date="${date}">
 <div class="timeslot-time"><i class="booked-icon booked-icon-clock"></i> <span class="timeslot-range">${t}</span> <span class="timeslot-ampm">${ampm(t)}</span></div>
 <div class="timeslot-people"><span class="spots-available">1 자리</span> <button type="button" class="button">예약하기</button></div>
 </div>`).join("\n");
-  return `<div class="booked-appt-list">${head}\n${slots}\n</div>`;
+  return `<div class="booked-appt-list shown">${head}\n${slots}\n</div>`;
 }
 
 /** 옛 예약 페이지 통째로 — 달력 3개 + 앞으로 10일치 시간 목록.
