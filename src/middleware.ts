@@ -17,6 +17,28 @@ const WP_PROBE = /^\/(wp-admin|wp-login|wp-content|wp-includes|wp-json|xmlrpc\.p
 export function middleware(req: NextRequest) {
   const host = req.headers.get("host") ?? "";
 
+  /* ⭐ 보안 없는 주소(http)로 들어온 요청 처리 — 2026-08-19
+     ─────────────────────────────────────────────────────────────
+     [무슨 일이 있었나]
+       빠방 수집기는 옛 워드프레스 시절 주소 그대로 **http:// 로 POST** 를 보낸다
+       (옛 페이지의 booked_js_vars.ajax_url 이 http 였다).
+       클라우드플레어의 "항상 HTTPS 사용" 이 그 요청을 **301** 로 https 로 넘기는데,
+       301 을 만난 클라이언트는 대부분 **POST 를 GET 으로 바꾸고 본문을 버린다.**
+       그래서 우리에겐 "action 도 calendar_id 도 없는 빈 GET" 만 하루 5,900번 들어왔다.
+       (증거: 그 요청이 GET 인데도 content-type 이 폼 전송용이었다.)
+     [그래서]
+       클라우드플레어의 "항상 HTTPS 사용" 을 끄고, 여기서 우리가 직접 넘긴다.
+       단 **창구(admin-ajax)만은 안 넘기고 http 로 그냥 답한다** — 그래야 POST 가 살아서
+       도착한다. 그 주소가 내보내는 건 공개된 예약 가능 시간뿐이라 http 로 나가도 문제 없다.
+     ⚠️ 나머지 주소는 예전과 똑같이 301 로 https 에 넘긴다(손님·검색엔진에 변화 없음).
+     ⚠️ HSTS 는 꺼져 있는 걸 확인하고 바꿨다 — 켜져 있으면 브라우저가 제멋대로 올려버린다. */
+  const proto = req.headers.get("x-forwarded-proto") || req.nextUrl.protocol.replace(":", "");
+  if (proto === "http" && req.nextUrl.pathname !== "/wp-admin/admin-ajax.php") {
+    const url = new URL(req.url);
+    url.protocol = "https:";
+    return NextResponse.redirect(url, 301);
+  }
+
   /* 끝에 슬래시가 붙은 `/booking/` 을 **튕기지 않고** 그대로 처리한다.
      Next 는 기본으로 `/booking/` → `/booking` 으로 한 번 돌려보내는데(308),
      빠방 수집기가 등록해둔 주소가 하필 슬래시가 붙은 쪽이다. 돌려보내면 따라오지 않을 수 있어
