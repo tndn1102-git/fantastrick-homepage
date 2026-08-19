@@ -50,7 +50,9 @@ const nextConfig: NextConfig = {
      · 301(영구이동)이라 검색엔진도 새 주소로 옮겨 배운다. */
   async redirects() {
     return [
-      { source: "/booking", destination: "/reserve", permanent: true },   // 예약하기
+      /* /booking 은 여기서 넘기지 않는다 — src/app/booking/route.ts 가 직접 답한다.
+         손님은 그대로 /reserve 로 넘어가고, 외부 수집기에게는 옛 워드프레스 모양으로 답한다.
+         (여기 두면 라우트까지 도달하지 못한다 — redirects 가 먼저 돌기 때문) */
       { source: "/faqs", destination: "/faq", permanent: true },          // 자주 묻는 질문
       { source: "/policy", destination: "/privacy", permanent: true },    // 개인정보 취급방침
       { source: "/contacts", destination: "/business", permanent: true }, // 컨설팅 문의 → B2B

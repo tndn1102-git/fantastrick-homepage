@@ -17,6 +17,12 @@ const WP_PROBE = /^\/(wp-admin|wp-login|wp-content|wp-includes|wp-json|xmlrpc\.p
 export function middleware(req: NextRequest) {
   const host = req.headers.get("host") ?? "";
 
+  /* 딱 하나 예외: /wp-admin/admin-ajax.php 는 **우리가 되살린 진짜 창구**다.
+     예약 모아보기 앱(빠방)의 우리 몫 수집 코드가 이 주소만 볼 줄 알아서, 옛 플러그인
+     모양으로 예약 현황을 답해준다. 자세한 사정은 src/lib/booked-compat.ts 맨 위 참고.
+     ⚠️ 방화벽(WAF) 규칙에서도 이 주소만 빼야 한다 — 안 빼면 여기까지 오지도 못한다. */
+  if (req.nextUrl.pathname === "/wp-admin/admin-ajax.php") return NextResponse.next();
+
   if (WP_PROBE.test(req.nextUrl.pathname)) {
     return new NextResponse("Not Found", { status: 404, headers: { "Cache-Control": "public, max-age=86400" } });
   }

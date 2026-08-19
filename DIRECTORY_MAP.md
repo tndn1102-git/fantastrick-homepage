@@ -32,8 +32,8 @@ fantastrick-homepage\   ← Next.js 웹앱 (예약·리뷰 자체 시스템)
 │  ├─ scraper-report.mjs ← 외부 수집기 조사. `wrangler tail ... > t.json` 받아서 분석
 │  ├─ slots-clients.mjs  ← 어떤 주소를 **누가** 부르는지(IP별·캐시여부). 수집기 추적용
 │  ├─ waf-events.mjs     ← 방화벽이 막은 요청의 정체(IP·UA). ⚠️막힌 요청은 wrangler tail 에 안 보임
-│  └─ peek-ajax.mjs      ← /wp-admin/admin-ajax.php 만 잠깐 열어 내용 엿보기(open/close).
-│                          ⚠️조사 끝나면 **반드시 close**
+│  └─ waf-ajax.mjs       ← 방화벽에서 /wp-admin/admin-ajax.php 만 통과(allow/block).
+│                          ⚠️평소 **allow** 여야 빠방 노출이 산다
 ├─ supabase\
 │  ├─ schema.sql        ← 예약·리뷰 데이터베이스 표 만드는 SQL (Supabase에 1회 실행)
 │  └─ migration_*.sql   ← 나중에 칸·표를 더한 것들 (deposits=입금알림 기록 표 등)
