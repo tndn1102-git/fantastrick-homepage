@@ -1,0 +1,43 @@
+﻿안녕하세요, 판타스트릭입니다.
+
+말씀주신 대로 예약 현황 API를 만들어 두었습니다. 신청이나 인증키 없이 바로 쓰실 수 있습니다.
+
+■ 설명 페이지 (이 주소 하나만 보시면 됩니다)
+https://fantastrick.co.kr/reservation-api
+
+■ 주소
+GET https://fantastrick.co.kr/api/availability?days=7
+
+■ 응답 (요약)
+themes[].themeId           테마 구분자
+themes[].name              테마 이름
+themes[].branch            지점
+themes[].legacyCalendarId  기존에 쓰시던 calendar_id (17 / 23 / 24)
+themes[].days[].date       날짜
+themes[].days[].open       예약 가능한 시간  <- 이것만 보시면 됩니다
+themes[].days[].slots      그날 운영 회차 전부
+themes[].days[].closed     마감된 시간
+
+■ 테마 (기존 calendar_id 그대로 매칭 가능합니다)
+firstfoundbride   태초의 신부      1호점   calendar_id 17
+bookofduat        사자의 서        2호점   calendar_id 23
+ldc               락다운시티       TGC점   calendar_id 24
+time              시간의 영속성    TGC점   (현재 미등록 테마입니다)
+
+■ 참고
+- 시각은 24시간제 HH:MM, 기준 시간대는 Asia/Seoul 입니다.
+- days=7 한 번이면 7일치가 전부 나옵니다. 날짜별로 나눠 부르실 필요 없습니다.
+- 응답은 60초 캐시됩니다. 권장 호출 주기는 1~2분입니다.
+- 지난 시간은 걸러내지 않으니 '지금 이후'는 그쪽 기준으로 잡아주세요.
+- 예약창은 이용일 7일 전 21:00(KST)에 열립니다.
+- CORS 열어두어 브라우저에서 바로 확인 가능합니다.
+
+■ 기존 방식
+기존 /wp-admin/admin-ajax.php 창구도 당분간 그대로 응답하도록 열어두었습니다.
+새 API로 옮기신 뒤에는 닫을 예정이니, 옮기시면 알려주시면 감사하겠습니다.
+
+필요한 항목이 더 있으면 말씀해주세요. 추가는 언제든 가능하고,
+기존 항목을 없애거나 이름을 바꾸는 일은 하지 않겠습니다.
+
+감사합니다.
+판타스트릭 010-5536-0483
