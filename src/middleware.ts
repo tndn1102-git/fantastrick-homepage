@@ -17,6 +17,16 @@ const WP_PROBE = /^\/(wp-admin|wp-login|wp-content|wp-includes|wp-json|xmlrpc\.p
 export function middleware(req: NextRequest) {
   const host = req.headers.get("host") ?? "";
 
+  /* 끝에 슬래시가 붙은 `/booking/` 을 **튕기지 않고** 그대로 처리한다.
+     Next 는 기본으로 `/booking/` → `/booking` 으로 한 번 돌려보내는데(308),
+     빠방 수집기가 등록해둔 주소가 하필 슬래시가 붙은 쪽이다. 돌려보내면 따라오지 않을 수 있어
+     아예 안 튕기게 **속으로만 바꿔서**(rewrite) 답한다 — 밖에서 보면 한 번에 끝난다. */
+  if (req.nextUrl.pathname === "/booking/") {
+    const to = req.nextUrl.clone();
+    to.pathname = "/booking";
+    return NextResponse.rewrite(to);
+  }
+
   /* 딱 하나 예외: /wp-admin/admin-ajax.php 는 **우리가 되살린 진짜 창구**다.
      예약 모아보기 앱(빠방)의 우리 몫 수집 코드가 이 주소만 볼 줄 알아서, 옛 플러그인
      모양으로 예약 현황을 답해준다. 자세한 사정은 src/lib/booked-compat.ts 맨 위 참고.
