@@ -32,8 +32,12 @@ export function middleware(req: NextRequest) {
        도착한다. 그 주소가 내보내는 건 공개된 예약 가능 시간뿐이라 http 로 나가도 문제 없다.
      ⚠️ 나머지 주소는 예전과 똑같이 301 로 https 에 넘긴다(손님·검색엔진에 변화 없음).
      ⚠️ HSTS 는 꺼져 있는 걸 확인하고 바꿨다 — 켜져 있으면 브라우저가 제멋대로 올려버린다. */
-  const proto = req.headers.get("x-forwarded-proto") || req.nextUrl.protocol.replace(":", "");
-  if (proto === "http" && req.nextUrl.pathname !== "/wp-admin/admin-ajax.php") {
+  /* ⚠️ **진짜 도메인일 때만** 넘긴다. 로컬(localhost)에서도 Next 가 이 헤더를 http 로 붙여줘서,
+     주소를 안 보고 헤더만 믿으면 https://localhost 로 튕겨 **로컬 점검이 통째로 막힌다**
+     (2026-08-19 실제로 그랬다 — 빌드해서 확인하는 길이 끊긴다). */
+  const proto = req.headers.get("x-forwarded-proto");
+  const realSite = host.endsWith("fantastrick.co.kr");
+  if (realSite && proto === "http" && req.nextUrl.pathname !== "/wp-admin/admin-ajax.php") {
     const url = new URL(req.url);
     url.protocol = "https:";
     return NextResponse.redirect(url, 301);

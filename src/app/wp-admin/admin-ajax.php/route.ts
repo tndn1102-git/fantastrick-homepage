@@ -14,9 +14,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
 import { themeById } from "@/lib/data";
-import {
-  CALENDARS, themeOfCalendar, openTimes, openTimesRange, apptListHtml, monthHtml, kstToday, bookedPageHtml,
-} from "@/lib/booked-compat";
+import { CALENDARS, themeOfCalendar, openTimes, apptListHtml, monthHtml, bookedPageHtml } from "@/lib/booked-compat";
+import { availabilityRange, kstToday } from "@/lib/availability";
 
 /** 30초 캐시 — /api/slots 와 같은 기준(예약 마감 판정의 책임은 서버에 있다). */
 const CACHE = { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120" };
@@ -54,7 +53,7 @@ async function handle(req: NextRequest) {
     const date = (p.get("date") || kstToday()).slice(0, 10);
     if (!theme) return new NextResponse("0", { status: 200, headers: HTML });
     const times = await openTimes(db, theme, date);
-    return new NextResponse(apptListHtml(date, times, themeById(theme)?.name || ""), { headers: HTML });
+    return new NextResponse(apptListHtml(date, times, themeById(theme)?.name || "", Number(p.get("calendar_id")) || undefined), { headers: HTML });
   }
 
   /* ── 한 달 달력 ──
@@ -67,7 +66,9 @@ async function handle(req: NextRequest) {
     const mm = String(M).padStart(2, "0");
     const days = new Date(Date.UTC(Y, M, 0)).getUTCDate();
     // 한 달치를 DB 질문 3번으로 끝낸다 (날짜마다 부르면 90번이 넘는다)
-    const openByDate = await openTimesRange(db, theme, `${Y}-${mm}-01`, `${Y}-${mm}-${days}`);
+    const rows = await availabilityRange(db, theme, `${Y}-${mm}-01`, `${Y}-${mm}-${days}`);
+    const openByDate: Record<string, string[]> = {};
+    rows.forEach((r) => { openByDate[r.date] = r.open; });
     return new NextResponse(monthHtml(calId, `${Y}-${mm}-01`, openByDate), { headers: HTML });
   }
 

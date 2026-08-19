@@ -1,47 +1,48 @@
-/* 옛 워드프레스 예약 플러그인("Booked") **흉내내기**
+/* ⏳ 임시 — 옛 워드프레스 예약 플러그인("Booked") 모양으로 답해주기
  * ─────────────────────────────────────────────────────────────────────────
- * [왜 이런 걸 만드나]
- *   방탈출 예약 모아보기 앱(빠방)은 **매장마다 수집 코드를 따로 짜서** 쓴다
- *   (2026-08-19 실측: 시간이 채워진 매장 134곳의 예약 주소가 32가지로 전부 다른 시스템이었다).
- *   우리 몫으로 짜인 코드는 **옛 워드프레스 + Booked 플러그인**을 읽도록 만들어져 있다.
- *   홈페이지를 새로 만들면서 그 플러그인이 사라지자, 그쪽 수집이 통째로 멈췄다.
- *     · 그쪽 목록의 우리 방 3개 모두 "예약 가능 시간" 이 7일치 전부 빈 값
- *     · 그런데도 하루 5,884번 `/wp-admin/admin-ajax.php` 를 두드리고 있다
- *       (referer 가 `http://fantastrick.co.kr/booking/` — 그쪽에 등록된 우리 예약 링크와 같다)
- *   고쳐달라고 연락했지만 안 고쳐줬다. → **우리가 옛 플러그인인 척 해서 해결한다.**
+ * ⚠️ 이 파일은 **없어질 파일이다.** 없애는 조건은 맨 아래에 적어뒀다.
  *
- * [규격은 어디서 가져왔나]  전부 실물에서 확보했다(추측 아님).
- *   · 인터넷 기록보관소(web.archive.org)에 남은 2022-01-17 자 `/booking/` 페이지
- *   · 같은 곳에 남은 플러그인 스크립트 `booked/assets/js/functions.js?ver=2.2.6`
- *   거기서 확인한 실제 주고받는 방식:
+ * [왜 있나]
+ *   방탈출 예약 모아보기 앱(빠방)은 매장마다 수집 코드를 따로 짜서 쓴다
+ *   (2026-08-19 실측: 시간이 채워진 매장 134곳의 예약 주소가 32가지로 전부 다른 시스템).
+ *   우리 몫 코드는 **옛 워드프레스 + Booked 플러그인**을 읽도록 짜여 있어서,
+ *   홈페이지를 새로 만들며 그 플러그인이 사라지자 수집이 통째로 멈췄다.
+ *   → 그쪽이 새 API 로 옮길 때까지, 우리가 옛 모양으로 답해 노출을 살려둔다.
+ *
+ * [규격 출처]  전부 실물에서 확보했다(추측 아님).
+ *   · 기록보관소(web.archive.org)에 남은 2022-01-17 자 `/booking/` 페이지 → 달력 표 모양
+ *   · 같은 곳의 `booked/assets/js/functions.js?ver=2.2.6` → 주고받는 명령과 버튼 속성
+ *   · 같은 곳의 `booked-ltr.css` → 시간칸 내부 구조
+ *   실제 오가는 방식:
  *       POST /wp-admin/admin-ajax.php
- *         action=booked_calendar_month        gotoMonth=YYYY-MM-DD  calendar_id=17
- *         action=booked_calendar_date         date=YYYY-MM-DD       calendar_id=17
- *         action=booked_appointment_list_date date=YYYY-MM-DD       calendar_id=17
- *       답: 화면에 그대로 끼워넣는 **HTML 조각**
- *   달력 표 모양도 보관본 그대로다:
- *       <div class="booked-calendar-wrap large">
- *         <table class="booked-calendar" data-calendar-id="17" data-calendar-date="2022-01-01">
- *           <td data-date="2022-01-19" class="">…
+ *         action=booked_calendar_date   date=YYYY-MM-DD  calendar_id=17
+ *         action=booked_calendar_month  gotoMonth=…      calendar_id=17
+ *       답: 화면에 그대로 끼워넣는 HTML 조각
  *
- * ⚠️ 내보내는 값은 **우리 예약 화면과 같은 함수**로 계산한다(slotsForThemeDate).
- *    보여주기용 가짜 자료가 아니라 진짜 현황이다.
- * ⚠️ 마감된 시간은 아예 안 그린다. 그래야 "그려진 것 = 예약 가능" 이 되어
- *    상대 코드가 어떻게 읽든 틀릴 수가 없다.
+ * ⚠️ 여기엔 **계산이 없다.** 값은 전부 src/lib/availability.ts 에서 가져온다.
+ *    그래서 이 파일을 통째로 지워도 예약 화면·공개 API 는 아무 영향이 없다.
+ *
+ * ────────────────────────────────────────────────────────────────────────
+ * 🗑 없애는 조건 (셋 다 만족하면 지운다)
+ *   ① 빠방이 /api/availability 로 옮겨서 그쪽 목록에 우리 시간이 정상으로 뜬다
+ *   ② `/wp-admin/admin-ajax.php` 로 오는 요청이 하루 100건 아래로 떨어진다
+ *   ③ 클라우드플레어 "항상 HTTPS 사용" 을 다시 켜도 되는 상태가 된다
+ *      (`node scripts/cf-always-https.mjs on` — 지금은 이 땜빵 때문에 꺼져 있다)
+ *   지울 때 같이 지울 것: src/app/wp-admin/ · src/app/booking/route.ts ·
+ *                        middleware 의 http 처리와 admin-ajax 예외 · scripts/waf-ajax.mjs
+ * ────────────────────────────────────────────────────────────────────────
  */
-import { THEMES, slotsForThemeDate, themeById } from "@/lib/data";
-import { getConfig } from "@/lib/settings";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { themeById } from "@/lib/data";
+import { availabilityRange, availabilityOne, kstToday, kstDatePlus } from "@/lib/availability";
 
 /** 달력 번호 ↔ 우리 테마.
- *  **번호는 짐작이 아니라 실제로 들어온 값이다** — 2026-08-19 창구 기록에서 확인한
- *  17 · 23 · 24 세 가지뿐이었다.
- *    · 17 = 태초의 신부  (보관본 페이지에도 이 번호가 찍혀 있었다 — 확정)
- *    · 23 · 24 = 사자의 서 / 락다운시티. 어느 쪽인지는 들어온 값만으론 알 수 없어
- *      **만든 순서**로 정했다: 워드프레스 번호는 만든 순서대로 붙고,
- *      그쪽에 등록된 날짜가 태초의 신부 2021 → 사자의 서 2023 → 락다운시티 2025 이다.
+ *  **짐작이 아니라 실제로 들어온 값이다** — 2026-08-19 창구 기록에서 17 · 23 · 24 세 가지를 확인했다.
+ *    · 17 = 태초의 신부 (보관본 페이지에도 이 번호가 찍혀 있었다 — 확정)
+ *    · 23 · 24 = 사자의 서 / 락다운시티. 들어온 값만으론 어느 쪽인지 알 수 없어 **만든 순서**로 정했다
+ *      (워드프레스 번호는 만든 순서대로 붙는다. 등록일 = 태초의 신부 2021 → 사자의 서 2023 → 락다운시티 2025).
  *  ✅ 맞는지 확인하는 법: 두 테마는 시간표가 확연히 다르다.
- *      사자의 서 = 13:10 · 14:20 · 15:30 …(70분 간격) / 락다운시티 = 11:00 · 13:00 …(정각)
+ *      사자의 서 = 13:40 · 14:50 …(70분 간격) / 락다운시티 = 13:00 · 15:00 …(정각)
  *      그쪽 목록의 방에 엉뚱한 시간표가 뜨면 아래 23·24 를 서로 바꾸면 된다. */
 export const CALENDARS: { id: number; theme: string }[] = [
   { id: 17, theme: "firstfoundbride" }, // 태초의 신부 (1호점)
@@ -49,164 +50,63 @@ export const CALENDARS: { id: number; theme: string }[] = [
   { id: 24, theme: "ldc" },             // LOCKDOWN CITY (TGC)
 ];
 
-/** 달력 번호나 테마 이름표 아무거나 받아 테마 이름표로. 못 알아보면 undefined. */
+/** 달력 번호(또는 테마 이름표) → 테마 이름표. 못 알아보면 undefined. */
 export function themeOfCalendar(raw: string | null): string | undefined {
   if (!raw) return undefined;
-  const byNum = CALENDARS.find((c) => String(c.id) === raw.trim());
-  if (byNum) return byNum.theme;
-  return THEMES.some((t) => t.id === raw) ? raw : undefined;
+  const t = raw.trim();
+  return CALENDARS.find((c) => String(c.id) === t)?.theme
+      ?? (CALENDARS.some((c) => c.theme === t) ? t : undefined);
 }
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
-/** 오늘(한국 시간) YYYY-MM-DD */
-export function kstToday(): string {
-  return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
-}
-
-/** 그 테마·그 날짜에 **아직 예약 가능한** 시간들. 우리 예약 화면과 같은 계산이다. */
-export async function openTimes(db: SupabaseClient, themeId: string, date: string): Promise<string[]> {
-  const [{ data: bs }, { data: rv }, cfg] = await Promise.all([
-    db.from("blocked_slots").select("theme_id, time").eq("date", date),
-    db.from("reservations").select("time").eq("theme_id", themeId).eq("date", date).neq("status", "cancelled"),
-    getConfig(),
-  ]);
-  const mine = (bs || []).filter((b: { theme_id: string | null }) => !b.theme_id || b.theme_id === themeId);
-  if (mine.some((b: { time: string | null }) => !b.time)) return []; // 그날 통째로 휴무
-  const closed = new Set<string>([
-    ...mine.filter((b: { time: string | null }) => b.time).map((b: { time: string }) => b.time),
-    ...(rv || []).map((r: { time: string }) => r.time),
-  ]);
-  const all = slotsForThemeDate(
-    cfg.themeSlots, cfg.storeSlots, cfg.timeSlots,
-    themeId, themeById(themeId)?.store, date,
-  );
-  return all.filter((t) => !closed.has(t));
-}
-
-/** 여러 날짜치를 **한 번에** — 날짜마다 DB를 부르면 한 달이면 90번이 넘는다.
- *  차단·예약·설정을 각각 한 번씩만 받아 메모리에서 계산한다(DB 질문 3번으로 끝).
- *  돌려주는 값: { "2026-08-22": ["11:00", …], … } */
-export async function openTimesRange(
-  db: SupabaseClient, themeId: string, from: string, to: string,
-): Promise<Record<string, string[]>> {
-  const [{ data: bs }, { data: rv }, cfg] = await Promise.all([
-    db.from("blocked_slots").select("theme_id, date, time").gte("date", from).lte("date", to),
-    db.from("reservations").select("date, time").eq("theme_id", themeId).gte("date", from).lte("date", to).neq("status", "cancelled"),
-    getConfig(),
-  ]);
-  const closedByDate: Record<string, Set<string>> = {};
-  const dayOff = new Set<string>();
-  for (const b of (bs || []) as { theme_id: string | null; date: string; time: string | null }[]) {
-    if (b.theme_id && b.theme_id !== themeId) continue;   // 다른 테마의 차단은 무시
-    if (!b.time) { dayOff.add(b.date); continue; }         // 시간이 없으면 그날 통째로 휴무
-    (closedByDate[b.date] ||= new Set()).add(b.time);
-  }
-  for (const r of (rv || []) as { date: string; time: string }[]) (closedByDate[r.date] ||= new Set()).add(r.time);
-
-  const store = themeById(themeId)?.store;
-  const out: Record<string, string[]> = {};
-  for (let d = new Date(from + "T00:00:00Z"); d.toISOString().slice(0, 10) <= to; d.setUTCDate(d.getUTCDate() + 1)) {
-    const iso = d.toISOString().slice(0, 10);
-    if (dayOff.has(iso)) { out[iso] = []; continue; }
-    const closed = closedByDate[iso];
-    const all = slotsForThemeDate(cfg.themeSlots, cfg.storeSlots, cfg.timeSlots, themeId, store, iso);
-    out[iso] = closed ? all.filter((t) => !closed.has(t)) : all;
-  }
-  return out;
-}
-
-/** "14:30" → "오후 2:30" (옛 페이지가 한국어였다. 숫자 HH:MM 도 같이 남긴다) */
+/** "14:30" → "오후 2:30" (옛 페이지가 한국어였다) */
 function ampm(t: string): string {
   const [h, m] = t.split(":").map(Number);
-  const ap = h < 12 ? "오전" : "오후";
-  const h12 = h % 12 === 0 ? 12 : h % 12;
-  return `${ap} ${h12}:${String(m).padStart(2, "0")}`;
+  return `${h < 12 ? "오전" : "오후"} ${h % 12 === 0 ? 12 : h % 12}:${String(m).padStart(2, "0")}`;
 }
 
-/** 하루치 시간 목록 HTML — 플러그인이 날짜를 눌렀을 때 돌려주던 조각.
- *  ⚠️ 예약 가능한 시간만 그린다(마감은 아예 안 나온다). */
-export function apptListHtml(date: string, times: string[], themeName: string): string {
+/** 하루치 시간 목록 — 플러그인이 날짜를 눌렀을 때 돌려주던 조각.
+ *  ⚠️ **예약 가능한 시간만 그린다.** 그래야 받는 쪽이 어떻게 읽든 "그려진 것 = 예약 가능" 이다.
+ *  ⚠️ 제목(h2)에는 날짜만 넣는다 — 진짜 플러그인이 그랬다. 뒤에 딴 글자를 붙이면
+ *     받는 쪽이 날짜를 못 읽을 수 있다. 테마 이름은 감싼 상자의 data-theme-name 으로 알린다. */
+export function apptListHtml(date: string, times: string[], themeName: string, calId?: number): string {
   const [y, m, d] = date.split("-");
-  const head = `<h2><i class="booked-icon booked-icon-calendar"></i> ${Number(y)}년 ${Number(m)}월 ${Number(d)}일 · ${esc(themeName)}</h2>`;
+  const head = `<h2><i class="booked-icon booked-icon-calendar"></i> ${Number(y)}년 ${Number(m)}월 ${Number(d)}일</h2>`;
+  const open = `<div class="booked-appt-list shown" data-date="${date}" data-theme-name="${esc(themeName)}">`;
   if (!times.length) {
-    return `<div class="booked-appt-list shown">${head}\n<p class="booked-no-appts">예약 가능한 시간이 없습니다.</p>\n</div>`;
+    return `${open}${head}\n<p class="booked-no-appts">예약 가능한 시간이 없습니다.</p>\n</div>`;
   }
-  const slots = times.map((t) => `<div class="timeslot" data-timeslot="${t}" data-date="${date}">
+  /* 버튼에 붙는 값이 중요하다 — 진짜 플러그인은 버튼에서 data-title · data-timeslot ·
+     data-date · data-calendar-id 를 읽어 예약 창을 연다(보관본 functions.js).
+     받는 쪽이 글자 대신 버튼을 읽을 수도 있어 똑같이 붙여준다. */
+  const slots = times.map((t) => {
+    const at = `data-title="" data-timeslot="${t}" data-time="${t}" data-date="${date}"${calId ? ` data-calendar-id="${calId}"` : ""}`;
+    return `<div class="timeslot" ${at}>
 <div class="timeslot-time"><i class="booked-icon booked-icon-clock"></i> <span class="timeslot-range">${t}</span> <span class="timeslot-ampm">${ampm(t)}</span></div>
-<div class="timeslot-people"><span class="spots-available">1 자리</span> <button type="button" class="button">예약하기</button></div>
-</div>`).join("\n");
-  return `<div class="booked-appt-list shown">${head}\n${slots}\n</div>`;
-}
-
-/** 옛 예약 페이지 통째로 — 달력 3개 + 앞으로 10일치 시간 목록.
- *
- *  `/booking/` 과 `/wp-admin/admin-ajax.php`(값 없는 요청) 두 곳이 같이 쓴다.
- *
- *  [왜 값 없는 요청에도 이걸 주나]
- *    빠방 수집기는 **아무 값도 안 붙인 GET 만** 하루 5,900번 보낸다(2026-08-19 실측,
- *    방화벽을 열어 5분 30초 지켜본 30건 전부 그랬다). 옛 워드프레스는 여기에 "0" 한 글자를
- *    돌려줬으니, 그 상태로는 영영 아무 자료도 못 가져간다.
- *    → 물어보는 방식이 바뀔 가망이 없으므로, **지금 보내는 그 요청에 답을 실어준다.**
- *
- *  ⚠️ 테마 3개가 한 답에 같이 담긴다. 상대가 구조를 안 보고 시간만 긁으면
- *     세 테마 시간이 섞여 보일 수 있다. 그래서 테마마다
- *     `booked-calendar-shortcode-wrap`(+ data-theme, 제목)으로 확실히 칸을 나눠 둔다.
- *     그쪽 목록에 어떻게 반영되는지 보고 필요하면 나눠 주는 방식으로 바꾼다.
- */
-export async function bookedPageHtml(db: SupabaseClient, ajaxUrl: string, daysAhead = 10): Promise<string> {
-  const from = kstToday();
-  const to = new Date(Date.now() + 9 * 3600 * 1000 + daysAhead * 86400000).toISOString().slice(0, 10);
-  const [Y, M] = from.split("-").map(Number);
-  const mm = String(M).padStart(2, "0");
-  const monthEnd = `${Y}-${mm}-${new Date(Date.UTC(Y, M, 0)).getUTCDate()}`;
-
-  const blocks = await Promise.all(CALENDARS.map(async (c) => {
-    const name = themeById(c.theme)?.name || c.theme;
-    const month = await openTimesRange(db, c.theme, `${Y}-${mm}-01`, monthEnd > to ? monthEnd : to);
-    const cal = monthHtml(c.id, `${Y}-${mm}-01`, month);
-    const lists = Object.keys(month).filter((d) => d >= from && d <= to)
-      .map((d) => apptListHtml(d, month[d], name)).join("\n");
-    return `<div class="booked-calendar-shortcode-wrap" data-calendar-id="${c.id}" data-theme="${c.theme}">
-<h3 class="booked-calendar-title">${esc(name)}</h3>
-${cal}
-${lists}
+<div class="timeslot-people"><button type="button" class="button" ${at}><span class="spots-available">1 자리</span> 예약하기</button></div>
 </div>`;
-  }));
-
-  return `<!DOCTYPE html>
-<html lang="ko"><head><meta charset="utf-8">
-<title>예약 - 판타스트릭</title>
-<script type="text/javascript">
-/* 옛 플러그인이 심어두던 값 — 수집기가 여기서 창구 주소를 읽어간다 */
-var booked_js_vars = {"ajax_url":"${ajaxUrl}","profilePage":"https://fantastrick.co.kr/reserve","publicAppointments":""};
-</script>
-</head><body class="booked-ltr">
-<div id="booked-page-form">
-${blocks.join("\n")}
-</div>
-<!-- 예약 가능한 시간만 그려져 있습니다. 실제 예약은 https://fantastrick.co.kr/reserve -->
-</body></html>`;
+  }).join("\n");
+  return `${open}${head}\n${slots}\n</div>`;
 }
 
-/** 한 달 달력 표 HTML — 플러그인이 달을 넘길 때 돌려주던 조각.
- *  예약 가능한 날은 칸을 비워두고(선택 가능), 자리가 없는 날엔 booked-full 을 붙인다. */
+/** 한 달 달력 표 — 플러그인이 달을 넘길 때 돌려주던 조각. */
 export function monthHtml(calId: number, monthStart: string, openByDate: Record<string, string[]>): string {
   const [Y, M] = monthStart.split("-").map(Number);
-  const first = new Date(Date.UTC(Y, M - 1, 1));
-  const lead = first.getUTCDay();                       // 그 달 1일의 요일 (0=일)
-  const days = new Date(Date.UTC(Y, M, 0)).getUTCDate(); // 그 달의 마지막 날짜
+  const lead = new Date(Date.UTC(Y, M - 1, 1)).getUTCDay();
+  const days = new Date(Date.UTC(Y, M, 0)).getUTCDate();
   const today = kstToday();
 
   const cells: string[] = [];
-  for (let i = 0; i < lead; i++) cells.push(`<td class="prev-month prev-date"><span class="date"><span class="number"></span></span></td>`);
+  const blank = (cls: string) => `<td class="${cls}"><span class="date"><span class="number"></span></span></td>`;
+  for (let i = 0; i < lead; i++) cells.push(blank("prev-month prev-date"));
   for (let d = 1; d <= days; d++) {
     const iso = `${Y}-${String(M).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-    const open = (openByDate[iso] || []).length;
-    const cls = iso < today ? "prev-date" : iso === today ? "today" : open ? "" : "booked-full";
-    cells.push(`<td data-date="${iso}" data-available="${open}" class="${cls}"><span class="date"><span class="number">${d}</span></span></td>`);
+    const n = (openByDate[iso] || []).length;
+    const cls = iso < today ? "prev-date" : iso === today ? "today" : n ? "" : "booked-full";
+    cells.push(`<td data-date="${iso}" data-available="${n}" class="${cls}"><span class="date"><span class="number">${d}</span></span></td>`);
   }
-  while (cells.length % 7) cells.push(`<td class="next-month prev-date"><span class="date"><span class="number"></span></span></td>`);
+  while (cells.length % 7) cells.push(blank("next-month prev-date"));
 
   const rows: string[] = [];
   for (let i = 0; i < cells.length; i += 7) rows.push(`<tr class="week">\n${cells.slice(i, i + 7).join("\n")}\n</tr>`);
@@ -223,3 +123,47 @@ ${rows.join("\n")}
 </table>
 </div>`;
 }
+
+/** 옛 예약 페이지 통째로 — 달력 3개 + 앞으로 며칠치 시간 목록.
+ *  `/booking/` 과 창구의 "값 없는 요청" 이 같이 쓴다.
+ *  ⚠️ 테마 3개가 한 답에 담긴다. 받는 쪽이 구조를 안 보고 시간만 긁으면 섞여 보일 수 있어
+ *     테마마다 booked-calendar-shortcode-wrap(+data-theme, 제목)으로 칸을 확실히 나눠 둔다. */
+export async function bookedPageHtml(db: SupabaseClient, ajaxUrl: string, daysAhead = 10): Promise<string> {
+  const from = kstToday(), to = kstDatePlus(daysAhead);
+  const [Y, M] = from.split("-").map(Number);
+  const mm = String(M).padStart(2, "0");
+  const monthEnd = `${Y}-${mm}-${new Date(Date.UTC(Y, M, 0)).getUTCDate()}`;
+
+  const blocks = await Promise.all(CALENDARS.map(async (c) => {
+    const name = themeById(c.theme)?.name || c.theme;
+    const rows = await availabilityRange(db, c.theme, `${Y}-${mm}-01`, monthEnd > to ? monthEnd : to);
+    const byDate: Record<string, string[]> = {};
+    rows.forEach((r) => { byDate[r.date] = r.open; });
+    const lists = rows.filter((r) => r.date >= from && r.date <= to)
+      .map((r) => apptListHtml(r.date, r.open, name, c.id)).join("\n");
+    return `<div class="booked-calendar-shortcode-wrap" data-calendar-id="${c.id}" data-theme="${c.theme}">
+<h3 class="booked-calendar-title">${esc(name)}</h3>
+${monthHtml(c.id, `${Y}-${mm}-01`, byDate)}
+${lists}
+</div>`;
+  }));
+
+  return `<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<title>예약 - 판타스트릭</title>
+<script type="text/javascript">
+var booked_js_vars = {"ajax_url":"${ajaxUrl}","profilePage":"https://fantastrick.co.kr/reserve","publicAppointments":""};
+</script>
+</head><body class="booked-ltr">
+<div id="booked-page-form">
+${blocks.join("\n")}
+</div>
+<!-- 예약 가능한 시간만 그려져 있습니다. 정식 연동은 https://fantastrick.co.kr/reservation-api -->
+</body></html>`;
+}
+
+/** 창구가 쓰는 하루치 조회 — 계산은 availability.ts 가 한다 */
+export async function openTimes(db: SupabaseClient, themeId: string, date: string): Promise<string[]> {
+  return (await availabilityOne(db, themeId, date)).open;
+}
+export { kstToday };
