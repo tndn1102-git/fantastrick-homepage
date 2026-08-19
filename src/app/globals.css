@@ -154,6 +154,11 @@ h1.title,h2.title{font-family:var(--font-display);font-size:var(--fs-2xl);font-w
 .btn:disabled:hover{box-shadow:none!important;transform:none!important}
 
 /* ---------- HEADER ---------- */
+/* ⚠️ 이 규칙은 **태그 이름**으로 잡는다 — 페이지 안에 <header> 를 쓰면 그것도 화면에 고정되고
+   z-index 100 을 받는다. 실제로 비즈니스 페이지의 범위 표제(<header class="pn-head">)가
+   사이트 헤더를 덮는 사고가 있었다(2026-08-19).
+   → 본문에서 <header> 를 쓸 일이 있으면 그쪽에서 position 과 **z-index 둘 다** 되돌릴 것.
+     (예: .bizsys .pn-head { position: relative; z-index: auto }) */
 header{position:fixed;top:0;left:0;right:0;z-index:100;transition:.25s}
 .hdr-in{max-width:var(--maxw);margin:0 auto;padding:16px 22px;display:flex;align-items:center;gap:18px}
 /* 저사양 스크롤 최적화: backdrop-filter(스크롤마다 블러 리페인트) 제거 → 불투명 배경으로 대체

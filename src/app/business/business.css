@@ -480,7 +480,13 @@
    고르는 장에서 눌러 내려왔는데 첫 화면이 12px 키커면 "시작됐다"는 느낌이 없다.
    ⚠️ 색을 하드코딩하지 않는다. 세 패널이 --text·--muted·--brand·--line 을 자기 값으로
       덮어쓰고 있어서, 이 한 벌만으로 종이·카본·흰 화면 셋이 알아서 따라온다. */
-.bizsys .pn-head { padding: 54px 0 0; position: relative }
+/* ⚠️ z-index 를 반드시 되돌린다.
+   이 표제는 <header> 태그다. globals.css 의 **전역 규칙** `header{position:fixed;z-index:100}` 이
+   태그 이름만 보고 여기까지 걸린다. 그러면 사이트 맨 위 헤더와 **z-index 가 100 으로 같아져**,
+   나중에 그려지는 이 표제가 헤더를 덮는다 — 큰 글씨가 로고·메뉴(소개·컨텐츠·리뷰·이벤트) 위로
+   올라와 겹쳐 보였다(2026-08-19 사장님 제보, 표제 3곳 전부 해당).
+   position 은 아래에서 relative 로 덮고 있었지만 z-index 는 아무도 안 되돌리고 있었다. */
+.bizsys .pn-head { padding: 54px 0 0; position: relative; z-index: auto }
 .bizsys .pn-head i {
   display: block; font-style: normal; font-weight: 800; line-height: .86;
   font-size: clamp(52px, 9.5vw, 112px); letter-spacing: -.045em;
