@@ -605,9 +605,7 @@ export default function BusinessPage() {
           <div className="kicker reveal">장치 고장의 영향</div>
           <h2 className="reveal">장치 하나가 작동을 안 하면<br /><strong>그  날 손님들의 만족도도 떨어집니다.</strong></h2>
           <p className="lead reveal">
-            장치 하나가 고장난다고 해서 진행이 안되진 않겠죠. 
-대신 그 문제나 장치를 스킵한다거나, 
-진행이 매끄럽지 않고 몰입감도 깨질 겁니다.
+            장치 하나가 고장난다고 해서 진행이 안되진 않겠죠.<br />대신 그 문제나 장치를 스킵한다거나,<br />진행이 매끄럽지 않고 몰입감도 깨질 겁니다.
           </p>
 
           <figure className="reveal">
@@ -647,14 +645,9 @@ export default function BusinessPage() {
         {/* 새 제어기 — 이 패널의 주인공. .pn-stage 는 여기 하나에만 붙인다(릴리즈 태그·조명) */}
         <section className="bz-sec pn-stage">
           <div className="kicker reveal">FANTASTRICK TEAM</div>
-          <h2 className="reveal">저희가 만든 기계, <strong>마스터와 슬레이브</strong></h2>
+          <h2 className="reveal">저희가 만든 기계 <strong>[마스터와 슬레이브]</strong></h2>
           <p className="lead reveal">
-            방 안에 설치되는 장치, 전자석, 센서, 연출 조명을 
-컴퓨터 한 대가  맡아서 움직이는 기계입니다.
- 본체(마스터) 한 대가 장치 32개를 맡고, 부족하면 옆에
- 판(슬레이브)을 하나 더 답니다. 또한, 테마의 모든 장치
-(작동, 조명 켜고 끄기, 신호 주기 등)는 원격으로 
-pc와 모바일에서 제어가 가능합니다!
+            방 안에 설치되는 장치, 전자석, 센서, 연출 조명을<br />컴퓨터 한 대가  맡아서 움직이는 기계입니다.<br />본체(마스터) 한 대가 장치 32개를 맡고, 부족하면 옆에<br />판(슬레이브)을 하나 더 답니다. 또한, 테마의 모든 장치<br />(작동, 조명 켜고 끄기, 신호 주기 등)는 원격으로<br />pc와 모바일에서 제어가 가능합니다!
           </p>
 
           <div className="pcbstage reveal">
@@ -822,8 +815,7 @@ pc와 모바일에서 제어가 가능합니다!
               <h3>베이직</h3>
               <div className="devbar"><i style={{ width: "18%" }} /></div>
               <div className="devn">장치 <b>23개</b>까지</div>
-              <p>방 한 칸으로 시작하시는 분들. 23개에서 더는 안 늘어납니다. 나중에 프리미엄으로 올리실 때
-                쓰시던 기계는 값을 쳐드려요.</p>
+              <p>모노룸이나 1세대 방탈출 기준 적합한 모델입니다.</p>
             </div>
             <div className="tier hot reveal">
               <h3>프리미엄</h3>
@@ -846,23 +838,22 @@ pc와 모바일에서 제어가 가능합니다!
               <div className="bar">
                 <div className="lab">손님이 먼저</div>
                 <div className="track">
-                  <div className="fill bad"><b>12만원</b>게임 중에 문 열고 들어가야 합니다. 후기까지 갑니다.</div>
+                  <div className="fill bad">몰입감도 깨지고 이미 의욕이 없다. 테마 후기도 안좋을 예정. 상황에 따라 환불을 해줘야 할 수도 있음</div>
                 </div>
               </div>
               <div className="bar">
                 <div className="lab">직원이 먼저</div>
                 <div className="track">
-                  <div className="fill warn"><b>6만원</b>그 타임 닫고 전화 돌립니다.</div>
+                  <div className="fill warn">그나마 이해하지만 몰입감이 깨져서 아쉬움</div>
                 </div>
               </div>
               <div className="bar">
                 <div className="lab">우리가 먼저</div>
-                <div className="track"><div className="fill z"><b>0원</b>오픈 전에 고쳐놓습니다.</div></div>
+                <div className="track"><div className="fill z">최상의 테마 컨디션으로 손님에게 최고의 경험을 선사하고 테마 만족도도 매우 높다.</div></div>
               </div>
             </div>
             <figcaption>
-              <p>기계가 장치 상태를 스스로 살핍니다. 대답이 없는 게 생기면 사장님 폰으로 알림이 갑니다.
-                &quot;3번 방 전자석 응답 없음&quot; 이런 식으로요.</p>
+              <p>기계가 장치 상태를 스스로 살핍니다. 이상이 있을 경우 FANTASTRICK TEAM에서 바로 발견 후 원격처리 합니다.</p>
               <p></p>
             </figcaption>
           </figure>
@@ -871,8 +862,7 @@ pc와 모바일에서 제어가 가능합니다!
         <section className="bz-sec">
           <div className="kicker reveal">사후 관리</div>
           <h2 className="reveal">전화 한 통이면 <strong>끝납니다.</strong></h2>
-          <p className="lead reveal">어디에 전화해야 하는지 고민하실 일이 없습니다.
- 저희 FANTASTRICK TEAM이 관리해드립니다.</p>
+          <p className="lead reveal">어디에 전화해야 하는지 고민하실 일이 없습니다.<br />저희 FANTASTRICK TEAM이 관리해드립니다.</p>
           <div className="trust">
             <div className="reveal"><b>24시간 고장 감시</b><span>장치가 응답을 안 하면 저희가 먼저 알고 연락드립니다.</span></div>
             <div className="reveal"><b>원격으로 가능한건  원격으로 바로 처리</b><span>방문 없이 처리되는 건 그 자리에서 끝냅니다.</span></div>
