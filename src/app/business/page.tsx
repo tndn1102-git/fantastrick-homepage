@@ -44,49 +44,60 @@ const KIND_BY_SCOPE: Record<string, string> = {
 type ShotImg = { src: string; w: number; h: number; alt: string; label?: string; phone?: boolean };
 type Shot = { title: string; cap: string; stamp: string; trio?: boolean; imgs: ShotImg[] };
 
-const SHOTS: Shot[] = [
-  { title: "직원은 폰으로, 사장님은 PC 로",
-    cap: "출근했다고 단톡에 올리는 것을 없앱니다. 찍은 시간이 그대로 남아서 나중에 말이 갈리지 않습니다. 같은 기록을 PC 에서도 그대로 봅니다.",
-    stamp: "판타스트릭 실제 화면 · 직원 이름은 가명으로 바꿔 캡처",
-    imgs: [
-      { src: "/images/business/shot-attendance-phone.webp", w: 780, h: 1600, phone: true, label: "직원 폰",
-        alt: "직원이 자기 폰으로 출근과 퇴근을 찍는 화면." },
-      { src: "/images/business/shot-attendance-pc.webp", w: 1440, h: 1000, label: "PC 화면",
-        alt: "같은 출퇴근 기록을 PC 화면에서 달력으로 본다." },
+/* 제품 묶음. id 는 CSS 의 색 이름표(--app)와 짝이다 — business.css 의 .app-* 참고 */
+type AppGroup = { id: string; name: string; tag: string; shots: Shot[] };
+
+const APPS: AppGroup[] = [
+  { id: "att", name: "출퇴근 · 급여 프로그램", tag: "찍는 것부터 명세서 발송까지",
+    shots: [
+      { title: "직원은 폰으로, 사장님은 PC 로",
+        cap: "출근했다고 단톡에 올리는 것을 없앱니다. 찍은 시간이 그대로 남아서 나중에 말이 갈리지 않습니다. 같은 기록을 PC 에서도 그대로 봅니다.",
+        stamp: "판타스트릭 실제 화면 · 직원 이름은 가명으로 바꿔 캡처",
+        imgs: [
+          { src: "/images/business/shot-attendance-phone.webp", w: 780, h: 1600, phone: true, label: "직원 폰",
+            alt: "직원이 자기 폰으로 출근과 퇴근을 찍는 화면." },
+          { src: "/images/business/shot-attendance-pc.webp", w: 1440, h: 1000, label: "PC 화면",
+            alt: "같은 출퇴근 기록을 PC 화면에서 달력으로 본다." },
+        ] },
+      { title: "근태가 급여로 넘어오고, 명세서는 메일로 한 번에",
+        cap: "말일에 시급 계산기를 두드리지 않습니다. 찍힌 근태로 지급액과 공제가 계산되고, 확정한 명세서는 직원 메일로 일괄 발송됩니다. 누구에게 나갔는지도 화면에 남습니다.",
+        stamp: "판타스트릭 관리자 실제 화면 · 이름과 메일은 가명으로 바꿔 캡처",
+        imgs: [{ src: "/images/business/shot-payroll.webp", w: 1440, h: 1121,
+          alt: "급여 관리자 화면. 직원별 지급 총계와 공제, 실 수령액이 계산돼 있고 확정과 발송 상태가 표시된다." }] },
     ] },
 
-  { title: "이번 주 근무표",
-    cap: "빈 칸이 대타 자리입니다. 직원이 직접 신청하고 바꿔줄 사람이 승인하면 그걸로 끝납니다. 사장님이 단톡방에서 중재하실 일이 없어집니다.",
-    stamp: "판타스트릭 3개 지점 실제 운영 화면",
-    imgs: [{ src: "/images/business/shot-schedule.webp", w: 1440, h: 1080,
-      alt: "근무 스케줄 프로그램의 월간 근무표. 날짜마다 근무자와 대타 신청이 표시된다." }] },
+  { id: "sch", name: "근무 스케줄 앱", tag: "근무표와 대타를 직원들이 알아서",
+    shots: [
+      { title: "이번 주 근무표",
+        cap: "빈 칸이 대타 자리입니다. 직원이 직접 신청하고 바꿔줄 사람이 승인하면 그걸로 끝납니다. 사장님이 단톡방에서 중재하실 일이 없어집니다.",
+        stamp: "판타스트릭 3개 지점 실제 운영 화면",
+        imgs: [{ src: "/images/business/shot-schedule.webp", w: 1440, h: 1080,
+          alt: "근무 스케줄 프로그램의 월간 근무표. 날짜마다 근무자와 대타 신청이 표시된다." }] },
+    ] },
 
-  { title: "근태가 급여로 넘어오고, 명세서는 메일로 한 번에",
-    cap: "말일에 시급 계산기를 두드리지 않습니다. 찍힌 근태로 지급액과 공제가 계산되고, 확정한 명세서는 직원 메일로 일괄 발송됩니다. 누구에게 나갔는지도 화면에 남습니다.",
-    stamp: "판타스트릭 관리자 실제 화면 · 이름과 메일은 가명으로 바꿔 캡처",
-    imgs: [{ src: "/images/business/shot-payroll.webp", w: 1440, h: 1121,
-      alt: "급여 관리자 화면. 직원별 지급 총계와 공제, 실 수령액이 계산돼 있고 확정과 발송 상태가 표시된다." }] },
+  { id: "cpn", name: "쿠폰 발행기", tag: "발행부터 사용 통계까지",
+    shots: [
+      { title: "쿠폰 발행과 사용 처리",
+        cap: "발행하고 큐알로 찍어 처리합니다. 몇 장 나갔고 몇 장 쓰였는지가 한 화면에 있습니다.",
+        stamp: "판타스트릭 실제 운영 화면",
+        imgs: [{ src: "/images/business/shot-coupon.webp", w: 1440, h: 1080,
+          alt: "쿠폰 관리자 화면. 총 발급과 사용 완료, 미사용 수와 호점별 사용 현황이 보인다." }] },
+    ] },
 
-  { title: "쿠폰 발행과 사용 처리",
-    cap: "발행하고 큐알로 찍어 처리합니다. 몇 장 나갔고 몇 장 쓰였는지가 한 화면에 있습니다.",
-    stamp: "판타스트릭 실제 운영 화면",
-    imgs: [{ src: "/images/business/shot-coupon.webp", w: 1440, h: 1080,
-      alt: "쿠폰 관리자 화면. 총 발급과 사용 완료, 미사용 수와 호점별 사용 현황이 보인다." }] },
-
-  /* 홈페이지는 "예쁘다"가 아니라 **사람 손이 덜 간다**가 강점이다.
-     그래서 대표 화면 대신 **입금 확인 → 문자 발송 → 도착 확인** 세 단계를 순서대로 보여준다.
-     한 장씩은 작게 — 한 화면에 세 장이 같이 보여야 "과정"으로 읽힌다(2026-08-20 사장님 지시). */
-  { title: "예약금 확인부터 문자 발송까지 사람 손을 안 탑니다",
-    cap: "예약금이 들어오면 이름과 금액을 맞춰 예약이 알아서 확정으로 넘어갑니다. 확정 문자와 알림톡도 자동으로 나가고, 손님 카카오톡에 도착했는지까지 화면에 남습니다.",
-    stamp: "fantastrick.co.kr 관리자 실제 화면 · 손님 이름과 연락처는 가명으로 바꿔 캡처",
-    trio: true,
-    imgs: [
-      { src: "/images/business/shot-deposit.webp", w: 1100, h: 620, label: "① 입금 자동 확인",
-        alt: "관리자 입금 화면. 입금 감시 상태와 처리 대기 없음이 표시된다." },
-      { src: "/images/business/shot-message.webp", w: 1100, h: 504, label: "② 확정 문자 자동 발송",
-        alt: "자동으로 나간 확정 안내 문자 내용. 예약자와 테마, 일시, 환불 규정이 들어 있다." },
-      { src: "/images/business/shot-alimtalk.webp", w: 1100, h: 760, label: "③ 도착까지 확인",
-        alt: "알림톡 발송 결과 화면. 총 건수와 도착 건수, 실패 건수가 보인다." },
+  { id: "web", name: "예약 홈페이지", tag: "예약금 확인과 문자 발송이 자동",
+    shots: [
+      { title: "예약금 확인부터 문자 발송까지 사람 손을 안 탑니다",
+        cap: "예약금이 들어오면 이름과 금액을 맞춰 예약이 알아서 확정으로 넘어갑니다. 확정 문자와 알림톡도 자동으로 나가고, 손님 카카오톡에 도착했는지까지 화면에 남습니다.",
+        stamp: "fantastrick.co.kr 관리자 실제 화면 · 손님 이름과 연락처는 가명으로 바꿔 캡처",
+        trio: true,
+        imgs: [
+          { src: "/images/business/shot-deposit.webp", w: 1100, h: 620, label: "① 입금 자동 확인",
+            alt: "관리자 입금 화면. 입금 감시 상태와 처리 대기 없음이 표시된다." },
+          { src: "/images/business/shot-message.webp", w: 1100, h: 504, label: "② 확정 문자 자동 발송",
+            alt: "자동으로 나간 확정 안내 문자 내용. 예약자와 테마, 일시, 환불 규정이 들어 있다." },
+          { src: "/images/business/shot-alimtalk.webp", w: 1100, h: 760, label: "③ 도착까지 확인",
+            alt: "알림톡 발송 결과 화면. 총 건수와 도착 건수, 실패 건수가 보인다." },
+        ] },
     ] },
 ];
 
@@ -591,11 +602,12 @@ export default function BusinessPage() {
           <p>자물쇠와 센서, 조명을 한 대가 다 맡습니다</p>
         </header>
         <section className="bz-sec" id="device">
-          <div className="kicker reveal">장치값보다 큰 돈</div>
-          <h2 className="reveal">장치 하나가 작동을 안 하면<br /><strong>그 테마는 그날 못 씁니다.</strong></h2>
+          <div className="kicker reveal">장치 고장의 영향</div>
+          <h2 className="reveal">장치 하나가 작동을 안 하면<br /><strong>그  날 손님들의 만족도도 떨어집니다.</strong></h2>
           <p className="lead reveal">
-            2시 타임 한 번 비면 그날 매출에서 그냥 빠져요. 내일 두 팀 받는다고 메워지는 것도 아니고요.
-            주말에 타임이 다 차는 방일수록 손해가 큽니다.
+            장치 하나가 고장난다고 해서 진행이 안되진 않겠죠. 
+대신 그 문제나 장치를 스킵한다거나, 
+진행이 매끄럽지 않고 몰입감도 깨질 겁니다.
           </p>
 
           <figure className="reveal">
@@ -634,12 +646,15 @@ export default function BusinessPage() {
 
         {/* 새 제어기 — 이 패널의 주인공. .pn-stage 는 여기 하나에만 붙인다(릴리즈 태그·조명) */}
         <section className="bz-sec pn-stage">
-          <div className="kicker reveal">새로 만든 것</div>
+          <div className="kicker reveal">FANTASTRICK TEAM</div>
           <h2 className="reveal">저희가 만든 기계, <strong>마스터와 슬레이브</strong></h2>
           <p className="lead reveal">
-            방 안에 붙는 자물쇠, 전자석, 센서, 연출 조명을 한 대가 다 맡아서 움직이는 기계입니다.
-            본체(마스터) 한 대가 장치 32개를 맡고, 모자라면 옆에 판(슬레이브)을 하나 더 답니다.
-            저희가 만들어 저희 매장에 넣고 쓰는 물건입니다.
+            방 안에 설치되는 장치, 전자석, 센서, 연출 조명을 
+컴퓨터 한 대가  맡아서 움직이는 기계입니다.
+ 본체(마스터) 한 대가 장치 32개를 맡고, 부족하면 옆에
+ 판(슬레이브)을 하나 더 답니다. 또한, 테마의 모든 장치
+(작동, 조명 켜고 끄기, 신호 주기 등)는 원격으로 
+pc와 모바일에서 제어가 가능합니다!
           </p>
 
           <div className="pcbstage reveal">
@@ -739,7 +754,7 @@ export default function BusinessPage() {
           </div>
 
           <figure className="reveal" style={{ marginTop: 26 }}>
-            <p className="ftitle">모자라면 판을 하나 더 답니다</p>
+            <p className="ftitle">부족하면 판 단위로 추가가 가능합니다(판만 추가하면 되기 때문에 컴퓨터 단위로 늘리는 것 보다 훨씬 저렴합니다)</p>
             <div className="blocks">
               <div className="blk main"><b>본체</b><span>장치 32개</span></div>
               {Array.from({ length: mods }, (_, i) => (
@@ -769,7 +784,7 @@ export default function BusinessPage() {
 
           {/* 방 늘릴 때 드는 돈 — 금액을 쓰지 않는다. 기울기 차이로만 읽게 한다. */}
           <figure className="reveal" style={{ marginTop: 14 }}>
-            <p className="ftitle">방을 늘려갈 때</p>
+            <p className="ftitle">장치를 늘려갈 때</p>
             <div className="step-chart">
               <svg viewBox="0 0 620 200" role="img"
                 aria-label="방을 늘릴 때 드는 돈 비교. 기계를 통째로 다시 사는 방식은 늘릴 때마다 처음 금액이 또 들어 가파르게 올라가고, 판만 더하는 방식은 완만하게 올라갑니다.">
@@ -795,39 +810,38 @@ export default function BusinessPage() {
                 <text className="axl" x="450" y="190" textAnchor="middle">128개</text>
               </svg>
             </div>
-            <figcaption>기계를 통째로 다시 사야 하는 방식이면, 방을 늘릴 때마다 처음 냈던 돈이 또 나갑니다.
-              판만 더하면 되는 방식은 처음 한 번으로 끝납니다.</figcaption>
+            <figcaption>기계를 통째로 다시 사야 하는 방식이면, 장치를 늘릴 때마다 처음 냈던 돈이 또 나갑니다. 판만 더하면 되는 방식은 상대적으로 훨씬 저렴합니다.</figcaption>
           </figure>
 
           {/* 구성 — 금액 없음 */}
-          <h3 className="reveal" style={{ margin: "44px 0 0", fontSize: 17, fontWeight: 800 }}>테마 몇 개짜리세요?</h3>
+          <h3 className="reveal" style={{ margin: "44px 0 0", fontSize: 17, fontWeight: 800 }}>테마 규모와 장치 개수에 따라 맞춤형으로 진행됩니다.</h3>
           {/* ⚠️ gridTemplateColumns 를 인라인으로 두면 미디어쿼리를 이겨서 360px 폰에서도 2열로 남는다
                  (카드 폭 111px → "장치 23개까지"가 세 줄로 접힘). CSS 로 옮겼다. */}
           <div className="tiers" style={{ marginTop: 16 }}>
             <div className="tier reveal">
-              <h3>소형</h3>
+              <h3>베이직</h3>
               <div className="devbar"><i style={{ width: "18%" }} /></div>
               <div className="devn">장치 <b>23개</b>까지</div>
-              <p>방 한 칸으로 시작하시는 분들. 23개에서 더는 안 늘어납니다. 나중에 표준으로 올리실 때
+              <p>방 한 칸으로 시작하시는 분들. 23개에서 더는 안 늘어납니다. 나중에 프리미엄으로 올리실 때
                 쓰시던 기계는 값을 쳐드려요.</p>
             </div>
             <div className="tier hot reveal">
-              <h3>표준</h3>
+              <h3>프리미엄</h3>
               <div className="devbar"><i style={{ width: "25%" }} /></div>
               <div className="devn">장치 <b>32개</b>부터</div>
-              <p>새로 여는 매장은 대부분 이걸로 갑니다. 판만 더 달면 계속 붙습니다. 위로 끝이 없어요.</p>
+              <p>방 2개 이상에 들어가는 모델입니다.</p>
             </div>
           </div>
-          <p className="note reveal">설치는 3일 기준입니다. 금액은 방 개수와 장치 수에 따라 달라서 보러 가서 말씀드립니다.</p>
+          <p className="note reveal">방 규모와 장치 개수에 따라 달라질 수 있습니다. FANTASTRICK TEAM이 체계적으로 현장 분석 후 맞춤 설계해 드립니다.</p>
         </section>
 
         {/* 누가 먼저 아느냐 */}
         <section className="bz-sec">
           <div className="kicker reveal">누가 먼저 아느냐</div>
-          <h2 className="reveal">손님이 인터폰 누르기 전에<br /><strong>아셔야 합니다.</strong></h2>
+          <h2 className="reveal">손님이 무전기누르기 전에<br /><strong>아셔야 합니다.</strong></h2>
 
           <figure className="reveal">
-            <p className="ftitle">누가 먼저 아느냐에 따라 손해가 갈립니다</p>
+            <p className="ftitle">누가 먼저 아느냐에 따라 손해도 손해지만 만족도와 몰입감 차이가 극명하게 갈립니다.</p>
             <div className="bars">
               <div className="bar">
                 <div className="lab">손님이 먼저</div>
@@ -849,8 +863,7 @@ export default function BusinessPage() {
             <figcaption>
               <p>기계가 장치 상태를 스스로 살핍니다. 대답이 없는 게 생기면 사장님 폰으로 알림이 갑니다.
                 &quot;3번 방 전자석 응답 없음&quot; 이런 식으로요.</p>
-              <p>다 잡히지는 않습니다. 손님이 뜯어버린 소품, 끊어진 배선, 정전은 이걸로 안 걸려요.
-                그건 여전히 사람이 봐야 합니다.</p>
+              <p></p>
             </figcaption>
           </figure>
         </section>
@@ -858,19 +871,20 @@ export default function BusinessPage() {
         <section className="bz-sec">
           <div className="kicker reveal">사후 관리</div>
           <h2 className="reveal">전화 한 통이면 <strong>끝납니다.</strong></h2>
-          <p className="lead reveal">어디에 전화해야 하는지 고민하실 일이 없습니다. 만든 사람이 받습니다.</p>
+          <p className="lead reveal">어디에 전화해야 하는지 고민하실 일이 없습니다.
+ 저희 FANTASTRICK TEAM이 관리해드립니다.</p>
           <div className="trust">
             <div className="reveal"><b>24시간 고장 감시</b><span>장치가 응답을 안 하면 저희가 먼저 알고 연락드립니다.</span></div>
-            <div className="reveal"><b>원격으로 되는 건 원격으로</b><span>방문 없이 처리되는 건 그 자리에서 끝냅니다.</span></div>
-            <div className="reveal"><b>장치 AS 도 직접</b><span>우리가 만든 장치라 다른 데로 돌리지 않습니다.</span></div>
-            <div className="reveal"><b>프로그램 손보는 것도</b><span>쓰시다가 불편한 곳은 고쳐서 올립니다.</span></div>
+            <div className="reveal"><b>원격으로 가능한건  원격으로 바로 처리</b><span>방문 없이 처리되는 건 그 자리에서 끝냅니다.</span></div>
+            <div className="reveal"><b>장치 AS 도 직접</b><span>저희가 만든 장치, 저희가 책임집니다.</span></div>
+            <div className="reveal"><b>프로그램 유지 보수 기능 추가도 가능</b><span>원하시는 부분만 말씀해주세요!  맞춰서 제공해드립니다.</span></div>
           </div>
         </section>
 
         {/* FAQ */}
         <section className="bz-sec">
           <div className="kicker reveal">자주 묻는 것</div>
-          <h2 className="reveal">이런 걸 물어보십니다.</h2>
+          <h2 className="reveal">어떤게 궁금하신가요?</h2>
           <div className="reveal">
             <details>
               <summary>지금 매장에 있는 장치, 안 뜯고 그대로 쓸 수 있나요?</summary>
@@ -1001,7 +1015,7 @@ export default function BusinessPage() {
                 · 기능 설명부에 **실제 캡처**를 쓰는 곳 9/11. 도해로 대체하는 곳 0곳.
                 · 도해가 사는 자리는 "구조·왜 우리인가·업종 목록" 뿐이다(11/11).
                 · 소상공인 대상은 5~8장. 10장 넘는 곳 없음.
-                · 개인정보는 **더미 데이터가 표준. 블러 쓴 곳 0곳**(블러는 숨길 게 있다는 신호).
+                · 개인정보는 **더미 데이터가 프리미엄. 블러 쓴 곳 0곳**(블러는 숨길 게 있다는 신호).
               전에 있던 "그림으로 옮긴 화면" 태그는 캡처 오인을 막으려던 장치였는데,
               B2B 페이지에서는 그대로 "아직 없는 물건" 신호로 읽혀서 걷어냈다.
 
@@ -1011,23 +1025,34 @@ export default function BusinessPage() {
               [우리 매장 이름은 일부러 남긴다] 조사 22곳 중 "직접 운영하며 만들었다"고 말하는 곳이
               0곳이었다. 규모도 대기업 로고도 없는 우리가 이길 수 있는 유일한 자리라,
               화면에 박힌 우리 매장 이름이 곧 증거다(2026-08-20 사장님 확인). */}
-          <div className="shots reveal">
-            {SHOTS.map((s) => (
-              <figure className={"shot" + (s.imgs.length > 1 ? " pair" : "") + (s.trio ? " trio" : "") + (s.imgs[0].phone ? " phone" : "")} key={s.title}>
-                <p className="s-title">{s.title}</p>
-                <div className="s-imgs">
-                  {s.imgs.map((im) => (
-                    <div className={"s-frame" + (im.phone ? " ph" : "")} key={im.src}>
-                      <Image src={im.src} alt={im.alt} width={im.w} height={im.h} sizes="(max-width: 900px) 92vw, 620px" />
-                      {im.label && <span className="s-lab">{im.label}</span>}
-                    </div>
+          <div className="apps">
+            {APPS.map((a, ai) => (
+              <section className={"appgrp reveal app-" + a.id} key={a.id}>
+                {/* 제품 이름표 — 색·번호·이름으로 "여기부터 다른 프로그램"임을 알린다 */}
+                <div className="app-head">
+                  <span className="app-chip">{String(ai + 1).padStart(2, "0")} {a.name}</span>
+                  <span className="app-tag">{a.tag}</span>
+                </div>
+                <div className="shots">
+                  {a.shots.map((s) => (
+                    <figure className={"shot" + (s.imgs.length > 1 ? " pair" : "") + (s.trio ? " trio" : "") + (s.imgs[0].phone ? " phone" : "")} key={s.title}>
+                      <p className="s-title">{s.title}</p>
+                      <div className="s-imgs">
+                        {s.imgs.map((im) => (
+                          <div className={"s-frame" + (im.phone ? " ph" : "")} key={im.src}>
+                            <Image src={im.src} alt={im.alt} width={im.w} height={im.h} sizes="(max-width: 900px) 92vw, 620px" />
+                            {im.label && <span className="s-lab">{im.label}</span>}
+                          </div>
+                        ))}
+                      </div>
+                      <figcaption>
+                        {s.cap}
+                        <span className="s-stamp">{s.stamp}</span>
+                      </figcaption>
+                    </figure>
                   ))}
                 </div>
-                <figcaption>
-                  {s.cap}
-                  <span className="s-stamp">{s.stamp}</span>
-                </figcaption>
-              </figure>
+              </section>
             ))}
           </div>
 

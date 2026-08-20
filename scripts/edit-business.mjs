@@ -24,6 +24,8 @@ import { spawn } from "node:child_process";
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
 
 const APP_PORT = 3459;   // 홈페이지(개발 모드)
 const EDIT_PORT = 3460;  // 고치기 도구
@@ -34,7 +36,9 @@ if (!fs.existsSync(TARGET)) { console.error(`${TARGET} 을 찾을 수 없습니�
 
 /* ── ① 홈페이지 띄우기 ── */
 console.log("홈페이지를 띄우는 중입니다… (처음엔 30초쯤 걸립니다)");
-const dev = spawn("npx", ["next", "dev", "-p", String(APP_PORT)], { shell: true, stdio: ["ignore", "pipe", "pipe"] });
+/* ⚠️ 빌드 폴더를 따로 쓴다(.next-edit). 같은 .next 를 쓰면 배포용 빌드와 부딪혀
+   화면이 500 으로 깨지고, 도구를 껐다 켜는 사이 고치던 내용이 날아간다(2026-08-20 두 번 발생). */
+const dev = spawn("npx", ["next", "dev", "-p", String(APP_PORT)], { shell: true, stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, NEXT_DIST_DIR: ".next-edit" } });
 dev.stdout.on("data", (d) => { const s = String(d); if (/Ready|error|Error/.test(s)) process.stdout.write("  " + s); });
 dev.stderr.on("data", (d) => process.stderr.write("  " + d));
 
@@ -64,7 +68,19 @@ function applyEdits(edits) {
   const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
   /** 한 조각을 소스에서 찾아 바꾼다. 바꿨으면 true. */
-  function one(from, to) {
+  /** 줄바꿈을 소스에 맞는 형태로 바꾼다.
+   *  JSX 글자 자리( >여기< )면 <br /> 로, 따옴표 안 글자면 띄어쓰기로 둔다.
+   *  ⚠️ 이걸 안 하면 엔터로 나눈 줄이 화면에서 **한 줄로 붙어** 나온다(JSX 는 줄바꿈을 공백으로 본다). */
+  function lineBreaks(from, to) {
+    if (!to.includes("\n")) return to;
+    const at = src.indexOf(from);
+    const before = at > 0 ? src.slice(Math.max(0, at - 40), at).replace(/\s+$/, "") : "";
+    const parts = to.split("\n").map((x) => x.trim()).filter(Boolean);
+    return before.endsWith(">") ? parts.join("<br />") : parts.join(" ");
+  }
+
+  function one(from, rawTo) {
+    const to = lineBreaks(from, rawTo);
     if (!from || from === to) return true;
     // ① 글자 그대로 한 곳
     let n = src.split(from).length - 1;
@@ -100,6 +116,14 @@ function applyEdits(edits) {
       failed.push({ from, to, why: "여러 줄 중 일부를 못 찾음" });
       continue;
     }
+    /* 줄 수가 달라진 경우(엔터로 줄을 더 넣으신 경우)도 살린다 —
+       첫 줄은 제목, 나머지는 <br /> 로 이어 한 조각으로 바꾼다. */
+    if (a.length > 1 && b.length > 1 && a.length !== b.length) {
+      if (one(a[0], b[0]) && one(a.slice(1).join(" "), b.slice(1).join("\n"))) {
+        done.push({ from: a.join(" / "), to: b.join(" / "), note: "줄 수가 달라져 이어 붙임" });
+        continue;
+      }
+    }
     failed.push({ from, to, why: a.length !== b.length && a.length > 1 ? `줄 수가 달라짐(${a.length}줄 → ${b.length}줄)` : "소스에서 못 찾음(코드로 만들어지는 글자일 수 있음)" });
   }
   if (done.length) fs.writeFileSync(TARGET, src, "utf8");
@@ -131,6 +155,13 @@ const INJECT = `
 <script>
 (function(){
   var KO=/[가-힣]/, edits=new Map();
+  /* 고친 내용을 브라우저에 적어둔다 — 개발 모드는 파일이 바뀔 때마다 화면을 다시 그리는데,
+     그때 DOM 에만 있던 수정분이 통째로 사라진다(2026-08-20 실제로 두 번 날아갔다). */
+  var KEY='edit-business:'+location.pathname;
+  function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){ return {}; } }
+  function keep(){ var o={}; edits.forEach(function(v,k){o[k]=v}); try{ localStorage.setItem(KEY,JSON.stringify(o)); }catch(e){} }
+  function clearKeep(){ try{ localStorage.removeItem(KEY); }catch(e){} }
+  window.addEventListener('beforeunload',function(e){ if(edits.size){ e.preventDefault(); e.returnValue=''; } });
   var SKIP={SCRIPT:1,STYLE:1,SVG:1,PATH:1,INPUT:1,TEXTAREA:1,SELECT:1,OPTION:1};
   function leafy(el){
     if(SKIP[el.tagName]) return false;
@@ -154,17 +185,55 @@ const INJECT = `
         if(n===o){edits.delete(o);el.setAttribute('data-dirty','0');}
         else{edits.set(o,n);el.setAttribute('data-dirty','1');}
         document.getElementById('edn').textContent=edits.size;
+        keep();
+      });
+      // 새로고침으로 날아간 내용 되살리기
+      var kept=load()[el.getAttribute('data-orig')];
+      if(kept!=null && kept!==(el.innerText||'').trim()){
+        el.innerText=kept; edits.set(el.getAttribute('data-orig'),kept); el.setAttribute('data-dirty','1');
+        document.getElementById('edn').textContent=edits.size;
+      }
+      /* 엔터로 줄을 바꾼다. 그냥 두면 링크·버튼 안에서 엔터가 씹히거나
+         페이지 쪽 처리로 넘어가 아무 일도 안 일어난다(2026-08-20 사장님 지적). */
+      el.addEventListener('keydown',function(e){
+        if(e.key!=='Enter') return;
+        e.preventDefault(); e.stopPropagation();
+        document.execCommand('insertLineBreak');
+        el.dispatchEvent(new Event('input',{bubbles:true}));
       });
       // 링크는 클릭하면 이동해버린다 — 고치는 동안 막는다
       el.addEventListener('click',function(e){ if(el.closest('a')) e.preventDefault(); });
     });
   }
-  mark(); new MutationObserver(mark).observe(document.body,{childList:true,subtree:true});
+  /* 화면이 다시 그려져 원래 글자로 돌아간 자리를 찾아 고친 값을 다시 넣는다. */
+  /* 화면이 다시 그려져 원래 글자로 돌아간 자리를 찾아 고친 값을 다시 넣는다.
+     ⚠️ 다시 넣는 동안에는 감시를 끈다 — 안 그러면 서로 물고 늘어져 화면이 멈춘다. */
+  var busy=false, mo=null;
+  function restore(){
+    if(busy||!edits.size) return;
+    busy=true; if(mo) mo.disconnect();
+    try{
+      document.querySelectorAll('[data-ed]').forEach(function(el){
+        var o=el.getAttribute('data-orig'); if(!edits.has(o)) return;
+        var want=edits.get(o);
+        if((el.innerText||'').trim()!==want){ el.innerText=want; el.setAttribute('data-dirty','1'); }
+      });
+      var n=document.getElementById('edn'); if(n) n.textContent=edits.size;
+    } finally {
+      if(mo) mo.observe(document.body,{childList:true,subtree:true});
+      busy=false;
+    }
+  }
+  mark(); restore();
+  mo=new MutationObserver(function(){ if(busy) return; mark(); restore(); });
+  mo.observe(document.body,{childList:true,subtree:true});
+  /* 그려주는 쪽이 늦게 덮어쓰는 경우도 있어 가끔 확인한다. */
+  setInterval(restore, 2500);
 
   function say(t){var m=document.getElementById('edmsg');m.textContent=t;m.style.display='block';
     clearTimeout(say._t); say._t=setTimeout(function(){m.style.display='none';},9000);}
 
-  document.getElementById('edundo').onclick=function(){ if(edits.size&&!confirm('고친 것을 전부 되돌릴까요?'))return; location.reload(); };
+  document.getElementById('edundo').onclick=function(){ if(edits.size&&!confirm('고친 것을 전부 되돌릴까요?'))return; clearKeep(); edits.clear(); location.reload(); };
   document.getElementById('edsave').onclick=function(){
     if(!edits.size){say('고친 곳이 없습니다.');return;}
     var list=[]; edits.forEach(function(v,k){list.push({original:k,updated:v});});
@@ -174,7 +243,7 @@ const INJECT = `
         if(j.failed.length){ t+='\\n\\n못 고친 '+j.failed.length+'곳 (이건 말씀해주시면 손으로 고쳐드립니다)\\n'
           + j.failed.map(function(f){return '· "'+f.from.slice(0,40)+'" — '+f.why}).join('\\n'); }
         say(t);
-        if(j.done.length) setTimeout(function(){location.reload()},2500);
+        if(j.done.length){ clearKeep(); edits.clear(); setTimeout(function(){location.reload()},2500); }
       }).catch(function(e){say('저장 실패: '+e.message)});
   };
 })();
@@ -224,6 +293,21 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
+/* ── 실시간 연결(WebSocket)도 그대로 넘긴다 ──
+   이걸 안 하면 브라우저가 연결 실패로 판단해 화면을 계속 다시 불러오고,
+   그때마다 화면에서 고치던 내용이 사라진다(2026-08-20 실제로 그랬다). */
+server.on("upgrade", (req, socket, head) => {
+  const net = require("node:net");
+  const up = net.connect(APP_PORT, "127.0.0.1", () => {
+    up.write(`${req.method} ${req.url} HTTP/1.1\r\n` +
+      Object.entries(req.headers).map(([k, v]) => `${k}: ${v}`).join("\r\n") + "\r\n\r\n");
+    if (head && head.length) up.write(head);
+    up.pipe(socket); socket.pipe(up);
+  });
+  up.on("error", () => socket.destroy());
+  socket.on("error", () => up.destroy());
+});
+
 const url = `http://127.0.0.1:${EDIT_PORT}${PAGE}`;
 if (!(await ready())) { console.error("홈페이지를 띄우지 못했습니다."); dev.kill(); process.exit(1); }
 server.listen(EDIT_PORT, () => {
@@ -232,6 +316,7 @@ server.listen(EDIT_PORT, () => {
   console.log("  · 고친 곳은 주황색으로 표시됩니다");
   console.log("  · 아래 [저장]을 누르면 실제 소스에 적힙니다");
   console.log("  · 라이브 사이트는 안 바뀝니다. 다 하시면 \"배포해\" 라고 말씀해주세요");
+  console.log("  · 화면이 저절로 새로고침돼도 고치신 내용은 그대로 살아납니다");
   console.log("  · 끄기: 이 창에서 Ctrl+C\n");
   spawn("cmd", ["/c", "start", "", "chrome", url], { shell: false, stdio: "ignore" }).unref();
 });

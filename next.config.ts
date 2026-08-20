@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  /* 빌드 결과를 넣을 폴더. 평소엔 .next 그대로다.
+     [왜 바꿀 수 있게 했나] 문구 편집 도구(scripts/edit-business.mjs)가 next dev 를 띄우는데,
+     그 상태에서 next build 를 돌리면 **같은 .next 를 동시에 쓰다가 화면이 500 으로 깨진다**
+     (CLAUDE.md 에 적힌 함정이고, 2026-08-20 실제로 밟았다).
+     그때마다 도구를 껐다 켜느라 사장님이 화면에서 고치던 내용이 두 번 날아갔다.
+     → 도구는 NEXT_DIST_DIR=.next-edit 로 띄운다. 이제 빌드와 절대 안 부딪힌다. */
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   // 정적 이미지는 public/ 아래에서 직접 서빙 (외부 도메인 없음)
   reactStrictMode: true,
   /* 🔴 2026-08-16 — 사진 자동 변환을 **끈다**(unoptimized).

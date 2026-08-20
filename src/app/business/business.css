@@ -1450,3 +1450,37 @@
   }
   .bizsys .shot.trio .s-imgs > * { scroll-snap-align: center }
 }
+
+/* ── 제품별 묶음 ──────────────────────────────────────────
+   캡처 7칸이 같은 모양으로 이어져 어느 프로그램인지 구분이 안 됐다(2026-08-20 사장님 지적).
+   제품마다 **위쪽 색 띠 + 색 이름표**를 달아 "여기부터 다른 프로그램"이 한눈에 보이게 한다.
+   색은 각 프로그램의 실제 화면 색을 따랐다 — 캡처와 이름표 색이 이어져 보인다. */
+.bizsys .apps { display: grid; gap: 26px; margin: 30px 0 8px }
+.bizsys .appgrp {
+  border: 1px solid var(--line); border-radius: var(--r);
+  border-top: 3px solid var(--app, var(--brand));
+  background: var(--card); padding: 18px 22px 24px;
+}
+.bizsys .app-att { --app: #4f46e5 }   /* 출퇴근 앱의 보라 */
+.bizsys .app-sch { --app: #7c5cd6 }   /* 스케줄 앱의 연보라 */
+.bizsys .app-cpn { --app: #b45309 }   /* 쿠폰의 호박색 */
+.bizsys .app-web { --app: #0369a1 }   /* 홈페이지의 파랑 */
+.bizsys .app-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 4px }
+.bizsys .app-chip {
+  display: inline-flex; align-items: center;
+  padding: 5px 12px; border-radius: 999px;
+  background: var(--app); color: #fff;
+  font-size: 13px; font-weight: 800; letter-spacing: -.01em; line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+}
+.bizsys .app-tag { font-size: 13px; color: var(--muted) }
+/* 묶음 안 캡처 간격은 조금 좁게 — 묶음 사이 간격보다 안쪽이 좁아야 소속이 보인다 */
+.bizsys .appgrp .shots { gap: 26px; margin: 14px 0 0 }
+@media (max-width: 640px) { .bizsys .appgrp { padding: 14px 14px 18px } }
+
+/* 묶음 카드 안의 캡처(figure.shot)는 **맨몸**으로 — 전역 figure 카드 스타일이 그대로 걸리면
+   묶음 안에서 캡처마다 또 상자가 생겨 "상자 속 상자"가 된다. 그러면 묶음 경계가 안 보여서
+   제품 구분이라는 목적 자체가 죽는다(2026-08-20 실측). 이름표 색 띠가 묶음의 유일한 경계다. */
+.bizsys .appgrp figure.shot {
+  background: transparent; border: 0; border-radius: 0; padding: 0; box-shadow: none;
+}
