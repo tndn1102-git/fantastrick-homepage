@@ -40,32 +40,52 @@ const KIND_BY_SCOPE: Record<string, string> = {
    근태·스케줄을 파는 6곳이 **전부 근무표를 1번**으로 내세웠다.
    캡션은 기능 나열이 아니라 사장님이 얻는 결과로 쓴다(조사 8곳 중 6곳이 이 방식).
    ⚠️ 이미지는 미리 줄여 넣는다 — scripts/prep-business-shots.mjs */
-const SHOTS = [
-  { src: "/images/business/shot-schedule.webp", w: 1440, h: 1080,
-    title: "이번 주 근무표",
-    alt: "근무 스케줄 프로그램의 월간 근무표 화면. 날짜마다 근무자와 대타 신청이 표시된다.",
+/** 실제 화면 캡처 한 칸. imgs 가 2장이면 나란히 놓는다(폰+PC 처럼 한 이야기일 때만). */
+type ShotImg = { src: string; w: number; h: number; alt: string; label?: string; phone?: boolean };
+type Shot = { title: string; cap: string; stamp: string; imgs: ShotImg[] };
+
+const SHOTS: Shot[] = [
+  { title: "이번 주 근무표",
     cap: "빈 칸이 대타 자리입니다. 직원이 직접 신청하고 바꿔줄 사람이 승인하면 그걸로 끝납니다. 사장님이 단톡방에서 중재하실 일이 없어집니다.",
-    stamp: "판타스트릭 3개 지점 실제 운영 화면" },
-  { src: "/images/business/shot-attendance-phone.webp", w: 780, h: 1600, phone: true,
-    title: "직원 폰으로 찍습니다",
-    alt: "직원이 자기 폰으로 출근과 퇴근을 찍는 화면. 이번 달 기록이 달력으로 보인다.",
-    cap: "출근했다고 단톡에 올리는 것을 없앱니다. 찍은 시간이 그대로 남아서 나중에 말이 갈리지 않습니다.",
-    stamp: "판타스트릭 직원용 실제 화면" },
-  { src: "/images/business/shot-attendance.webp", w: 1440, h: 1150,
-    title: "누가 몇 시간 일했는지 자동으로 쌓입니다",
-    alt: "출퇴근 관리자 화면. 이번 달 직원별 출근일수와 총 근무시간, 대타 현황이 표로 정리돼 있다.",
-    cap: "말일에 시급 계산기를 두드리지 않습니다. 직원별 근무시간이 이미 계산된 상태로 올라옵니다.",
-    stamp: "판타스트릭 관리자 실제 화면 · 직원 이름은 가명으로 바꿔 캡처" },
-  { src: "/images/business/shot-coupon.webp", w: 1440, h: 1080,
-    title: "쿠폰 발행과 사용 처리",
-    alt: "쿠폰 관리자 화면. 총 발급과 사용 완료, 미사용 수와 호점별 사용 현황, 최근 사용 내역이 보인다.",
+    stamp: "판타스트릭 3개 지점 실제 운영 화면",
+    imgs: [{ src: "/images/business/shot-schedule.webp", w: 1440, h: 1080,
+      alt: "근무 스케줄 프로그램의 월간 근무표. 날짜마다 근무자와 대타 신청이 표시된다." }] },
+
+  /* 폰과 PC 를 나란히 — 직원은 폰으로 찍고 사장님은 PC 로 본다는 게 한눈에 보여야 한다. */
+  { title: "직원은 폰으로, 사장님은 PC 로",
+    cap: "출근했다고 단톡에 올리는 것을 없앱니다. 찍은 시간이 그대로 남아서 나중에 말이 갈리지 않습니다. 같은 기록을 PC 에서도 그대로 봅니다.",
+    stamp: "판타스트릭 실제 화면 · 직원 이름은 가명으로 바꿔 캡처",
+    imgs: [
+      { src: "/images/business/shot-attendance-phone.webp", w: 780, h: 1600, phone: true, label: "직원 폰",
+        alt: "직원이 자기 폰으로 출근과 퇴근을 찍는 화면." },
+      { src: "/images/business/shot-attendance-pc.webp", w: 1440, h: 1000, label: "PC 화면",
+        alt: "같은 출퇴근 기록을 PC 화면에서 달력으로 본다." },
+    ] },
+
+  /* 급여가 이 프로그램의 진짜 강점이다 — 근태가 그대로 넘어와 계산되고, 명세서가 메일로 한 번에 나간다. */
+  { title: "근태가 급여로 넘어오고, 명세서는 메일로 한 번에",
+    cap: "말일에 시급 계산기를 두드리지 않습니다. 찍힌 근태로 지급액과 공제가 계산되고, 확정한 명세서는 직원 메일로 일괄 발송됩니다. 누구에게 나갔는지도 화면에 남습니다.",
+    stamp: "판타스트릭 관리자 실제 화면 · 이름과 메일은 가명으로 바꿔 캡처",
+    imgs: [{ src: "/images/business/shot-payroll.webp", w: 1440, h: 1121,
+      alt: "급여 관리자 화면. 직원별 지급 총계와 공제, 실 수령액이 계산돼 있고 확정과 발송 상태가 표시된다." }] },
+
+  { title: "쿠폰 발행과 사용 처리",
     cap: "발행하고 큐알로 찍어 처리합니다. 몇 장 나갔고 몇 장 쓰였는지가 한 화면에 있습니다.",
-    stamp: "판타스트릭 실제 운영 화면" },
-  { src: "/images/business/shot-homepage.webp", w: 1440, h: 900,
-    title: "예약 홈페이지까지 같이 갑니다",
-    alt: "판타스트릭 예약 홈페이지 첫 화면.",
-    cap: "외부 플랫폼에 수수료를 내지 않습니다. 예약과 취소, 환불 규정까지 이 안에서 돌아갑니다.",
-    stamp: "fantastrick.co.kr · 지금 손님이 예약하는 그 화면" },
+    stamp: "판타스트릭 실제 운영 화면",
+    imgs: [{ src: "/images/business/shot-coupon.webp", w: 1440, h: 1080,
+      alt: "쿠폰 관리자 화면. 총 발급과 사용 완료, 미사용 수와 호점별 사용 현황이 보인다." }] },
+
+  /* 홈페이지는 "예쁘다"가 아니라 **사람 손이 덜 간다**가 강점이다.
+     그래서 대표 화면 대신 예약금 자동처리·문자 자동발송 화면을 넣는다(2026-08-20 사장님 지시). */
+  { title: "예약금 확인과 문자 발송이 사람 손을 안 탑니다",
+    cap: "예약금이 들어오면 이름과 금액을 맞춰 예약이 알아서 확정으로 넘어갑니다. 확정 문자와 알림톡도 자동으로 나가고, 손님 카카오톡에 도착했는지까지 화면에 남습니다.",
+    stamp: "fantastrick.co.kr 관리자 실제 화면 · 손님 이름과 연락처는 가명으로 바꿔 캡처",
+    imgs: [
+      { src: "/images/business/shot-deposit.webp", w: 1440, h: 760, label: "예약금 자동 처리",
+        alt: "관리자 입금 화면. 입금 감시 상태와 처리 대기 없음이 표시된다." },
+      { src: "/images/business/shot-alimtalk.webp", w: 1440, h: 1000, label: "문자·알림톡 발송 결과",
+        alt: "알림톡 발송 결과 화면. 총 건수와 도착 건수, 실패 건수가 보인다." },
+    ] },
 ];
 
 
@@ -991,10 +1011,15 @@ export default function BusinessPage() {
               화면에 박힌 우리 매장 이름이 곧 증거다(2026-08-20 사장님 확인). */}
           <div className="shots reveal">
             {SHOTS.map((s) => (
-              <figure className={"shot" + (s.phone ? " phone" : "")} key={s.src}>
+              <figure className={"shot" + (s.imgs.length > 1 ? " pair" : "") + (s.imgs[0].phone ? " phone" : "")} key={s.title}>
                 <p className="s-title">{s.title}</p>
-                <div className="s-frame">
-                  <Image src={s.src} alt={s.alt} width={s.w} height={s.h} sizes="(max-width: 900px) 92vw, 720px" />
+                <div className="s-imgs">
+                  {s.imgs.map((im) => (
+                    <div className={"s-frame" + (im.phone ? " ph" : "")} key={im.src}>
+                      <Image src={im.src} alt={im.alt} width={im.w} height={im.h} sizes="(max-width: 900px) 92vw, 620px" />
+                      {im.label && <span className="s-lab">{im.label}</span>}
+                    </div>
+                  ))}
                 </div>
                 <figcaption>
                   {s.cap}

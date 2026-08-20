@@ -232,7 +232,7 @@
 .bizsys .bzform .full { grid-column: 1 / -1 }
 .bizsys .bzform label { display: block; font-size: 11.5px; color: var(--faint); margin-bottom: 5px; font-weight: 700 }
 .bizsys .bzform input {
-  width: 100%; background: rgba(255,255,255,.07); border: 1px solid var(--line); border-radius: 9px;
+  width: 100%; background: var(--field, var(--card)); border: 1px solid var(--line2, var(--line)); border-radius: 9px;
   color: var(--text); padding: 11px 13px; font-size: 14.5px; font-family: inherit;
 }
 .bizsys .bzform input:focus { outline: none; border-color: var(--brand) }
@@ -671,7 +671,7 @@
   --text: #1a1a18; --muted: #56554f; --faint: #6b6960;
   --line: rgba(26,24,20,.22); --line2: rgba(26,24,20,.34);
   --brand: #0d3b8c; --brand-bright: #0d3b8c;
-  --surf: #ffffff; --card: rgba(255,255,255,.62);
+  --surf: #ffffff; --card: rgba(255,255,255,.62); --field: #ffffff;
   color-scheme: light;
   position: relative; color: var(--text);
   background-color: #f3efe6;
@@ -879,7 +879,7 @@
   --text: #e6f7ff; --muted: #a4b3bf; --faint: #8b9aa6;
   --line: rgba(0,212,255,.24); --line2: rgba(0,212,255,.38);
   --brand: #00d4ff; --brand-bright: #6fe6ff;
-  --surf: #11151a; --card: rgba(255,255,255,.035);
+  --surf: #11151a; --card: rgba(255,255,255,.035); --field: rgba(255,255,255,.06);
   position: relative; color: var(--text);
   background-color: #0d0f12;
   /* 카본 — 45도 잔무늬. 격자가 아니라 짜임이라 앞뒤 패널과 결이 다르다. */
@@ -1088,7 +1088,7 @@
   --text: #101828; --muted: #5b6675; --faint: #667085;
   --line: rgba(16,24,40,.10); --line2: rgba(16,24,40,.18);
   --brand: #2563eb; --brand-bright: #1d4ed8;
-  --surf: #f8fafc; --card: #f8fafc;
+  --surf: #f8fafc; --card: #f8fafc; --field: #ffffff;
   color-scheme: light;
   position: relative; color: var(--text);
   background: #ffffff;
@@ -1409,3 +1409,22 @@
   grid-template-columns: 1fr; grid-template-areas: "title" "img" "cap";
 }
 @media (max-width: 900px) { .bizsys .shots.duo { grid-template-columns: 1fr } }
+
+/* 한 칸에 화면 두 장을 나란히 (폰+PC, 입금+알림톡).
+   두 장이 **한 가지 이야기**일 때만 쓴다 — 떨어뜨려 놓으면 관계가 안 보인다. */
+.bizsys .shot .s-imgs { grid-area: img; display: grid; gap: 12px }
+.bizsys .shot.pair .s-imgs { grid-template-columns: auto 1fr; align-items: start }
+.bizsys .shot.pair.phone .s-imgs { grid-template-columns: 200px 1fr }
+.bizsys .shot .s-frame { position: relative }
+/* 어느 쪽이 무엇인지 한 단어로 */
+.bizsys .shot .s-lab {
+  position: absolute; left: 8px; top: 8px; z-index: 1;
+  padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: -.01em;
+  background: rgba(12,16,24,.78); color: #fff; line-height: 1.4;
+}
+.bizsys .shot.phone .s-frame.ph { max-width: 200px }
+@media (max-width: 900px) {
+  .bizsys .shot.pair .s-imgs,
+  .bizsys .shot.pair.phone .s-imgs { grid-template-columns: 1fr }
+  .bizsys .shot.phone .s-frame.ph { max-width: 220px; margin: 0 auto }
+}
