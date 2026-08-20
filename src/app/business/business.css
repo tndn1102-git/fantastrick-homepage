@@ -1400,3 +1400,12 @@
   .bizsys .proof .pf-nums { grid-template-columns: 1fr; gap: 12px }
   .bizsys .proof .pf-cta { width: 100%; justify-content: center }
 }
+
+/* 힌트폰 두 화면은 **나란히** 둔다 — 손님 화면과 직원 화면이 붙어 있다는 게 요점이라
+   위아래로 떨어뜨리면 그 관계가 안 보인다. 좁은 화면에서는 위아래로 쌓는다. */
+.bizsys .shots.duo { grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 18px }
+.bizsys .shots.duo .shot,
+.bizsys .shots.duo .shot:nth-child(even) {
+  grid-template-columns: 1fr; grid-template-areas: "title" "img" "cap";
+}
+@media (max-width: 900px) { .bizsys .shots.duo { grid-template-columns: 1fr } }

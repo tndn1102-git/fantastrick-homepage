@@ -996,25 +996,20 @@ export default function BusinessPage() {
                 <div className="s-frame">
                   <Image src={s.src} alt={s.alt} width={s.w} height={s.h} sizes="(max-width: 900px) 92vw, 720px" />
                 </div>
-
-          {/* 실제 처리량 — 지어낸 숫자가 아니라 DB 에서 뽑은 값이다(2026-08-20 기준).
-              바뀌면 여기 숫자와 기준일을 같이 고쳐야 한다. 기준일 없는 숫자는 쓰지 않는다. */}
-          <div className="proof reveal">
-            <div className="pf-nums">
-              <div><b>157건</b><span>새 홈페이지로 받은 예약</span></div>
-              <div><b>97%</b><span>예약금 입금 자동확인</span></div>
-              <div><b>7건</b><span>미입금 30분 자동취소</span></div>
-            </div>
-            <p className="pf-note">2026년 8월 13일부터 20일까지 8일간, 판타스트릭 3개 지점 실제 기록입니다. 입금 자동확인은 109건 중 106건이 사람 손 없이 처리됐습니다.</p>
-            <a className="btn primary pf-cta" href="#cta">우리 매장 기준으로 견적 받기</a>
-          </div>
-
                 <figcaption>
                   {s.cap}
                   <span className="s-stamp">{s.stamp}</span>
                 </figcaption>
               </figure>
             ))}
+          </div>
+
+          {/* 견적 버튼은 캡처 바로 아래에 둔다 — 가격을 비공개로 두는 곳(조사 11곳 중 6곳)이
+              예외 없이 화면 옆에 견적·상담 버튼을 붙여 둔다. 캡처를 보고 마음이 움직인 자리에
+              버튼이 없으면 한참 스크롤해야 해서 그대로 닫힌다.
+              ⚠️ 처리량 숫자(157건·97%)는 뺐다 — 캡처 내용과 숫자가 서로 안 맞아 눈으로 대조가 안 됐다(2026-08-20 사장님 지시). */}
+          <div className="proof reveal">
+            <a className="btn primary pf-cta" href="#cta">우리 매장 기준으로 견적 받기</a>
           </div>
 
           <p className="lead reveal" style={{ margin: "22px 0 0" }}>
@@ -1058,32 +1053,34 @@ export default function BusinessPage() {
 둘이 실시간으로 붙어 있습니다.
           </p>
 
-          <figure className="swmock reveal">
-            <p className="ftitle">두 화면이 붙어 있습니다</p>
-            <span className="mocktag">처리 순서</span>
-            <div className="hintduo">
-              <div className="hd-screen" role="img"
-                aria-label="손님이 보는 태블릿 화면 그림입니다. 남은 시간과 지금 할 일, 방금 받은 힌트가 보입니다.">
-                <span className="hd-lab" aria-hidden="true">손님 태블릿</span>
-                <div className="hd-body" aria-hidden="true">
-                  <div className="hd-time">1:12:40</div>
-                  <div className="hd-row"><b>지금 할 일</b><span>2층 사무실로</span></div>
-                  <div className="hd-row"><b>받은 힌트</b><span>액자 뒤를 보세요</span></div>
-                </div>
+          {/* ⭐ 힌트폰 도해 → **실제 화면 2장**으로 교체 (2026-08-20 사장님 지시)
+              · 손님 태블릿 = 대기 화면(MISSION TRACKER SYSTEM). 진행 중 화면은 문제·힌트가 보여서 못 쓴다.
+              · GM 뷰어 = 실제 운영 중인 화면. 폰 2대 연결·힌트 사용 횟수가 그대로 보인다.
+              ⚠️ 뷰어 화면에는 락다운시티 **진행 단계 이름이 전부** 들어 있었다(안전가옥·소독실·박사방…).
+                 공개 페이지에 그대로 올리면 손님이 미리 보는 스포일러라, 단계 이름만 '미션 01…' 로
+                 바꿔서 찍었다. 화면 구조(체크·진행·힌트 사용 수)는 실물 그대로다. */}
+          <div className="shots duo reveal">
+            <figure className="shot">
+              <p className="s-title">손님이 보는 태블릿</p>
+              <div className="s-frame">
+                <Image src="/images/business/shot-tablet.webp" alt="방 안 태블릿의 대기 화면. 테마 이름과 미션 트래커 표시가 보인다." width={1200} height={900} sizes="(max-width: 900px) 92vw, 560px" />
               </div>
-              <div className="hd-link" aria-hidden="true"><i /><b>실시간</b></div>
-              <div className="hd-screen us" role="img"
-                aria-label="직원이 보는 화면 그림입니다. 어디까지 왔는지, 시간이 얼마나 남았는지 보이고 힌트를 눌러 보냅니다.">
-                <span className="hd-lab" aria-hidden="true">직원 화면</span>
-                <div className="hd-body" aria-hidden="true">
-                  <div className="hd-row"><b>진행</b><span>7 / 12 단계</span></div>
-                  <div className="hd-row"><b>남은 시간</b><span>1:12:40</span></div>
-                  <div className="hd-send"><span>1차 힌트 보내기</span><em>정답 보기</em></div>
-                </div>
+              <figcaption>
+                힌트를 종이로 주거나 직원이 문을 열고 들어갈 일이 없습니다. 남은 시간과 지금 할 일, 받은 힌트가 이 화면에 있습니다.
+                <span className="s-stamp">락다운시티 방 안 태블릿 실제 화면</span>
+              </figcaption>
+            </figure>
+            <figure className="shot">
+              <p className="s-title">직원이 보는 뷰어</p>
+              <div className="s-frame">
+                <Image src="/images/business/shot-gmviewer.webp" alt="직원용 진행 뷰어. 연결된 태블릿 수와 남은 시간, 진행 단계와 힌트 사용 횟수가 보인다." width={1440} height={900} sizes="(max-width: 900px) 92vw, 560px" />
               </div>
-            </div>
-            <figcaption>원하시는 구성, 방향으로 다 맞춰서 설계가 진행됩니다. 원하시는 기능도 추가 가능합니다.</figcaption>
-          </figure>
+              <figcaption>
+                어느 방이 어디까지 왔는지 한 화면에서 보고, 필요하면 그 자리에서 힌트를 보냅니다. 태블릿이 꺼졌다 켜져도 진행과 남은 시간이 그대로 따라옵니다.
+                <span className="s-stamp">지금 3호점에서 돌아가는 화면 · 진행 단계 이름은 스포일러라 가림</span>
+              </figcaption>
+            </figure>
+          </div>
 
           <div className="ops" style={{ marginTop: 18 }}>
             <div className="op reveal"><b>방 성격에 맞춰 만듭니다</b><span>카드를 대면 다음 할 일이 뜨는 방식, 코드를 넣으면 이야기가 오는 방식.<br />둘 다 저희 매장에서 돌리고 있습니다.</span></div>
