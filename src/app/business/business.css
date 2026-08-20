@@ -1349,8 +1349,10 @@
 .bizsys .shot .s-title {
   grid-area: title; margin: 0 0 2px; font-size: 16px; font-weight: 800; letter-spacing: -.02em;
 }
+/* ⚠️ 여기에 grid-area 를 주지 말 것 — 칸은 .s-imgs 가 맡는다.
+   주면 이미지 여러 장이 같은 칸에 겹쳐 놓인다(2026-08-20 실제로 그랬다). */
 .bizsys .shot .s-frame {
-  grid-area: img; border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
+  border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
   background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,.08); line-height: 0;
 }
 .bizsys .shot .s-frame img { width: 100%; height: auto; display: block }
@@ -1365,8 +1367,8 @@
 }
 /* 폰 화면만 단순 목업 — 프레임이 없으면 세로 이미지가 그냥 잘린 그림처럼 보인다.
    노치·홈버튼·손 사진은 넣지 않는다. */
-.bizsys .shot.phone .s-frame {
-  max-width: 250px; border-radius: 22px; border-width: 6px; border-color: #12161f;
+.bizsys .shot .s-frame.ph {
+  max-width: 230px; border-radius: 22px; border-width: 6px; border-color: #12161f;
   box-shadow: 0 8px 24px rgba(0,0,0,.16);
 }
 @media (max-width: 900px) {
@@ -1374,7 +1376,7 @@
   .bizsys .shot:nth-child(even) {
     grid-template-columns: 1fr; grid-template-areas: "title" "img" "cap";
   }
-  .bizsys .shot.phone .s-frame { max-width: 220px; margin: 0 auto }
+
 }
 
 /* ── 실제 처리량 + 견적 버튼 (캡처 바로 아래) ─────────────
@@ -1413,8 +1415,11 @@
 /* 한 칸에 화면 두 장을 나란히 (폰+PC, 입금+알림톡).
    두 장이 **한 가지 이야기**일 때만 쓴다 — 떨어뜨려 놓으면 관계가 안 보인다. */
 .bizsys .shot .s-imgs { grid-area: img; display: grid; gap: 12px }
-.bizsys .shot.pair .s-imgs { grid-template-columns: auto 1fr; align-items: start }
-.bizsys .shot.pair.phone .s-imgs { grid-template-columns: 200px 1fr }
+.bizsys .shot.pair .s-imgs { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 14px }
+.bizsys .shot.pair .s-imgs > * { flex: 1 1 260px; min-width: 0 }
+/* 폰은 늘어나지 않게 고정 — 늘어나면 옆 화면을 밀어 겹친다 */
+.bizsys .shot.pair .s-imgs > .ph { flex: 0 0 auto; width: 200px }
+
 .bizsys .shot .s-frame { position: relative }
 /* 어느 쪽이 무엇인지 한 단어로 */
 .bizsys .shot .s-lab {
@@ -1422,9 +1427,26 @@
   padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: -.01em;
   background: rgba(12,16,24,.78); color: #fff; line-height: 1.4;
 }
-.bizsys .shot.phone .s-frame.ph { max-width: 200px }
+
 @media (max-width: 900px) {
-  .bizsys .shot.pair .s-imgs,
-  .bizsys .shot.pair.phone .s-imgs { grid-template-columns: 1fr }
-  .bizsys .shot.phone .s-frame.ph { max-width: 220px; margin: 0 auto }
+    .bizsys .shot.pair .s-imgs { flex-direction: column; align-items: center }
+
+  .bizsys .shot .s-frame.ph { max-width: 200px; margin: 0 auto }
+}
+
+/* 세 단계를 한 줄에 — 입금 확인 → 문자 발송 → 도착 확인.
+   한 장씩 크게 놓으면 "과정"이 아니라 별개 화면 셋으로 읽힌다.
+   좁은 화면에서는 옆으로 넘겨 본다(세로로 쌓으면 스크롤이 너무 길어진다). */
+.bizsys .shot.trio { grid-template-columns: 1fr; grid-template-areas: "title" "img" "cap" }
+.bizsys .shot.trio .s-imgs {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: start;
+}
+.bizsys .shot.trio .s-frame img { max-height: 320px; object-fit: cover; object-position: top }
+.bizsys .shot.trio figcaption { align-self: start; margin-top: 4px }
+@media (max-width: 820px) {
+  .bizsys .shot.trio .s-imgs {
+    grid-template-columns: repeat(3, 78%); overflow-x: auto; scroll-snap-type: x mandatory;
+    padding-bottom: 6px; -webkit-overflow-scrolling: touch;
+  }
+  .bizsys .shot.trio .s-imgs > * { scroll-snap-align: center }
 }

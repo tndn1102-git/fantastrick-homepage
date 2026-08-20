@@ -42,16 +42,9 @@ const KIND_BY_SCOPE: Record<string, string> = {
    ⚠️ 이미지는 미리 줄여 넣는다 — scripts/prep-business-shots.mjs */
 /** 실제 화면 캡처 한 칸. imgs 가 2장이면 나란히 놓는다(폰+PC 처럼 한 이야기일 때만). */
 type ShotImg = { src: string; w: number; h: number; alt: string; label?: string; phone?: boolean };
-type Shot = { title: string; cap: string; stamp: string; imgs: ShotImg[] };
+type Shot = { title: string; cap: string; stamp: string; trio?: boolean; imgs: ShotImg[] };
 
 const SHOTS: Shot[] = [
-  { title: "이번 주 근무표",
-    cap: "빈 칸이 대타 자리입니다. 직원이 직접 신청하고 바꿔줄 사람이 승인하면 그걸로 끝납니다. 사장님이 단톡방에서 중재하실 일이 없어집니다.",
-    stamp: "판타스트릭 3개 지점 실제 운영 화면",
-    imgs: [{ src: "/images/business/shot-schedule.webp", w: 1440, h: 1080,
-      alt: "근무 스케줄 프로그램의 월간 근무표. 날짜마다 근무자와 대타 신청이 표시된다." }] },
-
-  /* 폰과 PC 를 나란히 — 직원은 폰으로 찍고 사장님은 PC 로 본다는 게 한눈에 보여야 한다. */
   { title: "직원은 폰으로, 사장님은 PC 로",
     cap: "출근했다고 단톡에 올리는 것을 없앱니다. 찍은 시간이 그대로 남아서 나중에 말이 갈리지 않습니다. 같은 기록을 PC 에서도 그대로 봅니다.",
     stamp: "판타스트릭 실제 화면 · 직원 이름은 가명으로 바꿔 캡처",
@@ -62,7 +55,12 @@ const SHOTS: Shot[] = [
         alt: "같은 출퇴근 기록을 PC 화면에서 달력으로 본다." },
     ] },
 
-  /* 급여가 이 프로그램의 진짜 강점이다 — 근태가 그대로 넘어와 계산되고, 명세서가 메일로 한 번에 나간다. */
+  { title: "이번 주 근무표",
+    cap: "빈 칸이 대타 자리입니다. 직원이 직접 신청하고 바꿔줄 사람이 승인하면 그걸로 끝납니다. 사장님이 단톡방에서 중재하실 일이 없어집니다.",
+    stamp: "판타스트릭 3개 지점 실제 운영 화면",
+    imgs: [{ src: "/images/business/shot-schedule.webp", w: 1440, h: 1080,
+      alt: "근무 스케줄 프로그램의 월간 근무표. 날짜마다 근무자와 대타 신청이 표시된다." }] },
+
   { title: "근태가 급여로 넘어오고, 명세서는 메일로 한 번에",
     cap: "말일에 시급 계산기를 두드리지 않습니다. 찍힌 근태로 지급액과 공제가 계산되고, 확정한 명세서는 직원 메일로 일괄 발송됩니다. 누구에게 나갔는지도 화면에 남습니다.",
     stamp: "판타스트릭 관리자 실제 화면 · 이름과 메일은 가명으로 바꿔 캡처",
@@ -76,14 +74,18 @@ const SHOTS: Shot[] = [
       alt: "쿠폰 관리자 화면. 총 발급과 사용 완료, 미사용 수와 호점별 사용 현황이 보인다." }] },
 
   /* 홈페이지는 "예쁘다"가 아니라 **사람 손이 덜 간다**가 강점이다.
-     그래서 대표 화면 대신 예약금 자동처리·문자 자동발송 화면을 넣는다(2026-08-20 사장님 지시). */
-  { title: "예약금 확인과 문자 발송이 사람 손을 안 탑니다",
+     그래서 대표 화면 대신 **입금 확인 → 문자 발송 → 도착 확인** 세 단계를 순서대로 보여준다.
+     한 장씩은 작게 — 한 화면에 세 장이 같이 보여야 "과정"으로 읽힌다(2026-08-20 사장님 지시). */
+  { title: "예약금 확인부터 문자 발송까지 사람 손을 안 탑니다",
     cap: "예약금이 들어오면 이름과 금액을 맞춰 예약이 알아서 확정으로 넘어갑니다. 확정 문자와 알림톡도 자동으로 나가고, 손님 카카오톡에 도착했는지까지 화면에 남습니다.",
     stamp: "fantastrick.co.kr 관리자 실제 화면 · 손님 이름과 연락처는 가명으로 바꿔 캡처",
+    trio: true,
     imgs: [
-      { src: "/images/business/shot-deposit.webp", w: 1440, h: 760, label: "예약금 자동 처리",
+      { src: "/images/business/shot-deposit.webp", w: 1100, h: 620, label: "① 입금 자동 확인",
         alt: "관리자 입금 화면. 입금 감시 상태와 처리 대기 없음이 표시된다." },
-      { src: "/images/business/shot-alimtalk.webp", w: 1440, h: 1000, label: "문자·알림톡 발송 결과",
+      { src: "/images/business/shot-message.webp", w: 1100, h: 504, label: "② 확정 문자 자동 발송",
+        alt: "자동으로 나간 확정 안내 문자 내용. 예약자와 테마, 일시, 환불 규정이 들어 있다." },
+      { src: "/images/business/shot-alimtalk.webp", w: 1100, h: 760, label: "③ 도착까지 확인",
         alt: "알림톡 발송 결과 화면. 총 건수와 도착 건수, 실패 건수가 보인다." },
     ] },
 ];
@@ -1011,7 +1013,7 @@ export default function BusinessPage() {
               화면에 박힌 우리 매장 이름이 곧 증거다(2026-08-20 사장님 확인). */}
           <div className="shots reveal">
             {SHOTS.map((s) => (
-              <figure className={"shot" + (s.imgs.length > 1 ? " pair" : "") + (s.imgs[0].phone ? " phone" : "")} key={s.title}>
+              <figure className={"shot" + (s.imgs.length > 1 ? " pair" : "") + (s.trio ? " trio" : "") + (s.imgs[0].phone ? " phone" : "")} key={s.title}>
                 <p className="s-title">{s.title}</p>
                 <div className="s-imgs">
                   {s.imgs.map((im) => (
