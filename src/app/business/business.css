@@ -1319,3 +1319,60 @@
 .bizsys .bzdone { margin: 26px auto 0; max-width: 480px; padding: 24px 22px; border-radius: 14px; background: rgba(63,166,111,.12); border: 1px solid rgba(63,166,111,.42) }
 .bizsys .bzdone b { display: block; font-size: 17px; margin-bottom: 8px; color: var(--text) }
 .bizsys .bzdone p { margin: 0; font-size: 14px; color: var(--muted); line-height: 1.75 }
+
+/* ── ⭐ 실제 운영 화면 캡처 ──────────────────────────────────
+   2026-08-20. 국내외 22개사 제품 페이지 전수 조사 결과를 그대로 옮긴 규칙이다.
+
+   [프레임] 브라우저 주소창 목업을 **쓰지 않는다.**
+     주소창을 그리면 관리자 주소를 노출해야 하고, 가짜 도메인을 그려 넣으면
+     그 순간 캡처의 신뢰가 깎인다. 조사한 곳 어디에서도 주소창을 확인하지 못했다.
+     대신 얇은 테두리 + 아주 옅은 그림자 + 8px 라운드만 준다.
+
+   [기울임·겹치기 금지] 사장님은 근무표의 **글자를 읽으려고** 본다. 기울이면 못 읽는다.
+     데스크톱과 폰을 겹쳐 놓지도 않는다(겹치면 폰이 데스크톱 글자를 가린다).
+
+   [배치] 좌우 교차. 이미지 옆에 캡션이 붙어 한 덩어리로 읽힌다.
+     좁은 화면에서는 이미지 위, 글 아래로 쌓는다.
+
+   [강조 장치 없음] 화살표·말풍선·번호 배지를 쓰지 않는다(조사 22곳 중 사용 0곳). */
+.bizsys .shots { display: grid; gap: 34px; margin: 30px 0 8px }
+.bizsys .shot {
+  margin: 0; display: grid; gap: 8px 26px; align-items: start;
+  grid-template-columns: minmax(0, 1.5fr) minmax(220px, 1fr);
+  grid-template-areas: "title title" "img cap";
+}
+/* 좌우 교차 — 짝수 번째는 글이 왼쪽 */
+.bizsys .shot:nth-child(even) {
+  grid-template-columns: minmax(220px, 1fr) minmax(0, 1.5fr);
+  grid-template-areas: "title title" "cap img";
+}
+.bizsys .shot .s-title {
+  grid-area: title; margin: 0 0 2px; font-size: 16px; font-weight: 800; letter-spacing: -.02em;
+}
+.bizsys .shot .s-frame {
+  grid-area: img; border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
+  background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,.08); line-height: 0;
+}
+.bizsys .shot .s-frame img { width: 100%; height: auto; display: block }
+.bizsys .shot figcaption {
+  grid-area: cap; align-self: center; font-size: 14px; line-height: 1.75; color: var(--muted);
+  word-break: keep-all;
+}
+/* 이 한 줄이 이 페이지의 핵심 차별점이다 — 조사 22곳 중 아무도 안 쓰는 자리.
+   "우리도 이걸 매일 쓴다"는 말은 주장이 아니라 **날짜와 화면**으로 해야 힘이 실린다. */
+.bizsys .shot .s-stamp {
+  display: block; margin-top: 8px; font-size: 12px; color: var(--faint); letter-spacing: -.01em;
+}
+/* 폰 화면만 단순 목업 — 프레임이 없으면 세로 이미지가 그냥 잘린 그림처럼 보인다.
+   노치·홈버튼·손 사진은 넣지 않는다. */
+.bizsys .shot.phone .s-frame {
+  max-width: 250px; border-radius: 22px; border-width: 6px; border-color: #12161f;
+  box-shadow: 0 8px 24px rgba(0,0,0,.16);
+}
+@media (max-width: 900px) {
+  .bizsys .shot,
+  .bizsys .shot:nth-child(even) {
+    grid-template-columns: 1fr; grid-template-areas: "title" "img" "cap";
+  }
+  .bizsys .shot.phone .s-frame { max-width: 220px; margin: 0 auto }
+}

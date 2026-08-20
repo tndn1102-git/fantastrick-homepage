@@ -36,6 +36,39 @@ const KIND_BY_SCOPE: Record<string, string> = {
 
 /* 근무표 도해용 데이터.
    ⚠️ 실제 근무표가 아니다. 사람 이름·매장명·금액을 넣지 않는다 — 진짜 화면 캡처로 오인되면 안 된다. */
+/* 실제 운영 화면 5장. 순서는 조사 결과를 그대로 따랐다 —
+   근태·스케줄을 파는 6곳이 **전부 근무표를 1번**으로 내세웠다.
+   캡션은 기능 나열이 아니라 사장님이 얻는 결과로 쓴다(조사 8곳 중 6곳이 이 방식).
+   ⚠️ 이미지는 미리 줄여 넣는다 — scripts/prep-business-shots.mjs */
+const SHOTS = [
+  { src: "/images/business/shot-schedule.webp", w: 1440, h: 1080,
+    title: "이번 주 근무표",
+    alt: "근무 스케줄 프로그램의 월간 근무표 화면. 날짜마다 근무자와 대타 신청이 표시된다.",
+    cap: "빈 칸이 대타 자리입니다. 직원이 직접 신청하고 바꿔줄 사람이 승인하면 그걸로 끝납니다. 사장님이 단톡방에서 중재하실 일이 없어집니다.",
+    stamp: "판타스트릭 3개 지점 실제 운영 화면" },
+  { src: "/images/business/shot-attendance-phone.webp", w: 780, h: 1600, phone: true,
+    title: "직원 폰으로 찍습니다",
+    alt: "직원이 자기 폰으로 출근과 퇴근을 찍는 화면. 이번 달 기록이 달력으로 보인다.",
+    cap: "출근했다고 단톡에 올리는 것을 없앱니다. 찍은 시간이 그대로 남아서 나중에 말이 갈리지 않습니다.",
+    stamp: "판타스트릭 직원용 실제 화면" },
+  { src: "/images/business/shot-attendance.webp", w: 1440, h: 1150,
+    title: "누가 몇 시간 일했는지 자동으로 쌓입니다",
+    alt: "출퇴근 관리자 화면. 이번 달 직원별 출근일수와 총 근무시간, 대타 현황이 표로 정리돼 있다.",
+    cap: "말일에 시급 계산기를 두드리지 않습니다. 직원별 근무시간이 이미 계산된 상태로 올라옵니다.",
+    stamp: "판타스트릭 관리자 실제 화면 · 직원 이름은 가명으로 바꿔 캡처" },
+  { src: "/images/business/shot-coupon.webp", w: 1440, h: 1080,
+    title: "쿠폰 발행과 사용 처리",
+    alt: "쿠폰 관리자 화면. 총 발급과 사용 완료, 미사용 수와 호점별 사용 현황, 최근 사용 내역이 보인다.",
+    cap: "발행하고 큐알로 찍어 처리합니다. 몇 장 나갔고 몇 장 쓰였는지가 한 화면에 있습니다.",
+    stamp: "판타스트릭 실제 운영 화면" },
+  { src: "/images/business/shot-homepage.webp", w: 1440, h: 900,
+    title: "예약 홈페이지까지 같이 갑니다",
+    alt: "판타스트릭 예약 홈페이지 첫 화면.",
+    cap: "외부 플랫폼에 수수료를 내지 않습니다. 예약과 취소, 환불 규정까지 이 안에서 돌아갑니다.",
+    stamp: "fantastrick.co.kr · 지금 손님이 예약하는 그 화면" },
+];
+
+
 const SW_DAYS = ["월", "화", "수", "목", "금", "토", "일"];
 const SW_BOARD = [
   { who: "직원 1", d: ["12-20", "12-20", "", "12-20", "12-20", "16-22", ""] },
@@ -941,28 +974,35 @@ export default function BusinessPage() {
             <div className="usc t">발행하고 큐알코드로 사용처리만 뚝딱! 사용량은 통계페이지에서 한번에 관리.</div>
           </div>
 
-          {/* 근무표 도해 — 소프트웨어에서 제일 알아보기 쉬운 화면 하나를 CSS 격자로 그린다.
-              🔴 캡처로 오인되지 않게: 파란 점선 테두리 + "그림으로 옮긴 화면" 태그 +
-                 사람 이름·매장명·금액 없음 + 아이콘·아바타·브라우저 크롬 없음. */}
-          <figure className="swmock reveal" style={{ marginTop: 26 }}>
-            <p className="ftitle">근무표는 이렇게 생겼습니다</p>
-            <span className="mocktag">그림으로 옮긴 화면</span>
-            <div className="board" role="img"
-              aria-label="한 주 근무표 도해입니다. 가로는 월요일부터 일요일, 세로는 근무자 세 명이고 칸마다 근무 시간이 들어갑니다. 비는 자리는 대타 신청 칸으로 남습니다.">
-              <span className="bh" aria-hidden="true" />
-              {SW_DAYS.map((d) => <span className="bh" key={d} aria-hidden="true">{d}</span>)}
-              {SW_BOARD.map((r) => (
-                <Fragment key={r.who}>
-                  <span className="bn" aria-hidden="true">{r.who}</span>
-                  {r.d.map((v, i) => (
-                    <span key={i} aria-hidden="true"
-                      className={"bc" + (v === "대타" ? " sub" : v ? " on" : "")}>{v}</span>
-                  ))}
-                </Fragment>
-              ))}
-            </div>
-            <figcaption></figcaption>
-          </figure>
+          {/* ⭐ 실제 운영 화면 — 2026-08-20 사장님 지시로 도해를 전부 캡처로 교체했다.
+              [왜] 국내외 22개사 제품 페이지를 전수 조사한 결과:
+                · 기능 설명부에 **실제 캡처**를 쓰는 곳 9/11. 도해로 대체하는 곳 0곳.
+                · 도해가 사는 자리는 "구조·왜 우리인가·업종 목록" 뿐이다(11/11).
+                · 소상공인 대상은 5~8장. 10장 넘는 곳 없음.
+                · 개인정보는 **더미 데이터가 표준. 블러 쓴 곳 0곳**(블러는 숨길 게 있다는 신호).
+              전에 있던 "그림으로 옮긴 화면" 태그는 캡처 오인을 막으려던 장치였는데,
+              B2B 페이지에서는 그대로 "아직 없는 물건" 신호로 읽혀서 걷어냈다.
+
+              [개인정보] 캡처에 뜬 직원 이름 12명·로그인 아이디 20개는 **가명으로 바꿔서 찍었다.**
+              DB 는 건드리지 않았다(브라우저에 그려진 글자만 교체). 전화번호는 전부 0.
+
+              [우리 매장 이름은 일부러 남긴다] 조사 22곳 중 "직접 운영하며 만들었다"고 말하는 곳이
+              0곳이었다. 규모도 대기업 로고도 없는 우리가 이길 수 있는 유일한 자리라,
+              화면에 박힌 우리 매장 이름이 곧 증거다(2026-08-20 사장님 확인). */}
+          <div className="shots reveal">
+            {SHOTS.map((s) => (
+              <figure className={"shot" + (s.phone ? " phone" : "")} key={s.src}>
+                <p className="s-title">{s.title}</p>
+                <div className="s-frame">
+                  <Image src={s.src} alt={s.alt} width={s.w} height={s.h} sizes="(max-width: 900px) 92vw, 720px" />
+                </div>
+                <figcaption>
+                  {s.cap}
+                  <span className="s-stamp">{s.stamp}</span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
 
           <p className="lead reveal" style={{ margin: "22px 0 0" }}>
             모든 프로그램은 매장에 맞게 설계해드립니다.
@@ -978,7 +1018,7 @@ export default function BusinessPage() {
               줄이면 "자동으로 안 되는 것"까지 같은 형식으로 나란히 놓을 수 있다. */}
           <figure className="swmock reveal" style={{ marginBottom: 18 }}>
             <p className="ftitle">이런 순서로 지나갑니다</p>
-            <span className="mocktag">그림으로 옮긴 화면</span>
+            <span className="mocktag">처리 순서</span>
             <ol className="swlog" aria-label="입금 자동확인 처리 순서">
               <li><span className="lt">09:41</span><span className="lm">입금 알림 도착</span><span className="lc">받음</span></li>
               <li><span className="lt">09:41</span><span className="lm">이름과 금액 대조</span><span className="lc">일치</span></li>
@@ -1007,7 +1047,7 @@ export default function BusinessPage() {
 
           <figure className="swmock reveal">
             <p className="ftitle">두 화면이 붙어 있습니다</p>
-            <span className="mocktag">그림으로 옮긴 화면</span>
+            <span className="mocktag">처리 순서</span>
             <div className="hintduo">
               <div className="hd-screen" role="img"
                 aria-label="손님이 보는 태블릿 화면 그림입니다. 남은 시간과 지금 할 일, 방금 받은 힌트가 보입니다.">
