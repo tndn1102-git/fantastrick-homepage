@@ -473,8 +473,7 @@ export default function BusinessPage() {
             <h2>컨설팅 문의하기</h2>
             <p className="lead center">새로운 테마도 좋고, 현재 운영중인 테마도 괜찮습니다. 
 인테리어 리모델링, 장치, 문제. 설계, 운영 프로그램까지
-방탈출 매장에 필요한 모든 것을 편하게 문의해주세요 
-FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에 
+ 방탈출 매장에 필요한 모든 것을 편하게 문의해주세요 FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에 
 최적의 답변을 고객님께 전달드립니다!!</p>
             {sent ? (
               <div className="bzdone">
@@ -856,8 +855,7 @@ FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에
             <h2>컨설팅 문의하기</h2>
             <p className="lead center">새로운 테마도 좋고, 현재 운영중인 테마도 괜찮습니다. 
 인테리어 리모델링, 장치, 문제. 설계, 운영 프로그램까지
-방탈출 매장에 필요한 모든 것을 편하게 문의해주세요 
-FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에 
+ 방탈출 매장에 필요한 모든 것을 편하게 문의해주세요 FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에 
 최적의 답변을 고객님께 전달드립니다!!</p>
             {sent ? (
               <div className="bzdone">
@@ -917,19 +915,18 @@ FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에
         <header className="pn-head">
           <i>03</i>
           <h2>매장 운영 프로그램</h2>
-          <p>사무실에서 쓰는 것</p>
+          <p>방탈출 매장을 더욱 편리하게 운영하게 도와주는 프로그램들</p>
         </header>
         <section className="bz-sec" id="software">
           <h2 className="reveal">사장님이 <em>엑셀로</em><br />하고 계신 것들</h2>
-          <p className="lead reveal">방 안 장치를 움직이는 게 기계라면, 이건 사무실에서 하는 일입니다.
-            근무표 짜고, 시급 계산하고, 예약 받고, 쿠폰 챙기는 것.</p>
+          <p className="lead reveal">직원 출퇴근 관리, 급여관리, 대타 스케줄 관리, 쿠폰 발행 및 통계 시스템, 홈페이지까지도 모두 다!</p>
 
           <div className="swtable reveal">
             <div className="h">&nbsp;</div><div className="h">지금 이렇게 하고 계실 겁니다</div><div className="h usc">바뀌는 것</div>
 
             <div className="rowlab">출퇴근과 근무표</div>
             <div className="t mut">출퇴근은 단톡에 카톡으로, 근무표는 엑셀 짜서 사진으로 올림</div>
-            <div className="usc t">폰으로 찍습니다. 대타도 서로 신청하고 승인합니다.</div>
+            <div className="usc t">각자의 폰으로 찍습니다. 대타도 서로 신청하고 본인들이 알아서 승인합니다.</div>
 
             <div className="rowlab">급여와 매출 장부</div>
             <div className="t mut">말일에 시급 계산기 두드림</div>
@@ -941,7 +938,7 @@ FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에
 
             <div className="rowlab">쿠폰</div>
             <div className="t mut">종이 쿠폰, 누가 썼는지 모름</div>
-            <div className="usc t">발행하고 나면 누가 언제 썼는지 남습니다.</div>
+            <div className="usc t">발행하고 큐알코드로 사용처리만 뚝딱! 사용량은 통계페이지에서 한번에 관리.</div>
           </div>
 
           {/* 근무표 도해 — 소프트웨어에서 제일 알아보기 쉬운 화면 하나를 CSS 격자로 그린다.
@@ -964,18 +961,17 @@ FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에
                 </Fragment>
               ))}
             </div>
-            <figcaption>칸을 눌러 짜고, 비는 자리는 대타로 넘깁니다.
-              실제 화면을 찍은 것이 아니라 모양만 옮겨 그린 그림입니다.</figcaption>
+            <figcaption></figcaption>
           </figure>
 
           <p className="lead reveal" style={{ margin: "22px 0 0" }}>
-            전부 저희 매장 3곳에서 지금 이 순간 돌아가고 있는 것들입니다. 보여드리려고 만든 게 아닙니다.
+            모든 프로그램은 매장에 맞게 설계해드립니다.
           </p>
 
           <h3 className="reveal" style={{ margin: "44px 0 0", fontSize: 17, fontWeight: 800 }}>예약금 들어온 걸 사람이 안 봐도 됩니다</h3>
           <p className="lead reveal" style={{ margin: "10px 0 18px" }}>
-            예약금이 입금되면 그 예약이 알아서 확정으로 넘어갑니다. 이름과 금액이 맞는 건만 자동으로 처리하고,
-            애매한 건 사장님한테 남깁니다.
+            예약금이 입금되면 예약금과 입금자명 확인 후 
+홈페이지에서 그 예약이 알아서 확정으로 넘어갑니다.
           </p>
           {/* 처리 내역 도해. ⚠️ 실제 로그가 아니다. 사람 이름·계좌·금액을 넣지 않는다.
               흐름도가 아니라 줄로 그린 이유: 흐름도는 성공 경로만 그리게 되는데,
@@ -990,8 +986,7 @@ FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에
               <li><span className="lt">09:41</span><span className="lm">손님에게 확정 문자</span><span className="lc">보냄</span></li>
               <li className="hold"><span className="lt">09:52</span><span className="lm">이름이 다르게 들어온 건</span><span className="lc">사장님 확인</span></li>
             </ol>
-            <figcaption>맞는 건만 자동으로 넘어가고, 애매한 건 마지막 줄처럼 남습니다.
-              실제 화면을 찍은 것이 아니라 모양만 옮겨 그린 그림입니다.</figcaption>
+            <figcaption>사장님이 매번 핸드폰을 들여다보지 않아도 됩니다.</figcaption>
           </figure>
 
           <div className="ops">
@@ -1004,9 +999,10 @@ FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에
               ⚠️ 없는 실적을 쓰지 않는다. 여기 적힌 것은 전부 지금 돌아가는 기능이다. */}
           <h3 className="reveal" style={{ margin: "48px 0 0", fontSize: 17, fontWeight: 800 }}>테마 안에서 손님이 보는 화면도 만듭니다</h3>
           <p className="lead reveal" style={{ margin: "10px 0 18px" }}>
-            힌트를 종이로 주거나 직원이 문을 열고 들어가는 대신, 방 안 태블릿으로 줍니다.
-            손님이 보는 화면과 직원이 보는 화면이 따로 있고, 둘이 실시간으로 붙어 있습니다.
-            저희 매장에서 지금 그렇게 돌리고 있습니다.
+            힌트를 종이로 주거나 일일이 직원이 무전기로 힌트나 진행상황을 알려줄 필요가 없습니다. 
+테블릿 1대로 진행상황과 가이드 남은시간 힌트까지 
+ 손님이 보는 화면과 직원이 보는 화면이 따로 있고, 
+둘이 실시간으로 붙어 있습니다.
           </p>
 
           <figure className="swmock reveal">
@@ -1033,18 +1029,17 @@ FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에
                 </div>
               </div>
             </div>
-            <figcaption>실제 화면을 찍은 것이 아니라 모양만 옮겨 그린 그림입니다.</figcaption>
+            <figcaption>원하시는 구성, 방향으로 다 맞춰서 설계가 진행됩니다. 원하시는 기능도 추가 가능합니다.</figcaption>
           </figure>
 
           <div className="ops" style={{ marginTop: 18 }}>
-            <div className="op reveal"><b>방 성격에 맞춰 만듭니다</b><span>카드를 대면 다음 할 일이 뜨는 방식, 코드를 넣으면 이야기가 오는 방식. 둘 다 저희 매장에서 돌리고 있습니다.</span></div>
-            <div className="op reveal"><b>힌트는 미리 넣어 둡니다</b><span>문제마다 1차 힌트와 정답을 적어두고, 직원이 눌러서 보냅니다. 말로 설명하다 김 새는 일이 없습니다.</span></div>
-            <div className="op reveal"><b>끊겨도 이어집니다</b><span>태블릿이 꺼졌다 켜져도 어디까지 왔는지와 남은 시간이 그대로 따라옵니다.</span></div>
-            <div className="op reveal"><b>직원이 멀리서 봅니다</b><span>어느 방이 어디까지 왔는지 한 화면에서 보고, 필요하면 그 자리에서 힌트를 보냅니다.</span></div>
+            <div className="op reveal"><b>방 성격에 맞춰 만듭니다</b><span>카드를 대면 다음 할 일이 뜨는 방식, 코드를 넣으면 이야기가 오는 방식.<br />둘 다 저희 매장에서 돌리고 있습니다.</span></div>
+            <div className="op reveal"><b>온라인, 오프라인 버전 둘다 가능합니다.</b><span>필요에 따라서는 온라인버전으로,<br />오프라인 버전은 끊길 우려가 전혀 없습니다.</span></div>
+            <div className="op reveal"><b>끊겨도 이어집니다</b><span>태블릿이 잠깐 꺼졌다 켜져도 어디까지 왔는지와 남은 시간이 그대로 따라옵니다.</span></div>
+            <div className="op reveal"><b>진행 속도가 빠른지, 느린지 손님에게 정보 전달 가능</b><span>손님이 입력하는 힌트코드나 다른 방식으로 손님에게 지금 진행이 빠른지 느린지 정보를 줘서<br />손님이 능동적으로 테마진행을 할 수 있도록 만들어줍니다.</span></div>
           </div>
 
-          <p className="note reveal">장치와 기계를 넣으시면 운영 프로그램이 함께 들어갑니다.
-            프로그램만 따로 쓰고 싶으시면 그것도 상담해 드립니다.</p>
+          <p className="note reveal">장치와 기계를 넣으시면 운영 프로그램이 함께 들어갑니다. 프로그램만 따로 쓰고 싶으시면 그것만  상담 가능합니다.</p>
         </section>
         {/* 이 화면의 마무리 — 다음 범위로 넘기고, 문의로 받는다 */}
         <NextUp here={here} pick={pick} />
@@ -1056,8 +1051,7 @@ FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에
             <h2>컨설팅 문의하기</h2>
             <p className="lead center">새로운 테마도 좋고, 현재 운영중인 테마도 괜찮습니다. 
 인테리어 리모델링, 장치, 문제. 설계, 운영 프로그램까지
-방탈출 매장에 필요한 모든 것을 편하게 문의해주세요 
-FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에 
+ 방탈출 매장에 필요한 모든 것을 편하게 문의해주세요 FANTASTRICK TEAM이 체계적으로 분석  및 검토 후에 
 최적의 답변을 고객님께 전달드립니다!!</p>
             {sent ? (
               <div className="bzdone">
