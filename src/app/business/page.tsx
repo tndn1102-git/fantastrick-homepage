@@ -996,6 +996,19 @@ export default function BusinessPage() {
                 <div className="s-frame">
                   <Image src={s.src} alt={s.alt} width={s.w} height={s.h} sizes="(max-width: 900px) 92vw, 720px" />
                 </div>
+
+          {/* 실제 처리량 — 지어낸 숫자가 아니라 DB 에서 뽑은 값이다(2026-08-20 기준).
+              바뀌면 여기 숫자와 기준일을 같이 고쳐야 한다. 기준일 없는 숫자는 쓰지 않는다. */}
+          <div className="proof reveal">
+            <div className="pf-nums">
+              <div><b>157건</b><span>새 홈페이지로 받은 예약</span></div>
+              <div><b>97%</b><span>예약금 입금 자동확인</span></div>
+              <div><b>7건</b><span>미입금 30분 자동취소</span></div>
+            </div>
+            <p className="pf-note">2026년 8월 13일부터 20일까지 8일간, 판타스트릭 3개 지점 실제 기록입니다. 입금 자동확인은 109건 중 106건이 사람 손 없이 처리됐습니다.</p>
+            <a className="btn primary pf-cta" href="#cta">우리 매장 기준으로 견적 받기</a>
+          </div>
+
                 <figcaption>
                   {s.cap}
                   <span className="s-stamp">{s.stamp}</span>
