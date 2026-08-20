@@ -48,11 +48,11 @@ type Shot = { title: string; cap: string; stamp: string; trio?: boolean; imgs: S
 type AppGroup = { id: string; name: string; tag: string; shots: Shot[] };
 
 const APPS: AppGroup[] = [
-  { id: "att", name: "출퇴근 · 급여 프로그램", tag: "찍는 것부터 명세서 발송까지",
+  { id: "att", name: "출퇴근 · 급여 프로그램", tag: "출퇴근 기록은 기본, 자동 급여 계산과 급여 명세서 일괄 발송까지 원버튼으로 뚝딱!",
     shots: [
-      { title: "직원은 폰으로, 사장님은 PC 로",
-        cap: "출근했다고 단톡에 올리는 것을 없앱니다. 찍은 시간이 그대로 남아서 나중에 말이 갈리지 않습니다. 같은 기록을 PC 에서도 그대로 봅니다.",
-        stamp: "판타스트릭 실제 화면 · 직원 이름은 가명으로 바꿔 캡처",
+      { title: "폰에서도 pc에서도 편하게 사용한다!",
+        cap: "출근했다고 단톡에 올리는 것을 없앱니다. 폰에서도 PC에서도 동일하게 사용이 가능하고, 찍은 시간이 그대로 남아서 나중에 말이 갈리지 않습니다.",
+        stamp: "판타스트릭 실제 운영중인 출퇴근 프로그램 화면입니다. (직원 이름은 가명)",
         imgs: [
           { src: "/images/business/shot-attendance-phone.webp", w: 780, h: 1600, phone: true, label: "직원 폰",
             alt: "직원이 자기 폰으로 출근과 퇴근을 찍는 화면." },
@@ -60,16 +60,16 @@ const APPS: AppGroup[] = [
             alt: "같은 출퇴근 기록을 PC 화면에서 달력으로 본다." },
         ] },
       { title: "근태가 급여로 넘어오고, 명세서는 메일로 한 번에",
-        cap: "말일에 시급 계산기를 두드리지 않습니다. 찍힌 근태로 지급액과 공제가 계산되고, 확정한 명세서는 직원 메일로 일괄 발송됩니다. 누구에게 나갔는지도 화면에 남습니다.",
-        stamp: "판타스트릭 관리자 실제 화면 · 이름과 메일은 가명으로 바꿔 캡처",
+        cap: "말일에 시급 계산기를 두드리지 않습니다. 찍힌 근태로 지급액과 공제가 계산되고, 확정한 명세서는 직원 메일로 일괄 발송됩니다. 전송이 제대로 되었는지까지도 기록에 남습니다.",
+        stamp: "판타스트릭 관리자 실제 화면입니다. (이름과 메일은 가명)",
         imgs: [{ src: "/images/business/shot-payroll.webp", w: 1440, h: 1121,
           alt: "급여 관리자 화면. 직원별 지급 총계와 공제, 실 수령액이 계산돼 있고 확정과 발송 상태가 표시된다." }] },
     ] },
 
-  { id: "sch", name: "근무 스케줄 앱", tag: "근무표와 대타를 직원들이 알아서",
+  { id: "sch", name: "근무 스케줄 앱", tag: "근무표와 대타를 직원들이 알아서, 사장님은 검토만 하시면 됩니다!",
     shots: [
-      { title: "이번 주 근무표",
-        cap: "빈 칸이 대타 자리입니다. 직원이 직접 신청하고 바꿔줄 사람이 승인하면 그걸로 끝납니다. 사장님이 단톡방에서 중재하실 일이 없어집니다.",
+      { title: "이번 달 근무표",
+        cap: "일이 생겼을 때, 직원이 직접 신청하고 바꿔줄 사람이 승인하면 그걸로 끝납니다. 사장님이 단톡방에서 중재하실 일이 없어집니다.",
         stamp: "판타스트릭 3개 지점 실제 운영 화면",
         imgs: [{ src: "/images/business/shot-schedule.webp", w: 1440, h: 1080,
           alt: "근무 스케줄 프로그램의 월간 근무표. 날짜마다 근무자와 대타 신청이 표시된다." }] },
@@ -981,10 +981,10 @@ export default function BusinessPage() {
         </header>
         <section className="bz-sec" id="software">
           <h2 className="reveal">사장님이 <em>엑셀로</em><br />하고 계신 것들</h2>
-          <p className="lead reveal">직원 출퇴근 관리, 급여관리, 대타 스케줄 관리, 쿠폰 발행 및 통계 시스템, 홈페이지까지도 모두 다!</p>
+          <p className="lead reveal">직원 출퇴근 관리, 급여관리, 대타 스케줄 관리,<br />쿠폰 발행 및 통계 시스템, 홈페이지까지도<br />방탈출 운영의 모든 것!</p>
 
           <div className="swtable reveal">
-            <div className="h">&nbsp;</div><div className="h">지금 이렇게 하고 계실 겁니다</div><div className="h usc">바뀌는 것</div>
+            <div className="h">&nbsp;</div><div className="h">지금 하고 있는 방식</div><div className="h usc">바뀌는 것</div>
 
             <div className="rowlab">출퇴근과 근무표</div>
             <div className="t mut">출퇴근은 단톡에 카톡으로, 근무표는 엑셀 짜서 사진으로 올림</div>
@@ -996,10 +996,10 @@ export default function BusinessPage() {
 
             <div className="rowlab">예약과 홈페이지</div>
             <div className="t mut">외부 플랫폼 수수료, 손 안 대는 홈페이지</div>
-            <div className="usc t">자체 예약, 취소, 환불 규정까지. 홈페이지도 같이 갑니다.</div>
+            <div className="usc t">자체 예약, 취소, 환불 규정까지. 홈페이지에서 모든게 자동화로 이루어집니다.</div>
 
             <div className="rowlab">쿠폰</div>
-            <div className="t mut">종이 쿠폰, 누가 썼는지 모름</div>
+            <div className="t mut">종이 쿠폰, 누가 썼는지 모름, 인쇄비용 많이 발생</div>
             <div className="usc t">발행하고 큐알코드로 사용처리만 뚝딱! 사용량은 통계페이지에서 한번에 관리.</div>
           </div>
 

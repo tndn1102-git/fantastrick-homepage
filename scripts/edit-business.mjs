@@ -248,7 +248,15 @@ const INJECT = `
         if(j.failed.length){ t+='\\n\\n못 고친 '+j.failed.length+'곳 (이건 말씀해주시면 손으로 고쳐드립니다)\\n'
           + j.failed.map(function(f){return '· "'+f.from.slice(0,40)+'" — '+f.why}).join('\\n'); }
         say(t);
-        if(j.done.length){ clearKeep(); edits.clear(); setTimeout(function(){location.reload()},2500); }
+        if(j.done.length){
+          /* ⚠️ 반영 **실패한 것만 남기고** 지운다.
+             전에는 전부 지우고 새로고침해서, 실패한 수정까지 화면에서 사라졌다
+             (2026-08-20 "저장했는데도 날아갔다" 사고의 원인). */
+          edits.clear();
+          (j.failed||[]).forEach(function(f){ if(f.from) edits.set(f.from, f.to); });
+          keep(); if(!edits.size) clearKeep();
+          setTimeout(function(){location.reload()},2500);
+        }
       }).catch(function(e){say('저장 실패: '+e.message)});
   };
 })();
