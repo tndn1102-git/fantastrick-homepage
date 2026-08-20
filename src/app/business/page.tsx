@@ -51,7 +51,7 @@ const APPS: AppGroup[] = [
   { id: "att", name: "출퇴근 · 급여 프로그램", tag: "출퇴근 기록은 기본, 자동 급여 계산과 급여 명세서 일괄 발송까지 원버튼으로 뚝딱!",
     shots: [
       { title: "폰에서도 pc에서도 편하게 사용한다!",
-        cap: "출근했다고 단톡에 올리는 것을 없앱니다. 폰에서도 PC에서도 동일하게 사용이 가능하고, 찍은 시간이 그대로 남아서 나중에 말이 갈리지 않습니다.",
+        cap: "출근했다고 단톡에 올리는 것을 없앱니다. 폰에서도 PC에서도 동일하게 사용이 가능하고, 찍은 시간이 그대로 남아서 나중에 문제가 생기지 않습니다.",
         stamp: "판타스트릭 실제 운영중인 출퇴근 프로그램 화면입니다. (직원 이름은 가명)",
         imgs: [
           { src: "/images/business/shot-attendance-phone.webp", w: 780, h: 1600, phone: true, label: "직원 폰",
@@ -78,7 +78,7 @@ const APPS: AppGroup[] = [
   { id: "cpn", name: "쿠폰 발행기", tag: "발행부터 사용 통계까지",
     shots: [
       { title: "큐알 찍으면 그 자리에서 처리 끝",
-        cap: "손님 폰의 쿠폰 큐알을 직원이 찍으면 바로 사용 처리가 됩니다. 무슨 혜택인지도 그 자리에서 보여서 헷갈릴 일이 없습니다.",
+        cap: "손님 폰의 쿠폰 QR코드를 직원이 찍으면 바로 사용 처리가 됩니다. 무슨 혜택인지도 그 자리에서 보여서 헷갈릴 일이 없습니다.",
         /* ⚠️ 실제 쿠폰을 쓰면 안 되므로(한 번 쓰면 되돌릴 수 없다) 시연용 쿠폰으로 찍었다.
            화면 자체는 직원이 매일 쓰는 실제 앱 그대로다. 캡션에도 시연임을 밝힌다. */
         stamp: "판타스트릭 직원용 실제 화면 · 시연용 쿠폰으로 촬영",
@@ -86,13 +86,13 @@ const APPS: AppGroup[] = [
           alt: "직원이 카메라로 쿠폰 큐알을 찍어 사용 처리를 끝낸 화면. 처리 완료와 혜택 내용이 표시된다." }] },
       
       { title: "쿠폰 발행과 사용 처리",
-        cap: "발행하고 큐알로 찍어 처리합니다. 몇 장 나갔고 몇 장 쓰였는지가 한 화면에 있습니다.",
+        cap: "쿠폰을 직접 발행하고 QR코드로 찍어 처리합니다. 몇 장 나갔고 몇 장 쓰였는지가 한 화면에 있습니다.",
         stamp: "판타스트릭 실제 운영 화면",
         imgs: [{ src: "/images/business/shot-coupon.webp", w: 1440, h: 1080,
           alt: "쿠폰 관리자 화면. 총 발급과 사용 완료, 미사용 수와 호점별 사용 현황이 보인다." }] },
     ] },
 
-  { id: "web", name: "예약 홈페이지", tag: "예약금 확인과 문자 발송이 자동",
+  { id: "web", name: "예약 홈페이지", tag: "예약금 확인과 문자 발송이 자동으로 처리됩니다. 사장님이 전혀 신경쓸 것이 없습니다.",
     shots: [
       { title: "예약금 확인부터 문자 발송까지 사람 손을 안 탑니다",
         cap: "예약금이 들어오면 이름과 금액을 맞춰 예약이 알아서 확정으로 넘어갑니다. 확정 문자와 알림톡도 자동으로 나가고, 손님 카카오톡에 도착했는지까지 화면에 남습니다.",
@@ -1061,10 +1061,9 @@ export default function BusinessPage() {
             모든 프로그램은 매장에 맞게 설계해드립니다.
           </p>
 
-          <h3 className="reveal" style={{ margin: "44px 0 0", fontSize: 17, fontWeight: 800 }}>예약금 들어온 걸 사람이 안 봐도 됩니다</h3>
+          <h3 className="reveal" style={{ margin: "44px 0 0", fontSize: 17, fontWeight: 800 }}>예약금 들어오는걸 계속 기다렸다가 확정처리 하실 필요가 없습니다!</h3>
           <p className="lead reveal" style={{ margin: "10px 0 18px" }}>
-            예약금이 입금되면 예약금과 입금자명 확인 후 
-홈페이지에서 그 예약이 알아서 확정으로 넘어갑니다.
+            예약금이 입금되면 예약금과 입금자명 확인 후<br />홈페이지에서 그 예약이 알아서 확정으로 넘어갑니다.
           </p>
           {/* 처리 내역 도해. ⚠️ 실제 로그가 아니다. 사람 이름·계좌·금액을 넣지 않는다.
               흐름도가 아니라 줄로 그린 이유: 흐름도는 성공 경로만 그리게 되는데,
@@ -1077,20 +1076,20 @@ export default function BusinessPage() {
               <li><span className="lt">09:41</span><span className="lm">이름과 금액 대조</span><span className="lc">일치</span></li>
               <li><span className="lt">09:41</span><span className="lm">예약 확정</span><span className="lc">자동</span></li>
               <li><span className="lt">09:41</span><span className="lm">손님에게 확정 문자</span><span className="lc">보냄</span></li>
-              <li className="hold"><span className="lt">09:52</span><span className="lm">이름이 다르게 들어온 건</span><span className="lc">사장님 확인</span></li>
+              <li className="hold"><span className="lt">09:52</span><span className="lm">이름이 다르게 들어온 건 보류</span><span className="lc">사장님 확인</span></li>
             </ol>
             <figcaption>사장님이 매번 핸드폰을 들여다보지 않아도 됩니다.</figcaption>
           </figure>
 
           <div className="ops">
             <div className="op reveal"><b>손으로 대조하던 일</b><span>통장 열어서 이름 맞춰보고, 관리자 들어가서 확정 누르고.</span></div>
-            <div className="op reveal"><b>지금</b><span>입금 알림이 오면 맞는 예약을 찾아 확정까지 갑니다. 손님한테 확정 문자도 나갑니다.</span></div>
+            <div className="op reveal"><b>지금</b><span>입금 알림이 오면 맞는 예약을 찾아 확정까지 갑니다. 손님한테 확정 문자도 나갑니다.<br />사장님은 하실게 없습니다.</span></div>
           </div>
 
           {/* 힌트폰 — 저희가 실제로 만들어 쓰는 것. 락다운시티(태블릿 카드 태그식)와
               태초의 신부(코드 입력식) 두 가지를 매장에서 돌리고 있다.
               ⚠️ 없는 실적을 쓰지 않는다. 여기 적힌 것은 전부 지금 돌아가는 기능이다. */}
-          <h3 className="reveal" style={{ margin: "48px 0 0", fontSize: 17, fontWeight: 800 }}>테마 안에서 손님이 보는 화면도 만듭니다</h3>
+          <h3 className="reveal" style={{ margin: "48px 0 0", fontSize: 17, fontWeight: 800 }}>테마 안에서 손님이 보는 힌트폰 프로그램도 제작해드립니다.</h3>
           <p className="lead reveal" style={{ margin: "10px 0 18px" }}>
             힌트를 종이로 주거나 일일이 직원이 무전기로 힌트나 진행상황을 알려줄 필요가 없습니다. 
 테블릿 1대로 진행상황과 가이드 남은시간 힌트까지 
@@ -1122,19 +1121,19 @@ export default function BusinessPage() {
               </div>
               <figcaption>
                 어느 방이 어디까지 왔는지 한 화면에서 보고, 필요하면 그 자리에서 힌트를 보냅니다. 태블릿이 꺼졌다 켜져도 진행과 남은 시간이 그대로 따라옵니다.
-                <span className="s-stamp">지금 3호점에서 돌아가는 화면 · 진행 단계 이름은 스포일러라 가림</span>
+                <span className="s-stamp">실제 운영중인 관리자 뷰어 페이지 (진행 단계 이름은 스포일러라 가림)</span>
               </figcaption>
             </figure>
           </div>
 
           <div className="ops" style={{ marginTop: 18 }}>
-            <div className="op reveal"><b>방 성격에 맞춰 만듭니다</b><span>카드를 대면 다음 할 일이 뜨는 방식, 코드를 넣으면 이야기가 오는 방식.<br />둘 다 저희 매장에서 돌리고 있습니다.</span></div>
+            <div className="op reveal"><b>방 성격에 맞춰 만듭니다</b><span>카드를 대면 다음 할 일이 뜨는 방식, 코드를 넣으면 이야기가 오는 방식.<br />어떤 방식으로든 맞춤제작이 가능합니다.</span></div>
             <div className="op reveal"><b>온라인, 오프라인 버전 둘다 가능합니다.</b><span>필요에 따라서는 온라인버전으로,<br />오프라인 버전은 끊길 우려가 전혀 없습니다.</span></div>
             <div className="op reveal"><b>끊겨도 이어집니다</b><span>태블릿이 잠깐 꺼졌다 켜져도 어디까지 왔는지와 남은 시간이 그대로 따라옵니다.</span></div>
             <div className="op reveal"><b>진행 속도가 빠른지, 느린지 손님에게 정보 전달 가능</b><span>손님이 입력하는 힌트코드나 다른 방식으로 손님에게 지금 진행이 빠른지 느린지 정보를 줘서<br />손님이 능동적으로 테마진행을 할 수 있도록 만들어줍니다.</span></div>
           </div>
 
-          <p className="note reveal">장치와 기계를 넣으시면 운영 프로그램이 함께 들어갑니다. 프로그램만 따로 쓰고 싶으시면 그것만  상담 가능합니다.</p>
+          <p className="note reveal">프로그램만 따로 도입하고 싶으신 분들은 운영프로그램만 상담도 가능합니다.</p>
         </section>
         {/* 이 화면의 마무리 — 다음 범위로 넘기고, 문의로 받는다 */}
         <NextUp here={here} pick={pick} />
