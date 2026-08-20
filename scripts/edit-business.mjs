@@ -161,6 +161,8 @@ const INJECT = `
   function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){ return {}; } }
   function keep(){ var o={}; edits.forEach(function(v,k){o[k]=v}); try{ localStorage.setItem(KEY,JSON.stringify(o)); }catch(e){} }
   function clearKeep(){ try{ localStorage.removeItem(KEY); }catch(e){} }
+  // 과거 버그로 저장된 빈 열쇠("") 청소 — 남아 있으면 숨은 요소들이 또 한꺼번에 바뀐다
+  try{ var _o=JSON.parse(localStorage.getItem(KEY)||'{}'); if(''in _o){ delete _o['']; localStorage.setItem(KEY,JSON.stringify(_o)); } }catch(e){}
   window.addEventListener('beforeunload',function(e){ if(edits.size){ e.preventDefault(); e.returnValue=''; } });
   var SKIP={SCRIPT:1,STYLE:1,SVG:1,PATH:1,INPUT:1,TEXTAREA:1,SELECT:1,OPTION:1};
   function leafy(el){
@@ -178,10 +180,13 @@ const INJECT = `
       if(el.hasAttribute('data-ed')) return;
       if(!leafy(el)) return;
       el.setAttribute('data-ed','1');
-      el.setAttribute('data-orig',(el.innerText||'').trim());
+      var orig=(el.textContent||'').replace(/\s+/g,' ').trim();
+      if(!orig){ el.removeAttribute('data-ed'); return; }   // 빈 열쇠 금지 — 숨은 요소끼리 한 묶음이 된다
+      el.setAttribute('data-orig',orig);
       el.setAttribute('contenteditable','plaintext-only');
       el.addEventListener('input',function(){
         var o=el.getAttribute('data-orig'), n=(el.innerText||'').trim();
+        if(!o) return;
         if(n===o){edits.delete(o);el.setAttribute('data-dirty','0');}
         else{edits.set(o,n);el.setAttribute('data-dirty','1');}
         document.getElementById('edn').textContent=edits.size;
@@ -214,7 +219,7 @@ const INJECT = `
     busy=true; if(mo) mo.disconnect();
     try{
       document.querySelectorAll('[data-ed]').forEach(function(el){
-        var o=el.getAttribute('data-orig'); if(!edits.has(o)) return;
+        var o=el.getAttribute('data-orig'); if(!o||!edits.has(o)) return;
         var want=edits.get(o);
         if((el.innerText||'').trim()!==want){ el.innerText=want; el.setAttribute('data-dirty','1'); }
       });

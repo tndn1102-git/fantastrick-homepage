@@ -645,7 +645,7 @@ export default function BusinessPage() {
         {/* 새 제어기 — 이 패널의 주인공. .pn-stage 는 여기 하나에만 붙인다(릴리즈 태그·조명) */}
         <section className="bz-sec pn-stage">
           <div className="kicker reveal">FANTASTRICK TEAM</div>
-          <h2 className="reveal">저희가 만든 기계 <strong>[마스터와 슬레이브]</strong></h2>
+          <h2 className="reveal">저희가 만든 기계, <strong>[마스터와 슬레이브]</strong></h2>
           <p className="lead reveal">
             방 안에 설치되는 장치, 전자석, 센서, 연출 조명을<br />컴퓨터 한 대가  맡아서 움직이는 기계입니다.<br />본체(마스터) 한 대가 장치 32개를 맡고, 부족하면 옆에<br />판(슬레이브)을 하나 더 답니다. 또한, 테마의 모든 장치<br />(작동, 조명 켜고 끄기, 신호 주기 등)는 원격으로<br />pc와 모바일에서 제어가 가능합니다!
           </p>
@@ -830,7 +830,7 @@ export default function BusinessPage() {
         {/* 누가 먼저 아느냐 */}
         <section className="bz-sec">
           <div className="kicker reveal">누가 먼저 아느냐</div>
-          <h2 className="reveal">손님이 무전기누르기 전에<br /><strong>아셔야 합니다.</strong></h2>
+          <h2 className="reveal">손님이 무전기누르기 전에<br /><strong>아셔야 합니다!</strong></h2>
 
           <figure className="reveal">
             <p className="ftitle">누가 먼저 아느냐에 따라 손해도 손해지만 만족도와 몰입감 차이가 극명하게 갈립니다.</p>
@@ -838,22 +838,22 @@ export default function BusinessPage() {
               <div className="bar">
                 <div className="lab">손님이 먼저</div>
                 <div className="track">
-                  <div className="fill bad">몰입감도 깨지고 이미 의욕이 없다. 테마 후기도 안좋을 예정. 상황에 따라 환불을 해줘야 할 수도 있음</div>
+                  <div className="fill bad">몰입감과 의욕이 떨어지는건 기본이고, 상황에따라 금액 환불이나 테마 후기가 매우 안좋아질 수 있다.</div>
                 </div>
               </div>
               <div className="bar">
                 <div className="lab">직원이 먼저</div>
                 <div className="track">
-                  <div className="fill warn">그나마 이해하지만 몰입감이 깨져서 아쉬움</div>
+                  <div className="fill warn">그나마 다행이지만 몰입감이 깨지고 테마에 대한 만족도가 높지 않다.</div>
                 </div>
               </div>
               <div className="bar">
                 <div className="lab">우리가 먼저</div>
-                <div className="track"><div className="fill z">최상의 테마 컨디션으로 손님에게 최고의 경험을 선사하고 테마 만족도도 매우 높다.</div></div>
+                <div className="track"><div className="fill z">최상의 테마 컨디션으로 최고의 몰입감을 이끌어 내 고객의 테마 만족도가 최상에 도달한다.</div></div>
               </div>
             </div>
             <figcaption>
-              <p>기계가 장치 상태를 스스로 살핍니다. 이상이 있을 경우 FANTASTRICK TEAM에서 바로 발견 후 원격처리 합니다.</p>
+              <p>기계가 장치 상태를 스스로 살핍니다. 문제가 발생하면 바로 FANTASTRICK TEAM에게 보고가 들어오고 원격으로 바로 처리합니다!</p>
               <p></p>
             </figcaption>
           </figure>
@@ -878,28 +878,23 @@ export default function BusinessPage() {
           <div className="reveal">
             <details>
               <summary>지금 매장에 있는 장치, 안 뜯고 그대로 쓸 수 있나요?</summary>
-              <div className="b">쓰시던 전자석이랑 센서, 조명은 대부분 선만 옮기면 됩니다.
-                뭘 살릴 수 있는지는 보러 가서 그 자리에 알려드립니다.</div>
+              <div className="b">대부분 사용 가능합니다. 정확한건 구조를 보고 현장 미팅 후 말씀드릴 수 있습니다.</div>
             </details>
             <details>
               <summary>공사하는 동안 매장 닫아야 하나요?</summary>
-              <div className="b">3일 기준입니다. 방 한 칸씩 나눠 하면 매장 전체를 닫지 않아도 됩니다.
-                예약 적은 요일에 맞춰 잡습니다.</div>
+              <div className="b">왠만하면 닫지 않고 진행하겠지만 구조나 규모에 따라 잠시 닫고 진행해야할 수도 있습니다. 최소화하겠습니다.</div>
             </details>
             <details>
               <summary>장치가 작동을 안 하면 얼마나 빨리 오시나요?</summary>
-              <div className="b">장치가 응답을 안 하면 저희가 먼저 알고 연락드립니다.
-                멀리서 되는 건 방문 없이 처리하고요. 그리고 전화 받는 사람이 그 기계를 만든 사람입니다.</div>
+              <div className="b">장치가 응답을 안 하면 저희가 먼저 알고 연락드립니다. 원격으로 가능한 건 바로 처리도와드리고, 출장이 필요한 경우 일정예약 후 최대한 빠르게 방문드리고 있습니다.</div>
             </details>
             <details>
               <summary>방 하나만 새로 만들 수도 있나요?</summary>
-              <div className="b">됩니다. 방 한 칸만 하시는 분들도 있고, 매장 전체를 맡기시는 분들도 있습니다.
-                지금 쓰시는 것 중 살릴 게 있으면 살립니다.</div>
+              <div className="b">가능합니다. 장치 하나, 방 하나 또는 방 전체 원하시는대로 맞춰서 진행해드립니다.</div>
             </details>
             <details>
               <summary>기계만 사고 나머지는 저희가 해도 되나요?</summary>
-              <div className="b">됩니다. 기계만 가져가셔도 되고, 운영 프로그램만 쓰셔도 됩니다.
-                어디까지 맡기실지는 보고 나서 같이 정합니다.</div>
+              <div className="b">가능합니다.. 기계만 가져가셔도 되고, 운영 프로그램만 쓰셔도 됩니다. 원하시는 부분을 말씀해주시면 맞춰서 진행해드립니다.</div>
             </details>
           </div>
         </section>
