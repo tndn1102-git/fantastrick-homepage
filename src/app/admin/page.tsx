@@ -1399,6 +1399,7 @@ function AutoCancelled() {
   const [loaded, setLoaded] = useState(false);
   const [q, setQ] = useState("");
 
+
   const load = useCallback(async () => {
     setLoaded(false);
     const res = await fetch("/api/admin/reservations?status=cancelled");
@@ -1674,13 +1675,12 @@ type ManualRefund = {
   created_at: string; done_at: string | null;
 };
 
-function ManualRefunds() {
+function ManualRefunds({ onChanged }: { onChanged?: () => void }) {
   const [rows, setRows] = useState<ManualRefund[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [err, setErr] = useState("");
   const [msg, setMsg] = useState("");
   const [open, setOpen] = useState(false);      // 접수 폼 열림
-  const [showDone, setShowDone] = useState(false);
   const [busy, setBusy] = useState("");
 
   const load = useCallback(async () => {
@@ -1700,16 +1700,15 @@ function ManualRefunds() {
       method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, ...body }),
     });
     setBusy("");
-    if (res.ok) load(); else alert(((await res.json().catch(() => ({}))) as { error?: string }).error || "처리 실패");
+    if (res.ok) { load(); onChanged?.(); } else alert(((await res.json().catch(() => ({}))) as { error?: string }).error || "처리 실패");
   }
   async function remove(id: string) {
     if (!confirm("이 접수를 지울까요? 되돌릴 수 없습니다.")) return;
     const res = await fetch(`/api/admin/manual-refunds?id=${id}`, { method: "DELETE" });
-    if (res.ok) load(); else alert("삭제 실패");
+    if (res.ok) { load(); onChanged?.(); } else alert("삭제 실패");
   }
 
   const pending = rows.filter((r) => r.status === "pending");
-  const done = rows.filter((r) => r.status !== "pending").slice(0, 20);
 
   return (
     <div className="mrf-wrap" style={{ "--th": MANUAL_COLOR } as CSSProperties}>
@@ -1771,29 +1770,8 @@ function ManualRefunds() {
         </div>
       ))}
 
-      {done.length > 0 && (
-        <>
-          <button className="mrf-toggle" onClick={() => setShowDone((v) => !v)}>
-            {showDone ? "▲ 처리된 것 숨기기" : `▼ 처리된 것 ${done.length}건 보기`}
-          </button>
-          {showDone && done.map((r) => (
-            <div key={r.id} className="rrow" style={{ opacity: 0.75 }}>
-              <div className="head" style={{ cursor: "default" }}>
-                <span className="when" style={{ color: "var(--faint)" }}>{formatStampShort(r.done_at || r.created_at)}</span>
-                <span className="who">{r.name}</span>
-                <span className="tname">{r.bank} {r.account} · {r.reason.slice(0, 20)}</span>
-                <span className="amt">{r.amount.toLocaleString()}원</span>
-                <span className="rt">
-                  <span className={"badge-st " + (r.status === "done" ? "st-confirmed" : "st-cancelled")}>
-                    {r.status === "done" ? "보냄" : "안 보냄"}
-                  </span>
-                  <button className="btn sm ghost" onClick={() => patch(r.id, { status: "pending" })}>되돌리기</button>
-                </span>
-              </div>
-            </div>
-          ))}
-        </>
-      )}
+      {/* 처리된 내역은 여기 두지 않는다 — 아래 "최근 환불 완료"에 홈페이지 취소분과
+          한 줄로 합쳐 보인다(🏪 매장 표시로 구분). 2026-08-20 사장님 지시. */}
     </div>
   );
 }
@@ -1854,6 +1832,15 @@ function RefundQueue({ onDone }: { onDone: () => void }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
 
+  /* 매장 접수 환불도 같이 불러온다 — 처리 내역을 아래 "최근 환불 완료"에 합쳐 보이기 위해서.
+     따로 두면 "환불을 어디서 했더라"를 두 군데서 찾아야 한다(2026-08-20 사장님 지시). */
+  const [manual, setManual] = useState<ManualRefund[]>([]);
+  const loadManual = useCallback(async () => {
+    const res = await fetch("/api/admin/manual-refunds");
+    if (res.ok) setManual(((await res.json()).items || []) as ManualRefund[]);
+  }, []);
+  useEffect(() => { loadManual(); }, [loadManual]);
+
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/reservations?status=cancelled");
     if (res.ok) setRows(((await res.json()).reservations || []) as Reservation[]);
@@ -1876,10 +1863,21 @@ function RefundQueue({ onDone }: { onDone: () => void }) {
         "최근 20건"이 아니게 된다.
      ⚠️ 환불시각이 없는 옛 자료는 취소시각으로 대신하고, 그것도 없으면 맨 아래로 보낸다. */
   const refundStamp = (r: Reservation) => r.refunded_at || r.cancelled_at || "";
-  const done = rows
-    .filter((r) => r.refunded)
-    .sort((a, b) => refundStamp(b).localeCompare(refundStamp(a)))
-    .slice(0, 20);
+  /* 최근 환불 완료 = 홈페이지 취소분 + 매장 접수분을 **한 줄로 합친다**(2026-08-20 사장님 지시).
+     기준 시각: 홈페이지분은 환불 보낸 시각, 매장분은 처리한 시각. 최근 것이 위로. */
+  type DoneItem = { key: string; at: string; who: string; desc: string; amount: number; manual?: ManualRefund; res?: Reservation; label: string; ok: boolean };
+  const done: DoneItem[] = [
+    ...rows.filter((r) => r.refunded).map((r): DoneItem => ({
+      key: "res:" + r.id, at: refundStamp(r), who: r.refund_holder || r.name,
+      desc: `${r.theme_name} · ${formatDate(r.date)} ${r.time}`, amount: refundAmount(r), res: r,
+      label: "환불완료", ok: true,
+    })),
+    ...manual.filter((m) => m.status !== "pending").map((m): DoneItem => ({
+      key: "mrf:" + m.id, at: m.done_at || m.created_at, who: m.holder || m.name,
+      desc: `${m.bank} ${m.account}${m.reason ? " · " + m.reason.slice(0, 18) : ""}`, amount: m.amount, manual: m,
+      label: m.status === "done" ? "환불완료" : "안 보냄", ok: m.status === "done",
+    })),
+  ].sort((a, b) => (b.at || "").localeCompare(a.at || "")).slice(0, 20);
 
   async function copyAcct(r: Reservation) {
     const digits = (r.refund_account || "").replace(/[^0-9]/g, ""); // 은행앱 붙여넣기용
@@ -1907,7 +1905,7 @@ function RefundQueue({ onDone }: { onDone: () => void }) {
       </div>
 
       {/* 매장에서 손으로 접수한 환불 — 홈페이지 취소와 성격이 달라 맨 위에 따로 둔다. */}
-      <ManualRefunds />
+      <ManualRefunds onChanged={() => { loadManual(); onDone(); }} />
 
       {/* 🔴 사장님이 취소한 입금완료 건 — 돈은 돌려줘야 하는데 손님 계좌를 모른다.
           손님에게 계좌를 받아 여기서 입력하면, 아래 "바로 보낼 수 있음" 칸으로 내려간다. */}
@@ -1976,22 +1974,32 @@ function RefundQueue({ onDone }: { onDone: () => void }) {
       {done.length > 0 && (
         <>
           <div className="card-h" style={{ marginTop: 22 }}>최근 환불 완료 {done.length}건</div>
-          {done.map((r) => (
-            <div key={r.id} className="rrow">
+          {done.map((d) => (
+            <div key={d.key} className="rrow">
               <div className="head" style={{ cursor: "default" }}>
-                {/* 예약일이 아니라 '환불을 보낸 시각' — 통장 이체 기록과 맞춰보는 자리라 이게 맞다 */}
-                <span className="when" style={{ color: "var(--faint)" }}>{formatStampShort(r.refunded_at)}</span>
-                <span className="who">{r.refund_holder || r.name}</span>
-                <span className="tname">{r.theme_name} · {formatDate(r.date)} {r.time}</span>
-                <span className="amt">{refundAmount(r).toLocaleString()}원</span>
+                {/* 예약일이 아니라 돈이 나간 시각 — 통장 이체 기록과 맞춰보는 자리다 */}
+                <span className="when" style={{ color: "var(--faint)" }}>{formatStampShort(d.at)}</span>
+                {/* 🏪 = 매장에서 접수한 환불. 홈페이지 취소분과 한 줄로 섞이므로 표시로 가른다 */}
+                {d.manual && <span className="src-tag" style={{ background: "#F7E3EE", color: MANUAL_COLOR }}>🏪 매장</span>}
+                <span className="who">{d.who}</span>
+                <span className="tname">{d.desc}</span>
+                <span className="amt">{d.amount.toLocaleString()}원</span>
                 <span className="rt">
-                  <span className="badge-st st-confirmed">환불완료</span>
+                  <span className={"badge-st " + (d.ok ? "st-confirmed" : "st-cancelled")}>{d.label}</span>
                   <button className="btn sm ghost" onClick={async () => {
                     if (!confirm("환불 완료를 취소할까요? (잘못 눌렀을 때만)")) return;
-                    await fetch("/api/admin/reservations", {
-                      method: "PATCH", headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ id: r.id, refunded: false }),
-                    });
+                    if (d.res) {
+                      await fetch("/api/admin/reservations", {
+                        method: "PATCH", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ id: d.res.id, refunded: false }),
+                      });
+                    } else if (d.manual) {
+                      await fetch("/api/admin/manual-refunds", {
+                        method: "PATCH", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ id: d.manual.id, status: "pending" }),
+                      });
+                      loadManual();
+                    }
                     load(); onDone();
                   }}>되돌리기</button>
                 </span>

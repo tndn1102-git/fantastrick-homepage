@@ -66,6 +66,17 @@ export async function GET(req: NextRequest) {
     .select("status, theme_id, theme_name, deposit, deposit_paid, date, refunded, refund_rate, refund_account");
   const stats = buildStats(allRows || []);
 
+  /* 매장 접수 환불(현장에서 직원이 적어둔 것)도 "보내드릴 환불"이다.
+     이걸 안 세면 화면엔 2건이 보이는데 뱃지는 1이라고 하는 어긋남이 생긴다(2026-08-20 사장님 제보).
+     ⚠️ 표가 아직 없을 수 있으므로(마이그레이션 전) 실패해도 조용히 넘어간다. */
+  try {
+    const { data: mrf } = await db.from("manual_refunds").select("amount").eq("status", "pending");
+    if (mrf) {
+      stats.refundPending += mrf.length;
+      stats.refundPendingSum += mrf.reduce((a: number, b: { amount: number | null }) => a + (b.amount || 0), 0);
+    }
+  } catch { /* 표 없음 — 매장 접수 기능을 아직 안 켠 상태 */ }
+
   return NextResponse.json({ ok: true, reservations: data, stats });
 }
 
