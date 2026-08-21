@@ -1536,3 +1536,18 @@
   color: var(--app, var(--brand));
 }
 .bizsys .ops-h::after { content: ""; display: block; height: 1px; margin-top: 6px; background: var(--line) }
+
+/* ── 히어로 "브랜드 협업 가능" 카드 ──────────────────────
+   버튼 줄에 나란히 서되 **버튼이 아니다**(2026-08-21 사장님 지시).
+   같은 키·둥글기로 통일감만 주고, 점선 테두리 + 초록 상태점 + 흐린 글색으로
+   "누르는 곳"이 아니라 "상태 안내"로 읽히게 한다. hover·cursor 반응도 없음. */
+.bizsys .bz-can {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-weight: 800; font-size: 14px; padding: 13px 22px;
+  border: 1px dashed rgba(148, 190, 255, .38); border-radius: var(--r-sm); min-height: 44px;
+  color: var(--faint); letter-spacing: .01em; cursor: default; user-select: none;
+}
+.bizsys .bz-can i {
+  width: 7px; height: 7px; border-radius: 50%; background: #2fbf71;
+  box-shadow: 0 0 8px rgba(47, 191, 113, .8);
+}

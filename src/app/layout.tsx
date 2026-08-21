@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
   title: "판타스트릭 FANTASTRICK — 강남 이머시브 방탈출 & 머더룸",
   description:
-    "일상이 멈추고, 이야기가 시작된다. 강남 이머시브 방탈출·머더룸 브랜드 판타스트릭 · EST. 2012. 테마 예약·후기.",
+    "일상이 멈추고, 이야기가 시작된다. 강남 이머시브 방탈출·머더룸 브랜드 판타스트릭 · SINCE 2015. 테마 예약·후기.",
   icons: { icon: "/images/favicon.png" },
   openGraph: {
     title: "판타스트릭 FANTASTRICK",

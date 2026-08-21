@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "협업 · 브랜드 팝업 · 기업 교육 — 판타스트릭 비즈니스",
   description:
-    "방탈출 방식으로 브랜드 팝업, 기업 교육, 전시 콘텐츠를 만듭니다. 기획·시나리오부터 인테리어·전기 배선·장치 제작·시공까지 한 팀이 합니다. 강남 직영 3곳 · EST. 2012.",
+    "방탈출 방식으로 브랜드 팝업, 기업 교육, 전시 콘텐츠를 만듭니다. 기획·시나리오부터 인테리어·전기 배선·장치 제작·시공까지 한 팀이 합니다. 강남 직영 3곳 · SINCE 2015.",
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

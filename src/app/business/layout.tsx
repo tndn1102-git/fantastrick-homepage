@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "방탈출 제작 · 제어기 · 매장 운영 프로그램 — 판타스트릭 비즈니스",
   description:
-    "방을 통째로 만듭니다. 시나리오·문제 기획부터 인테리어, 전기 배선, 장치 제작, 마스터·슬레이브 제어기, 매장 운영 프로그램까지 한 팀이 합니다. 강남 직영 3곳 · EST. 2012.",
+    "방을 통째로 만듭니다. 시나리오·문제 기획부터 인테리어, 전기 배선, 장치 제작, 마스터·슬레이브 제어기, 매장 운영 프로그램까지 한 팀이 합니다. 강남 직영 3곳 · SINCE 2015.",
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

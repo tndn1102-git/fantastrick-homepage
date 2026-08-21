@@ -374,7 +374,7 @@ export default function Home() {
           <div className="biz-head reveal">
             <div>
               <h2 className="title">제작 · Production</h2>
-              <p className="lead">2012년부터 직영으로 검증한 콘텐츠·공간·장치 제작.</p>
+              <p className="lead">2015년부터 직영으로 검증한 콘텐츠·공간·장치 제작.</p>
             </div>
             <Link prefetch={false} href="/business" className="btn gold">제작 역량 보기 →</Link>
           </div>

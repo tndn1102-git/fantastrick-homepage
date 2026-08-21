@@ -439,14 +439,17 @@ export default function BusinessPage() {
           <p className="sub">
             방탈출 테마를  통째로 만드는 일부터, 테마 내 장치를 움직이는 기계 
 그리고 매장을 운영하는 프로그램까지. 
-2012년부터 방탈출 매장을 운영해온 노하우로 전부 설계해드립니다.
+2015년부터 방탈출 매장을 운영해온 노하우로 전부 설계해드립니다.
           </p>
           <div className="bz-cta">
             <a className="btn primary" href="#cta">문의하기</a>
             <a className="btn ghost" href="#turnkey">제작 설계</a>
+            {/* 버튼이 아니라 "가능 여부 안내" 카드 — 누르는 곳으로 오해되면 안 돼서
+                점선 테두리 + 상태점으로 버튼과 격을 다르게 했다(2026-08-21 사장님 지시). */}
+            <span className="bz-can"><i aria-hidden="true" />브랜드 협업 가능</span>
           </div>
           <div className="strip">
-            <div><b>EST. 2012</b></div>
+            <div><b>SINCE 2015</b></div>
             <div><b>기획부터 장치 프로그램까지 모든 것</b></div>
           </div>
         </div>
@@ -536,7 +539,7 @@ export default function BusinessPage() {
           </svg>
           <p className="lead reveal">
             대부분은 스토리, 인테리어, 장치를 각각 다른 데 맡깁니다. 저희는 세 가지를 다 한팀에서 진행합니다. 
-방탈출 제작을 2012년부터 쭉 한팀으로 
+방탈출 제작을 2015년부터 쭉 한팀으로 
 운영해온 노하우로 최고의 테마를 제작해드립니다.
           </p>
 
@@ -660,7 +663,7 @@ export default function BusinessPage() {
 
             <div className="rowlab">만든 데가 방탈출을 하는가</div>
             <div><span className="mk n">&times;</span><span className="t mut">아니오</span></div>
-            <div className="usc"><span className="mk y">&#10003;</span><span className="t">EST. 2012</span></div>
+            <div className="usc"><span className="mk y">&#10003;</span><span className="t">SINCE 2015</span></div>
           </div>
         </section>
 
