@@ -147,6 +147,31 @@ function WebAuto() {
       <div className="op reveal"><b>손으로 대조하던 일</b><span>통장 열어서 이름 맞춰보고, 관리자 들어가서 확정 누르고.</span></div>
       <div className="op reveal"><b>지금</b><span>입금 알림이 오면 맞는 예약을 찾아 확정까지 갑니다. 손님한테 확정 문자도 나갑니다.<br />사장님은 하실게 없습니다.</span></div>
     </div>
+
+    {/* 💰 비용 비교 (2026-08-21 사장님 지시: "무료"가 강조돼야 한다)
+        숫자는 각 사 공시 요금 실측 — docs/조사-입금확인-자동화-비용.md (출처 URL 전부 보관).
+        · 토스 115,500원 = 건당 400원(VAT별도)×200건 + 가입비 22만·연관리비 11만의 1년차 월할
+        · 펌뱅킹 140,000원 = 우리은행 월정료 10만 + 건당 200원×200 (각주: 소상공인은 사실상 계약 불가)
+        · SaaS 9,900원을 일부러 넣었다 — PG만 비교하면 "9,900원짜리 있던데?" 한 방에 무너진다.
+        ⚠️ "완전 무료"라고 쓰지 않는다(알림톡 실비 월 2천원대가 실재 — 과장광고 소지).
+           "수수료 0원 · 월 이용료 0원"까지가 사실이다. */}
+    <p className="grp-sub reveal">이런 자동확정, 다른 데서도 됩니다 — 돈을 내면요.</p>
+    <p className="lead reveal" style={{ margin: "10px 0 18px" }}>
+      가상계좌·입금확인 서비스는 건당 수수료나 월 이용료를 냅니다.<br />
+      저희는 자체 개발 프로그램이라 <b>건당 수수료 0원, 월 이용료 0원</b>입니다.<br />
+      이름·금액이 정확히 맞을 때만 자동확정하고 애매하면 자동 보류라, 오입금이 확정되는 일도 없습니다.
+    </p>
+    <figure className="swmock reveal feecmp">
+      <p className="ftitle">입금 자동확인, 한 달 유지비 비교</p>
+      <span className="mocktag">월 200건 기준</span>
+      <div className="fc-rows">
+        <div className="fc-row reveal"><span className="fc-l">은행 펌뱅킹</span><span className="fc-tr"><span className="fc-fl" style={{ width: "100%" }} /></span><span className="fc-v">월 140,000원</span></div>
+        <div className="fc-row reveal"><span className="fc-l">PG 가상계좌</span><span className="fc-tr"><span className="fc-fl" style={{ width: "83%" }} /></span><span className="fc-v">월 115,500원</span></div>
+        <div className="fc-row reveal"><span className="fc-l">입금확인 서비스</span><span className="fc-tr"><span className="fc-fl" style={{ width: "8%" }} /></span><span className="fc-v">월 9,900원</span></div>
+        <div className="fc-row us reveal"><span className="fc-l">판타스트릭 자체 시스템</span><span className="fc-tr"><span className="fc-zero">수수료 0원</span></span><span className="fc-v hot">0원</span></div>
+      </div>
+      <figcaption>각 사 공시 요금 기준(2026.08) · VAT 포함, 가입비는 1년차 월할 환산. 저희 시스템은 손님께 나가는 확정 문자 실비만 듭니다.</figcaption>
+    </figure>
     </div>
   );
 }
