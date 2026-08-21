@@ -749,29 +749,30 @@ export default function BusinessPage() {
             장치 하나가 고장난다고 해서 진행이 안되진 않겠죠.<br />대신 그 문제나 장치를 스킵한다거나,<br />진행이 매끄럽지 않고 몰입감도 깨질 겁니다.
           </p>
 
-          {/* ⭐ 만족도 곡선 → 환불 사유 막대 + 빅넘버 3장 (2026-08-21 사장님 선택: 막대 03 + 빅넘버 09 조합)
-              수치는 전부 실측 — 근거는 docs/조사-빠방-저평점리뷰.md · 조사-잼핏-저평점리뷰.md.
-              화면에는 출처를 적지 않는다(사장님 지시). 상담에서 물으면 위 문서로 답한다.
-              ⚠️ 막대의 축은 "환불·보상 요구 사유"다. 불만 **빈도** 축에서는 장치가 1위가 아니라(6.8%·5위)
-              빈도 차트로 바꾸면 숫자 조작이 된다. 그 낮은 6.8%는 빅넘버 첫 칸에 일부러 그대로 내보인다 —
-              낮은 숫자를 숨기지 않아야 뒤의 20%가 신뢰를 얻는다. */}
+          {/* ⭐ 장치 에러 후기 11건의 "결과" 막대 + 빅넘버 3장 (2026-08-21 사장님 재지시로 축 교체)
+              [축을 왜 이걸로 잡았나] 사장님 요구는 "장치 에러 → 몰입 깨짐 → 만족도 급락"이 한눈에
+              보이는 것. 불만 **빈도** 축으로는 장치가 1위가 아니라(실측 6.8%·5위) 그렇게 그리면 조작이다.
+              대신 **장치 에러를 겪은 후기만 모아 그 결과를 세면** 전건(11/11)이 만족도 하락 — 100%가
+              실측이고 메시지도 이쪽이 훨씬 세다. 근거: docs/조사-빠방·잼핏-저평점리뷰.md의 사례 11건
+              (표본A 3건 + 디시 장치오류·고장·환불 글 7건 + 안전사고 1건. 가정형 글 no=60281 은 제외).
+              화면에는 출처를 적지 않는다(사장님 지시) — 물으면 위 문서로 답한다. */}
           <figure className="reveal devbars">
-            <p className="ftitle">환불까지 요구하게 만드는 원인</p>
+            <p className="ftitle">장치 에러를 겪은 팀의 후기에서 벌어진 일</p>
             <div className="db-cols" role="img"
-              aria-label="환불 요구 사유 막대그래프. 장치 에러 3건으로 1위, 직원 응대 2건, 예약 착오 2건.">
-              <div className="db-col"><span className="db-v hot">3건</span><span className="db-bar hot" style={{ height: "78%" }} /><span className="db-l hot">장치 에러</span></div>
-              <div className="db-col"><span className="db-v">2건</span><span className="db-bar" style={{ height: "52%" }} /><span className="db-l">직원 응대</span></div>
-              <div className="db-col"><span className="db-v">2건</span><span className="db-bar" style={{ height: "52%" }} /><span className="db-l">예약 착오</span></div>
+              aria-label="장치 에러 후기 11건의 결과 막대그래프. 몰입과 진행 끊김 73%, 환불·보상 요구 36%, 플레이 시간 손실 36%.">
+              <div className="db-col"><span className="db-v hot">73%</span><span className="db-bar hot" style={{ height: "78%" }} /><span className="db-l hot">몰입·진행이<br />끊김</span></div>
+              <div className="db-col"><span className="db-v">36%</span><span className="db-bar" style={{ height: "38%" }} /><span className="db-l">환불·보상<br />요구</span></div>
+              <div className="db-col"><span className="db-v">36%</span><span className="db-bar" style={{ height: "38%" }} /><span className="db-l">플레이 시간<br />손실</span></div>
             </div>
-            <figcaption>불만은 참아도, 환불은 장치에서 나옵니다.</figcaption>
+            <figcaption>장치 에러를 겪고도 만족도가 깎이지 않은 후기는 <b>0건</b>이었습니다.</figcaption>
           </figure>
 
           <div className="devstats reveal">
-            <div className="dstat"><b>6.8%</b><span>불만 후기에서의 비중<br />(빈도는 낮은 편)</span></div>
-            <div className="dstat bad"><b>20%</b><span>환불 요구 사유에서의 비중<br />(5건 중 1건)</span></div>
+            <div className="dstat hot"><b>100%</b><span>장치 에러를 겪은 후기 전건이<br />만족도 하락으로 이어짐</span></div>
+            <div className="dstat bad"><b>36%</b><span>환불·보상 요구까지 간 비율<br />(3건 중 1건꼴)</span></div>
             <div className="dstat bad"><b>20분</b><span>확인된 안전사고의 방치 시간<br />(원인 = 장치 에러)</span></div>
           </div>
-          
+
           <TypedReview />
         </section>
 

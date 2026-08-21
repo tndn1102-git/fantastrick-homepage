@@ -1494,7 +1494,7 @@
 .bizsys .pn-device .db-bar.hot { background: linear-gradient(180deg, var(--brand), #0088ad); box-shadow: 0 0 22px rgba(0,212,255,.4) }
 .bizsys .pn-device .db-v { font-weight: 800; font-size: 15px }
 .bizsys .pn-device .db-v.hot { color: var(--brand) }
-.bizsys .pn-device .db-l { font-size: 12.5px; color: var(--faint); text-align: center }
+.bizsys .pn-device .db-l { font-size: 12.5px; color: var(--faint); text-align: center; line-height: 1.35 }
 .bizsys .pn-device .db-l.hot { color: #eaf6fb; font-weight: 700 }
 /* 빅넘버 3장 — 첫 칸(6.8%)은 일부러 수수하게, 뒤 두 칸이 본론 */
 .bizsys .pn-device .devstats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 18px }
@@ -1502,6 +1502,8 @@
 .bizsys .pn-device .dstat b { display: block; font-size: 32px; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; font-variant-numeric: tabular-nums }
 .bizsys .pn-device .dstat span { display: block; font-size: 12px; color: var(--faint); margin-top: 8px; line-height: 1.5 }
 .bizsys .pn-device .dstat.bad b { color: #ff5d5d }
+.bizsys .pn-device .dstat.hot { border-color: rgba(0,212,255,.4) }
+.bizsys .pn-device .dstat.hot b { color: var(--brand) }
 @media (prefers-reduced-motion: no-preference) {
   /* 화면에 들어오면(.in) 막대가 아래에서 차오른다 — 이 페이지의 기존 모션 규칙(안 켜기 방식) */
   .bizsys .pn-device .devbars .db-bar { transform: scaleY(0) }
