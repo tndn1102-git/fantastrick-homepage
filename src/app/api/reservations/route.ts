@@ -184,18 +184,7 @@ export async function GET(req: NextRequest) {
   // 끝난 지 일주일 넘은 예약(취소·이용완료)은 손님 조회 화면에서 숨긴다(DB엔 남음, 관리자는 봄).
   const visible = (data || []).filter((r) => !isHiddenFromLookup(r));
 
-  // 각 예약이 손님이 이미 시간변경을 썼는지 표시 (변경은 1건당 1회만 — 화면에서 버튼을 미리 감춤).
-  //   이력에 '손님 시간변경' 기록이 있으면 changed=true.
-  const ids = visible.map((r) => r.id);
-  const changedSet = new Set<string>();
-  if (ids.length) {
-    const { data: logs } = await db
-      .from("reservation_logs")
-      .select("reservation_id")
-      .in("reservation_id", ids)
-      .eq("action", "손님 시간변경");
-    (logs || []).forEach((l: { reservation_id: string }) => changedSet.add(l.reservation_id));
-  }
-  const reservations = visible.map((r) => ({ ...r, changed: changedSet.has(r.id) }));
-  return NextResponse.json({ ok: true, reservations });
+  // (2026-08-21) "시간변경 1회 제한"을 풀면서 changed 표시도 없앴다 —
+  //   버튼을 감출 이유가 사라져 이력 조회 한 번을 아낀다.
+  return NextResponse.json({ ok: true, reservations: visible });
 }

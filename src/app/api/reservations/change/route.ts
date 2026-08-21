@@ -13,7 +13,8 @@ import { rateLimit, getClientIp } from "@/lib/ratelimit";
 //     · 같은 테마 안에서 날짜·시간만 변경 (다른 테마로는 못 바꿈 — 취소 후 재예약)
 //     · 시작 24시간 넘게 남았을 때만 변경 가능 (= 취소 시 100% 환불 조건과 동일).
 //       24시간 이내·당일·임박 예약은 매장 전화로. 이 규칙이 "80% 위약금 회피" 구멍도 막는다.
-//     · 변경은 예약 1건당 딱 1번만 (남용 방지). 2번째부터는 매장 문의.
+//     · 횟수 제한 없음 (2026-08-21 사장님 지시로 "1건당 1회" 제한을 풀었다.
+//       당일·임박 변경은 위 24시간 규칙이 막아주고, 남용은 레이트 리밋이 막는다)
 //   새 시간은 **새로 예약할 때와 똑같은 조건**을 통과해야 한다(오픈 규칙·요일 시간표·임박·마감·중복).
 export async function POST(req: NextRequest) {
   // 레이트 리밋: IP당 10회/분
@@ -78,17 +79,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "예약 변경은 시작 24시간 전까지만 가능해요. 임박한 예약은 매장으로 문의해 주세요." }, { status: 409 });
   }
 
-  // 변경 1회 제한 — 이력에 '손님 시간변경' 기록이 이미 있으면 막는다.
-  //   (관리자가 옮긴 건 action 이 달라서 이 카운트에 안 잡힘 — 손님 셀프 변경만 1회로 센다)
-  const { count: changeCount } = await db
-    .from("reservation_logs")
-    .select("id", { count: "exact", head: true })
-    .eq("reservation_id", id)
-    .eq("action", "손님 시간변경");
-  if ((changeCount || 0) >= 1) {
-    return NextResponse.json({ error: "예약 변경은 한 번만 가능해요. 추가 변경은 매장으로 문의해 주세요." }, { status: 409 });
-  }
-
   // 지금과 같은 시간으로는 변경 의미 없음
   if (date === before.date && time === before.time) {
     return NextResponse.json({ error: "지금 예약과 같은 시간이에요. 다른 시간을 선택해 주세요." }, { status: 400 });
@@ -150,7 +140,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "변경 중 오류가 발생했어요." }, { status: 500 });
   }
 
-  // 변경 이력 — 1회 제한 카운트의 근거이자 "내가 안 바꿨는데?" 대비 기록
+  // 변경 이력 — "내가 안 바꿨는데?" 대비 기록 (관리자 [시간변경 내역]에서도 봄)
   await db.from("reservation_logs").insert({
     reservation_id: id, action: "손님 시간변경",
     detail: `${before.date} ${before.time} → ${date} ${time}`,

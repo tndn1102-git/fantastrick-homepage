@@ -20,7 +20,6 @@ type Reservation = {
   deposit: number;
   deposit_paid: boolean;
   status: string;
-  changed?: boolean; // 손님이 이미 시간변경을 1회 썼는지 (조회 API 가 채워줌)
 };
 
 const STATUS_LABEL: Record<string, string> = {
@@ -247,8 +246,9 @@ export default function ReservationLookup() {
                     {!cancelled && (hasStarted(r.date, r.time)
                       ? <div className="hint">이용이 끝난 예약이에요. 문의는 매장으로 연락 주세요.</div>
                       : (() => {
-                          // 시간 변경은 ①예약금 입금 확정 ②시작 24시간 넘게 남고(=취소 100% 조건) ③아직 안 바꿨을 때만.
-                          const canChange = r.deposit_paid && refundRateFor(r.date, r.time) === 100 && !r.changed;
+                          // 시간 변경은 ①예약금 입금 확정 ②시작 24시간 넘게 남았을 때(=취소 100% 조건).
+                          //   횟수 제한은 없다(2026-08-21 사장님 지시로 1회 제한 폐지). 당일·임박은 ②가 막는다.
+                          const canChange = r.deposit_paid && refundRateFor(r.date, r.time) === 100;
                           return (
                             <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                               {canChange && <button className="btn sm" onClick={() => setChangeTarget(r)}>시간 변경</button>}
@@ -257,9 +257,7 @@ export default function ReservationLookup() {
                                 <span className="hint" style={{ margin: 0 }}>
                                   {!r.deposit_paid
                                     ? "예약금 입금이 확인되면 시간 변경이 가능해요."
-                                    : r.changed
-                                    ? "시간 변경은 한 번만 가능해 이미 사용하셨어요."
-                                    : "시간 변경은 시작 24시간 전까지 가능해요."}
+                                    : "시간 변경은 시작 24시간 전까지 가능해요. 당일 변경은 불가능해요."}
                                 </span>
                               )}
                             </div>
@@ -425,7 +423,7 @@ export default function ReservationLookup() {
             // 옛 일시는 목록이 갱신되기 **전에** 붙잡아 둔다 — 아래 setList 가 덮어쓰면
             // "언제에서 언제로" 중 '언제에서'가 사라진다.
             const from = { theme: changeTarget.theme_name, d: changeTarget.date, t: changeTarget.time };
-            setList((prev) => prev?.map((x) => (x.id === id ? { ...x, date: d, time: t, changed: true } : x)) || null);
+            setList((prev) => prev?.map((x) => (x.id === id ? { ...x, date: d, time: t } : x)) || null);
             setChangeTarget(null);
             setChangeDone({ theme: from.theme, fromD: from.d, fromT: from.t, toD: d, toT: t });
           }}
@@ -455,7 +453,7 @@ export default function ReservationLookup() {
 
             <div className="modal-policy">
               <p><b>1.</b> 예약금은 <b>그대로 유지</b>됩니다. 다시 입금하지 않으셔도 됩니다.</p>
-              <p><b>2.</b> 시간 변경은 <b>한 번만</b> 가능합니다. 추가 변경은 매장으로 연락 부탁드립니다.</p>
+              <p><b>2.</b> 시간 변경은 예약 조회에서 <b>몇 번이든</b> 다시 하실 수 있습니다. 단, <b>당일 변경은 불가능</b>합니다(시작 24시간 전까지).</p>
               <p><b>3.</b> 앞서 받으신 예약확정 문자에는 <b>변경 전 시간</b>이 적혀 있습니다. <b>이 화면의 시간</b>이 맞습니다.</p>
             </div>
 

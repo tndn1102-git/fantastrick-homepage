@@ -121,7 +121,7 @@ export default function ChangeModal({
 
         <div className="notice info" style={{ marginBottom: 14 }}>
           <b>{target.theme_name}</b> · 지금 예약 <b>{formatDate(target.date)} {target.time}</b>
-          <br />옮길 날짜와 시간을 골라 주세요. <b>예약금은 그대로</b> 유지돼요. (변경은 한 번만 가능)
+          <br />옮길 날짜와 시간을 골라 주세요. <b>예약금은 그대로</b> 유지돼요. (당일 변경은 불가능해요)
         </div>
 
         {/* 날짜 */}
