@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 import { THEMES } from "@/lib/data";
 import "./business.css";
 
@@ -40,7 +40,7 @@ const KIND_BY_SCOPE: Record<string, string> = {
    ⚠️ 이미지는 미리 줄여 넣는다 — scripts/prep-business-shots.mjs */
 /** 실제 화면 캡처 한 칸. imgs 가 2장이면 나란히 놓는다(폰+PC 처럼 한 이야기일 때만). */
 type ShotImg = { src: string; w: number; h: number; alt: string; label?: string; phone?: boolean };
-type Shot = { title: string; cap: string; stamp: string; trio?: boolean; imgs: ShotImg[] };
+type Shot = { title: string; cap: ReactNode; stamp: string; trio?: boolean; imgs: ShotImg[] };
 
 /* 제품 묶음. id 는 CSS 의 색 이름표(--app)와 짝이다 — business.css 의 .app-* 참고 */
 type AppGroup = { id: string; name: string; tag: string; shots: Shot[] };
@@ -58,7 +58,7 @@ const APPS: AppGroup[] = [
             alt: "같은 출퇴근 기록을 PC 화면에서 달력으로 본다." },
         ] },
       { title: "근태가 급여로 넘어오고, 명세서는 메일로 한 번에",
-        cap: "말일에 시급 계산기를 두드리지 않습니다. 찍힌 근태로 지급액과 공제가 계산되고, 확정한 명세서는 직원 메일로 일괄 발송됩니다. 전송이 제대로 되었는지까지도 기록에 남습니다.",
+        cap: <>말일에 시급 계산기를 두드리지 않습니다. <br />찍힌 근태로 지급액과 공제가 계산되고, 확정한 명세서는 <br />직원 메일로 일괄 발송됩니다.<br />전송이 제대로 되었는지까지도 기록에 남습니다.</>,
         stamp: "판타스트릭 관리자 실제 화면입니다. (이름과 메일은 가명)",
         imgs: [{ src: "/images/business/shot-payroll.webp", w: 1440, h: 1121,
           alt: "급여 관리자 화면. 직원별 지급 총계와 공제, 실 수령액이 계산돼 있고 확정과 발송 상태가 표시된다." }] },
@@ -67,7 +67,7 @@ const APPS: AppGroup[] = [
   { id: "sch", name: "근무 스케줄 앱", tag: "근무표와 대타를 직원들이 알아서, 사장님은 검토만 하시면 됩니다!",
     shots: [
       { title: "이번 달 근무표",
-        cap: "일이 생겼을 때, 직원이 직접 신청하고 바꿔줄 사람이 승인하면 그걸로 끝납니다. 사장님이 단톡방에서 중재하실 일이 없어집니다.",
+        cap: <>일이 생겼을 때, 직원이 직접 신청하고 바꿔줄 사람이 <br />승인하면 그걸로 끝납니다. <br />사장님이 단톡방에서 중재하실 일이 없어집니다.</>,
         stamp: "판타스트릭 3개 지점 실제 운영 화면",
         imgs: [{ src: "/images/business/shot-schedule.webp", w: 1440, h: 1080,
           alt: "근무 스케줄 프로그램의 월간 근무표. 날짜마다 근무자와 대타 신청이 표시된다." }] },
@@ -138,7 +138,7 @@ function WebAuto() {
         <li><span className="lt">09:41</span><span className="lm">이름과 금액 대조</span><span className="lc">일치</span></li>
         <li><span className="lt">09:41</span><span className="lm">예약 확정</span><span className="lc">자동</span></li>
         <li><span className="lt">09:41</span><span className="lm">손님에게 확정 문자</span><span className="lc">보냄</span></li>
-        <li className="hold"><span className="lt">09:52</span><span className="lm">이름이 다르게 들어온 건 보류</span><span className="lc">사장님 확인</span></li>
+        <li className="hold"><span className="lt">09:52</span><span className="lm">이름이 다르게 들어온 것만 보류</span><span className="lc">사장님 확인</span></li>
       </ol>
       <figcaption>사장님이 매번 핸드폰을 들여다보지 않아도 됩니다.</figcaption>
     </figure>
@@ -158,8 +158,10 @@ function WebAuto() {
     <p className="grp-sub reveal">이런 자동확정, 다른 데서도 됩니다 — 돈을 내면요.</p>
     <p className="lead reveal" style={{ margin: "10px 0 18px" }}>
       가상계좌·입금확인 서비스는 건당 수수료나 월 이용료를 냅니다.<br />
-      저희는 자체 개발 프로그램이라 <b>건당 수수료 0원, 월 이용료 0원</b>입니다.<br />
-      이름·금액이 정확히 맞을 때만 자동확정하고 애매하면 자동 보류라, 오입금이 확정되는 일도 없습니다.
+      저희는 자체 개발 프로그램이라 <br />
+      <b>건당 수수료 0원, <br />월 이용료 0원</b>입니다.<br />
+      이름·금액이 정확히 맞을 때만 자동확정하고 애매하면 <br />
+      자동 보류라, 오입금이 확정되는 일도 없습니다.
     </p>
     <figure className="swmock reveal feecmp">
       <p className="ftitle">입금 자동확인, 한 달 유지비 비교</p>
@@ -210,7 +212,7 @@ function HintPhone() {
           <Image src="/images/business/shot-tablet.webp" alt="방 안 태블릿의 대기 화면. 테마 이름과 미션 트래커 표시가 보인다." width={1200} height={900} sizes="(max-width: 900px) 92vw, 560px" />
         </div>
         <figcaption>
-          힌트를 종이로 주거나 직원이 문을 열고 들어갈 일이 없습니다. 남은 시간과 지금 할 일, 받은 힌트가 이 화면에 있습니다.
+          힌트를 종이로 주거나 직원이 문을 열고 들어갈 일이 없습니다. <br />남은 시간과 지금 할 일, 받은 힌트가 이 화면에 있습니다.
           <span className="s-stamp">락다운시티 방 안 태블릿 실제 화면</span>
         </figcaption>
       </figure>
