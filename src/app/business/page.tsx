@@ -17,8 +17,6 @@ import "./business.css";
      · 금액은 쓰지 않는다(사장님 지시 2026-08-06). 값은 보러 가서 말한다.
      · 근거 못 대는 우량 표시("많이 선택", "업계 1위") 금지. */
 
-const won = (n: number) => n.toLocaleString("ko-KR");
-const onlyNum = (s: string) => Number(String(s).replace(/[^0-9]/g, "")) || 0;
 
 /* short = 화면 가장자리 길잡이에 쓰는 짧은 이름.
    본이름을 그대로 쓰면 길잡이가 168px 이 넘어 본문을 가린다(1440 화면에서 56px 겹침 실측). */
@@ -120,6 +118,47 @@ const SW_BOARD = [
 /* 지금 보는 범위 끝에서 나머지 둘로 넘어가는 줄.
    탭으로 나누면 "고른 것만 보고 나머지는 있는 줄도 모른다"가 늘 따라온다(NN/g).
    맨 아래에 다음 칸을 깔아두면 위로 되돌아가 탭을 누르지 않아도 이어서 보게 된다. */
+/* 시안 08 — 후기가 씌어지는 순간. 문장이 뒷부분에 닿을 때 별이 하나씩 꺼진다.
+ * ⚠️ 실제 후기가 아니다 — 카드에 "예시 후기" 표시를 박아 오인을 막는다.
+ * 모션 줄임 설정이면 완성된 문장과 꺼진 별을 즉시 보여준다. 재생은 화면에 들어올 때 1회. */
+function TypedReview() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [txt, setTxt] = useState("");
+  const [off, setOff] = useState(0);   // 꺼진 별 수
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const full = "테마는 정말 좋았는데, 장치가 멈춰서 흐름이 끊겼어요. 아쉬웠습니다.";
+    const io = new IntersectionObserver((es) => {
+      if (!es.some((x) => x.isIntersecting)) return;
+      io.disconnect();
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { setTxt(full); setOff(3); return; }
+      let i = 0;
+      const t = window.setInterval(() => {
+        i += 1; setTxt(full.slice(0, i));
+        if (i === Math.floor(full.length * 0.45)) setOff(1);
+        if (i === Math.floor(full.length * 0.7)) setOff(2);
+        if (i >= full.length) { setOff(3); window.clearInterval(t); }
+      }, 55);
+    }, { threshold: 0.5 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <figure className="reveal typedrev">
+      <p className="ftitle">그리고 그날 밤, 이런 후기가 올라옵니다</p>
+      <div className="trv" ref={ref}>
+        <span className="trv-ex">예시 후기</span>
+        <div className="trv-st" aria-hidden="true">
+          <span>{"★★★★★".slice(0, 5 - off)}</span><span className="o">{"★★★★★".slice(0, off)}</span>
+        </div>
+        <p className="trv-t">{txt}<span className="cur" aria-hidden="true">▋</span></p>
+      </div>
+      <figcaption>한번 남은 후기는 지울 수 없습니다. 그래서 고장은 손님보다 먼저 알아야 합니다.</figcaption>
+    </figure>
+  );
+}
+
+
 function NextUp({ here, pick }: { here: string; pick: (id: string) => void }) {
   const rest = SCOPES.filter((s) => s.id !== here);
   return (
@@ -138,8 +177,6 @@ function NextUp({ here, pick }: { here: string; pick: (id: string) => void }) {
 
 export default function BusinessPage() {
   // 손실 계산기 — 사장님이 자기 매장 숫자를 넣어보는 곳. 우리가 금액을 단정하지 않는다.
-  const [fee, setFee] = useState(60000);
-  const [slots, setSlots] = useState(12);
   // 확장 도해 — 모듈을 붙였다 뗐다 하며 "장치를 몇 개까지 물리나"를 손으로 확인하게 한다.
   const [mods, setMods] = useState(2);
   /* 지금 펼쳐 놓은 범위. 누르면 그 자리로 이동하는 게 아니라 **내용만 바뀐다**(사장님 지시 2026-08-06).
@@ -199,7 +236,6 @@ export default function BusinessPage() {
     return () => io.disconnect();
   }, []);
 
-  const lost = fee * slots;
   const devices = 32 + mods * 32;
 
   /* 범위 바꾸기 — 내용을 갈아끼우고 **그 범위의 맨 처음으로 올려보낸다.**
@@ -616,38 +652,32 @@ export default function BusinessPage() {
             장치 하나가 고장난다고 해서 진행이 안되진 않겠죠.<br />대신 그 문제나 장치를 스킵한다거나,<br />진행이 매끄럽지 않고 몰입감도 깨질 겁니다.
           </p>
 
-          <figure className="reveal">
-            <p className="ftitle">우리 매장으로 계산해보기</p>
-            <div className="calcrow">
-              <span>타임 요금</span>
-              <input
-                inputMode="numeric" aria-label="타임 요금"
-                value={fee ? won(fee) : ""}
-                onChange={(e) => setFee(onlyNum(e.target.value))}
-              />
-              <span>원</span>
-              <span style={{ marginLeft: 6 }}>하루</span>
-              <input
-                inputMode="numeric" aria-label="하루 타임 수"
-                value={slots ? String(slots) : ""}
-                onChange={(e) => setSlots(Math.min(24, onlyNum(e.target.value)))}
-              />
-              <span>타임</span>
-            </div>
-            <div className="daylab">평소 하루</div>
-            <div className="slots">
-              {Array.from({ length: slots }, (_, i) => <div className="slot" key={i} />)}
-            </div>
-            <div className="daylab bad" style={{ marginTop: 16 }}>장치가 작동을 안 한 날</div>
-            <div className="slots">
-              {Array.from({ length: slots }, (_, i) => <div className="slot dead" key={i} />)}
-            </div>
-            <div className="lossline">
-              <span className="losslab">빠지는 금액</span>
-              <span className="bignum">{won(lost)}원</span>
-            </div>
-            <figcaption>칸 하나가 타임 하나입니다. 빈 칸은 그날 못 받은 타임이고요.</figcaption>
+          {/* ⭐ 금액 계산기 → 만족도 곡선 + 타이핑 후기 (2026-08-21 사장님 선택: 시안 02+08 조합)
+              [왜 바꿨나] 금액 계산은 이 화면의 메시지("몰입과 후기가 무너진다")와 결이 달랐다.
+              돈 숫자 대신 ①만족도가 무너지는 순간의 곡선과 ②그 결과로 씌어지는 후기를 보여준다.
+              근거: 피크엔드 법칙(손님은 가장 나빴던 순간과 마지막 순간으로 경험을 기억한다).
+              시안 원본과 조사 출처: docs/시안-장치오류-만족도-10종.html (10안 중 02·08 채택) */}
+          <figure className="reveal satcurve">
+            <p className="ftitle">한 팀의 60분</p>
+            <svg viewBox="0 0 640 200" role="img"
+              aria-label="만족도 곡선. 오르다가 장치 정지 지점에서 급락한 뒤 끝까지 회복하지 못한다.">
+              <line className="axl" x1="40" y1="170" x2="620" y2="170" />
+              <line className="axl" x1="40" y1="20" x2="40" y2="170" />
+              <text className="ax" x="44" y="30">만족도 높음</text>
+              <text className="ax" x="44" y="164">낮음</text>
+              <text className="ax" x="60" y="188">입장</text>
+              <text className="ax" x="320" y="188">진행</text>
+              <text className="ax" x="580" y="188">탈출</text>
+              <polyline points="40,150 130,118 220,92 310,64 360,52 380,140 450,148 540,144 620,150" />
+              <line className="xm" x1="372" y1="44" x2="388" y2="60" />
+              <line className="xm" x1="388" y1="44" x2="372" y2="60" />
+              <text className="drop" x="396" y="52">장치 정지</text>
+              <circle className="dot" cx="380" cy="140" r="4" />
+            </svg>
+            <figcaption>손님은 가장 나빴던 순간과 마지막 순간으로 그날을 기억합니다.</figcaption>
           </figure>
+          
+          <TypedReview />
         </section>
 
         {/* 새 제어기 — 이 패널의 주인공. .pn-stage 는 여기 하나에만 붙인다(릴리즈 태그·조명) */}

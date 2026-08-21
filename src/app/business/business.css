@@ -1484,3 +1484,41 @@
 .bizsys .appgrp figure.shot {
   background: transparent; border: 0; border-radius: 0; padding: 0; box-shadow: none;
 }
+
+/* ── 시안 02: 만족도 곡선 (장치 화면) ─────────────────────
+   금액 계산기를 대체(2026-08-21 사장님 선택). 조사 출처는 docs/시안-장치오류-만족도-10종.html.
+   ⚠️ 모션은 "끄기"가 아니라 "안 켜기"로 짠다(no-preference 안쪽에만 선언) — 이 페이지의 기존 규칙. */
+.bizsys .pn-device .satcurve svg { width: 100%; height: auto; display: block }
+.bizsys .pn-device .satcurve .axl { stroke: rgba(0,212,255,.2) }
+.bizsys .pn-device .satcurve .ax { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 10px; fill: var(--faint) }
+.bizsys .pn-device .satcurve .drop { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 10px; fill: #ff5d8f }
+.bizsys .pn-device .satcurve polyline { fill: none; stroke: var(--brand); stroke-width: 2.5; stroke-linejoin: round }
+.bizsys .pn-device .satcurve .xm { stroke: #ff5d8f; stroke-width: 2.5 }
+.bizsys .pn-device .satcurve .dot { fill: #ff5d8f }
+@media (prefers-reduced-motion: no-preference) {
+  /* 화면에 들어오면(.in) 선이 왼쪽부터 한 번 그려진다. 급락점은 점멸. */
+  .bizsys .pn-device .satcurve polyline { stroke-dasharray: 900; stroke-dashoffset: 900 }
+  .bizsys .pn-device .satcurve.in polyline { animation: satDraw 1.6s ease-out forwards }
+  .bizsys .pn-device .satcurve.in .dot { animation: satBlink 1.2s steps(2) infinite }
+}
+@keyframes satDraw { to { stroke-dashoffset: 0 } }
+@keyframes satBlink { 50% { opacity: .25 } }
+
+/* ── 시안 08: 타이핑되는 후기 ── */
+.bizsys .pn-device .trv {
+  border: 1px solid var(--line2); background: var(--card); padding: 18px; max-width: 560px; position: relative;
+}
+.bizsys .pn-device .trv-ex {
+  position: absolute; top: 8px; right: 10px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 10px; color: var(--faint);
+}
+.bizsys .pn-device .trv-st { font-size: 20px; letter-spacing: .1em; color: var(--brand) }
+.bizsys .pn-device .trv-st .o { color: rgba(0,212,255,.16) }
+.bizsys .pn-device .trv-t {
+  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 13.5px; min-height: 3em; margin-top: 10px;
+}
+.bizsys .pn-device .trv .cur { color: var(--brand) }
+@media (prefers-reduced-motion: no-preference) {
+  .bizsys .pn-device .trv .cur { animation: trvCur 1s steps(2) infinite }
+}
+@keyframes trvCur { 50% { opacity: 0 } }
