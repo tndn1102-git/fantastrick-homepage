@@ -12,7 +12,7 @@ import "./business.css";
    ⚠️ 카피 규칙 (에이전트 2종 조사 + 사장님 확인으로 굳힌 것 — 고칠 때 지킬 것)
      · 이모지 금지. 문장 속 대시(—) 금지. "A가 아니라 B입니다" 반복 금지.
      · 업계어: 장비(X) → 장치 / 블록(X) → 제어기·모듈 / 리셋(X) → 세팅.
-     · 고장은 "작동을 안 한다"로 쓴다(죽었다·먹통 같은 은어는 사장님이 안 쓰신다).
+     · 고장은 "장치 에러"로 쓴다(2026-08-21 통일. 죽었다·먹통 같은 은어 금지).
      · 타임은 "찬다". 방마다 장치 수가 다르므로 "보통 몇 개" 같은 기준선 문장은 쓰지 않는다.
      · 금액은 쓰지 않는다(사장님 지시 2026-08-06). 값은 보러 가서 말한다.
      · 근거 못 대는 우량 표시("많이 선택", "업계 1위") 금지. */
@@ -364,7 +364,7 @@ export default function BusinessPage() {
                     <h2 className="reveal">사장님들이 한번 쯤 고민해본 것</h2>
           <div className="asks">
             <div className="ask reveal">매장을 새로 오픈하고 싶은데 어디서부터 문의를 해야할지 모르겠어요.</div>
-            <div className="ask reveal">장치가 작동을 안 하는데 어디로 문의해야 할지 모르겠어요.</div>
+            <div className="ask reveal">장치 에러가 났는데 어디로 문의해야 할지 모르겠어요.</div>
             <div className="ask reveal">테마를 하나 더 만들거나 인테리어를 어디에서 상담해야할까?</div>
             <div className="ask reveal">출퇴근 프로그램, 대타 스케줄 관리, 급여 계산,<br />홈페이지 등등 운영 프로그램을 도입하고 싶어요.</div>
           </div>
@@ -548,7 +548,7 @@ export default function BusinessPage() {
             <div><span className="mk n">&times;</span><span className="t mut">기계를 통째로 다시</span></div>
             <div className="usc"><span className="mk y">&#10003;</span><span className="t">판 하나만 더</span></div>
 
-            <div className="rowlab">작동을 안 하는 걸 어떻게 아는가</div>
+            <div className="rowlab">장치 에러를 어떻게 아는가</div>
             <div><span className="mk n">&times;</span><span className="t mut">사람이 발견</span></div>
             <div className="usc"><span className="mk y">&#10003;</span><span className="t">24시간 자동 알림</span></div>
 
@@ -647,7 +647,7 @@ export default function BusinessPage() {
         </header>
         <section className="bz-sec" id="device">
           <div className="kicker reveal">장치 고장의 영향</div>
-          <h2 className="reveal">장치 하나가 작동을 안 하면<br /><strong>그  날 손님들의 만족도도 떨어집니다.</strong></h2>
+          <h2 className="reveal">장치 하나에 에러가 나면<br /><strong>그  날 손님들의 만족도도 떨어집니다.</strong></h2>
           <p className="lead reveal">
             장치 하나가 고장난다고 해서 진행이 안되진 않겠죠.<br />대신 그 문제나 장치를 스킵한다거나,<br />진행이 매끄럽지 않고 몰입감도 깨질 겁니다.
           </p>
@@ -923,7 +923,7 @@ export default function BusinessPage() {
               <div className="b">왠만하면 닫지 않고 진행하겠지만 구조나 규모에 따라 잠시 닫고 진행해야할 수도 있습니다. 최소화하겠습니다.</div>
             </details>
             <details>
-              <summary>장치가 작동을 안 하면 얼마나 빨리 오시나요?</summary>
+              <summary>장치 에러가 나면 얼마나 빨리 오시나요?</summary>
               <div className="b">장치가 응답을 안 하면 저희가 먼저 알고 연락드립니다. 원격으로 가능한 건 바로 처리도와드리고, 출장이 필요한 경우 일정예약 후 최대한 빠르게 방문드리고 있습니다.</div>
             </details>
             <details>

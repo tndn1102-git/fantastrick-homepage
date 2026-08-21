@@ -150,7 +150,7 @@ export default function CollabPage() {
           <h2 className="reveal">저희가 만들어<br />저희가 돌리고 있습니다.</h2>
           <p className="lead reveal">
             납품하고 끝난 것이 아니라, 매일 손님을 받으면서 고쳐온 방들입니다.
-            무엇이 닳고 무엇이 자주 작동을 안 하는지 저희가 직접 겪습니다.
+            무엇이 닳고 어디서 장치 에러가 잦은지 저희가 직접 겪습니다.
           </p>
           <div className="works">
             {THEMES.map((t) => (
