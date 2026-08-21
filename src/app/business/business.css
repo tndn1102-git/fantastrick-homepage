@@ -1589,3 +1589,18 @@
 @media (max-width: 640px) {
   .bizsys .pn-software .fc-row { grid-template-columns: 96px 1fr 84px; font-size: 12px }
 }
+
+/* ── "건당 수수료 0원 · 월 이용료 0원" 강조 ───────────────
+   한 줄 고정 + 형광펜 밑칠. 화면에 들어오면(.reveal.in) 왼쪽부터 쓱 칠해진다.
+   모션은 기존 규칙대로 no-preference 안쪽에만 켠다. */
+.bizsys .pn-software .fee-zero {
+  white-space: nowrap; font-weight: 800; font-size: 1.18em; color: #1d4ed8;
+  padding: 0 3px; border-radius: 3px;
+  background-image: linear-gradient(180deg, transparent 55%, rgba(37,99,235,.22) 55%, rgba(37,99,235,.22) 92%, transparent 92%);
+  background-repeat: no-repeat; background-size: 100% 100%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .bizsys .pn-software .fee-zero { background-size: 0% 100% }
+  .bizsys .pn-software .reveal.in .fee-zero { animation: feeSweep .9s .35s cubic-bezier(.2,.7,.2,1) forwards }
+}
+@keyframes feeSweep { to { background-size: 100% 100% } }
