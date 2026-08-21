@@ -11,7 +11,8 @@ const MENU = [
   { href: "/#reviews", label: "리뷰" },
   { href: "/events", label: "이벤트" },
   { href: "/faq", label: "자주 묻는 질문" },
-  { href: "/#business", label: "비즈니스" },
+  // 홈의 비즈니스 티저가 아니라 **비즈니스 페이지로 바로** 간다(2026-08-21 사장님 지시)
+  { href: "/business", label: "비즈니스" },
   { href: "/#stores", label: "오시는길" },
 ];
 
