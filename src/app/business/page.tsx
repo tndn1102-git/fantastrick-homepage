@@ -118,6 +118,100 @@ const SW_BOARD = [
 /* 지금 보는 범위 끝에서 나머지 둘로 넘어가는 줄.
    탭으로 나누면 "고른 것만 보고 나머지는 있는 줄도 모른다"가 늘 따라온다(NN/g).
    맨 아래에 다음 칸을 깔아두면 위로 되돌아가 탭을 누르지 않아도 이어서 보게 된다. */
+/* 04 예약 홈페이지 카드의 뒷부분 — 입금 자동확정 과정.
+ * 캡처 3장(입금·문자·도착) 바로 아래 이어져 "같은 제품 이야기"로 읽힌다. */
+function WebAuto() {
+  return (
+    <div className="grp-more">
+    <p className="grp-sub reveal">예약금 들어오는걸 계속 기다렸다가 확정처리 하실 필요가 없습니다!</p>
+    <p className="lead reveal" style={{ margin: "10px 0 18px" }}>
+      예약금이 입금되면 예약금과 입금자명 확인 후<br />홈페이지에서 그 예약이 알아서 확정으로 넘어갑니다.
+    </p>
+    {/* 처리 내역 도해. ⚠️ 실제 로그가 아니다. 사람 이름·계좌·금액을 넣지 않는다.
+        흐름도가 아니라 줄로 그린 이유: 흐름도는 성공 경로만 그리게 되는데,
+        줄이면 "자동으로 안 되는 것"까지 같은 형식으로 나란히 놓을 수 있다. */}
+    <figure className="swmock reveal" style={{ marginBottom: 18 }}>
+      <p className="ftitle">이런 순서로 지나갑니다</p>
+      <span className="mocktag">처리 순서</span>
+      <ol className="swlog" aria-label="입금 자동확인 처리 순서">
+        <li><span className="lt">09:41</span><span className="lm">입금 알림 도착</span><span className="lc">받음</span></li>
+        <li><span className="lt">09:41</span><span className="lm">이름과 금액 대조</span><span className="lc">일치</span></li>
+        <li><span className="lt">09:41</span><span className="lm">예약 확정</span><span className="lc">자동</span></li>
+        <li><span className="lt">09:41</span><span className="lm">손님에게 확정 문자</span><span className="lc">보냄</span></li>
+        <li className="hold"><span className="lt">09:52</span><span className="lm">이름이 다르게 들어온 건 보류</span><span className="lc">사장님 확인</span></li>
+      </ol>
+      <figcaption>사장님이 매번 핸드폰을 들여다보지 않아도 됩니다.</figcaption>
+    </figure>
+
+    <div className="ops">
+      <div className="op reveal"><b>손으로 대조하던 일</b><span>통장 열어서 이름 맞춰보고, 관리자 들어가서 확정 누르고.</span></div>
+      <div className="op reveal"><b>지금</b><span>입금 알림이 오면 맞는 예약을 찾아 확정까지 갑니다. 손님한테 확정 문자도 나갑니다.<br />사장님은 하실게 없습니다.</span></div>
+    </div>
+    </div>
+  );
+}
+
+/* 05 힌트폰 — 제품 묶음 카드. 01~04 와 같은 문법(색 이름표)이라 "다른 제품"임이 바로 보인다.
+ * 아래 4가지 항목은 힌트폰의 기능 목록이다 — "힌트폰이 하는 일" 제목으로 소속을 못박는다
+ * (전에는 카드 밖에 맨몸으로 있어 FAQ 인지 힌트폰 내용인지 갈렸다. 2026-08-21 사장님 지적). */
+function HintPhone() {
+  return (
+    <section className="appgrp reveal app-hint">
+      <div className="app-head">
+        <span className="app-chip">05 힌트폰 프로그램</span>
+        <span className="app-tag">테마 진행과 힌트를 태블릿 하나로</span>
+      </div>
+    {/* 힌트폰 — 저희가 실제로 만들어 쓰는 것. 락다운시티(태블릿 카드 태그식)와
+        태초의 신부(코드 입력식) 두 가지를 매장에서 돌리고 있다.
+        ⚠️ 없는 실적을 쓰지 않는다. 여기 적힌 것은 전부 지금 돌아가는 기능이다. */}
+    <p className="grp-sub reveal" style={{ marginTop: 10 }}>테마 안에서 손님이 보는 힌트폰 프로그램도 제작해드립니다.</p>
+    <p className="lead reveal" style={{ margin: "10px 0 18px" }}>
+      힌트를 종이로 주거나 일일이 직원이 무전기로 힌트나 진행상황을 알려줄 필요가 없습니다. 
+테블릿 1대로 진행상황과 가이드 남은시간 힌트까지 
+ 손님이 보는 화면과 직원이 보는 화면이 따로 있고, 
+둘이 실시간으로 붙어 있습니다.
+    </p>
+
+    {/* ⭐ 힌트폰 도해 → **실제 화면 2장**으로 교체 (2026-08-20 사장님 지시)
+        · 손님 태블릿 = 대기 화면(MISSION TRACKER SYSTEM). 진행 중 화면은 문제·힌트가 보여서 못 쓴다.
+        · GM 뷰어 = 실제 운영 중인 화면. 폰 2대 연결·힌트 사용 횟수가 그대로 보인다.
+        ⚠️ 뷰어 화면에는 락다운시티 **진행 단계 이름이 전부** 들어 있었다(안전가옥·소독실·박사방…).
+           공개 페이지에 그대로 올리면 손님이 미리 보는 스포일러라, 단계 이름만 '미션 01…' 로
+           바꿔서 찍었다. 화면 구조(체크·진행·힌트 사용 수)는 실물 그대로다. */}
+    <div className="shots duo reveal">
+      <figure className="shot">
+        <p className="s-title">손님이 보는 태블릿</p>
+        <div className="s-frame">
+          <Image src="/images/business/shot-tablet.webp" alt="방 안 태블릿의 대기 화면. 테마 이름과 미션 트래커 표시가 보인다." width={1200} height={900} sizes="(max-width: 900px) 92vw, 560px" />
+        </div>
+        <figcaption>
+          힌트를 종이로 주거나 직원이 문을 열고 들어갈 일이 없습니다. 남은 시간과 지금 할 일, 받은 힌트가 이 화면에 있습니다.
+          <span className="s-stamp">락다운시티 방 안 태블릿 실제 화면</span>
+        </figcaption>
+      </figure>
+      <figure className="shot">
+        <p className="s-title">직원이 보는 뷰어</p>
+        <div className="s-frame">
+          <Image src="/images/business/shot-gmviewer.webp" alt="직원용 진행 뷰어. 연결된 태블릿 수와 남은 시간, 진행 단계와 힌트 사용 횟수가 보인다." width={1440} height={900} sizes="(max-width: 900px) 92vw, 560px" />
+        </div>
+        <figcaption>
+          어느 방이 어디까지 왔는지 한 화면에서 보고, 필요하면 그 자리에서 힌트를 보냅니다. 태블릿이 꺼졌다 켜져도 진행과 남은 시간이 그대로 따라옵니다.
+          <span className="s-stamp">실제 운영중인 관리자 뷰어 페이지 (진행 단계 이름은 스포일러라 가림)</span>
+        </figcaption>
+      </figure>
+    </div>
+
+    <p className="ops-h reveal">힌트폰이 하는 일</p>
+      <div className="ops" style={{ marginTop: 10 }}>
+      <div className="op reveal"><b>방 성격에 맞춰 만듭니다</b><span>카드를 대면 다음 할 일이 뜨는 방식, 코드를 넣으면 이야기가 오는 방식.<br />어떤 방식으로든 맞춤제작이 가능합니다.</span></div>
+      <div className="op reveal"><b>온라인, 오프라인 버전 둘다 가능합니다.</b><span>필요에 따라서는 온라인버전으로,<br />오프라인 버전은 끊길 우려가 전혀 없습니다.</span></div>
+      <div className="op reveal"><b>끊겨도 이어집니다</b><span>태블릿이 잠깐 꺼졌다 켜져도 어디까지 왔는지와 남은 시간이 그대로 따라옵니다.</span></div>
+      <div className="op reveal"><b>진행 속도가 빠른지, 느린지 손님에게 정보 전달 가능</b><span>손님이 입력하는 힌트코드나 다른 방식으로 손님에게 지금 진행이 빠른지 느린지 정보를 줘서<br />손님이 능동적으로 테마진행을 할 수 있도록 만들어줍니다.</span></div>
+    </div>
+    </section>
+  );
+}
+
 /* 시안 08 — 후기가 씌어지는 순간. 문장이 뒷부분에 닿을 때 별이 하나씩 꺼진다.
  * ⚠️ 실제 후기가 아니다 — 카드에 "예시 후기" 표시를 박아 오인을 막는다.
  * 모션 줄임 설정이면 완성된 문장과 꺼진 별을 즉시 보여준다. 재생은 화면에 들어올 때 1회. */
@@ -1075,8 +1169,15 @@ export default function BusinessPage() {
                     </figure>
                   ))}
                 </div>
+                {/* 예약 홈페이지의 핵심 기능(입금 자동확정)은 이 카드 **안**에 있어야 한다 —
+                    밖에 두면 다음 카드(힌트폰)와 경계가 안 보인다(2026-08-21 사장님). */}
+                {a.id === "web" && <WebAuto />}
               </section>
             ))}
+
+            {/* 05 힌트폰 — APPS 데이터가 아니라 별도 컴포넌트지만, 같은 .apps 격자 안에서
+                같은 카드 문법(색 이름표)으로 이어진다. map 안에 넣으면 카드마다 반복되니 금지. */}
+            <HintPhone />
           </div>
 
 
@@ -1084,77 +1185,7 @@ export default function BusinessPage() {
             모든 프로그램은 매장에 맞게 설계해드립니다.
           </p>
 
-          <h3 className="reveal" style={{ margin: "44px 0 0", fontSize: 17, fontWeight: 800 }}>예약금 들어오는걸 계속 기다렸다가 확정처리 하실 필요가 없습니다!</h3>
-          <p className="lead reveal" style={{ margin: "10px 0 18px" }}>
-            예약금이 입금되면 예약금과 입금자명 확인 후<br />홈페이지에서 그 예약이 알아서 확정으로 넘어갑니다.
-          </p>
-          {/* 처리 내역 도해. ⚠️ 실제 로그가 아니다. 사람 이름·계좌·금액을 넣지 않는다.
-              흐름도가 아니라 줄로 그린 이유: 흐름도는 성공 경로만 그리게 되는데,
-              줄이면 "자동으로 안 되는 것"까지 같은 형식으로 나란히 놓을 수 있다. */}
-          <figure className="swmock reveal" style={{ marginBottom: 18 }}>
-            <p className="ftitle">이런 순서로 지나갑니다</p>
-            <span className="mocktag">처리 순서</span>
-            <ol className="swlog" aria-label="입금 자동확인 처리 순서">
-              <li><span className="lt">09:41</span><span className="lm">입금 알림 도착</span><span className="lc">받음</span></li>
-              <li><span className="lt">09:41</span><span className="lm">이름과 금액 대조</span><span className="lc">일치</span></li>
-              <li><span className="lt">09:41</span><span className="lm">예약 확정</span><span className="lc">자동</span></li>
-              <li><span className="lt">09:41</span><span className="lm">손님에게 확정 문자</span><span className="lc">보냄</span></li>
-              <li className="hold"><span className="lt">09:52</span><span className="lm">이름이 다르게 들어온 건 보류</span><span className="lc">사장님 확인</span></li>
-            </ol>
-            <figcaption>사장님이 매번 핸드폰을 들여다보지 않아도 됩니다.</figcaption>
-          </figure>
 
-          <div className="ops">
-            <div className="op reveal"><b>손으로 대조하던 일</b><span>통장 열어서 이름 맞춰보고, 관리자 들어가서 확정 누르고.</span></div>
-            <div className="op reveal"><b>지금</b><span>입금 알림이 오면 맞는 예약을 찾아 확정까지 갑니다. 손님한테 확정 문자도 나갑니다.<br />사장님은 하실게 없습니다.</span></div>
-          </div>
-
-          {/* 힌트폰 — 저희가 실제로 만들어 쓰는 것. 락다운시티(태블릿 카드 태그식)와
-              태초의 신부(코드 입력식) 두 가지를 매장에서 돌리고 있다.
-              ⚠️ 없는 실적을 쓰지 않는다. 여기 적힌 것은 전부 지금 돌아가는 기능이다. */}
-          <h3 className="reveal" style={{ margin: "48px 0 0", fontSize: 17, fontWeight: 800 }}>테마 안에서 손님이 보는 힌트폰 프로그램도 제작해드립니다.</h3>
-          <p className="lead reveal" style={{ margin: "10px 0 18px" }}>
-            힌트를 종이로 주거나 일일이 직원이 무전기로 힌트나 진행상황을 알려줄 필요가 없습니다. 
-테블릿 1대로 진행상황과 가이드 남은시간 힌트까지 
- 손님이 보는 화면과 직원이 보는 화면이 따로 있고, 
-둘이 실시간으로 붙어 있습니다.
-          </p>
-
-          {/* ⭐ 힌트폰 도해 → **실제 화면 2장**으로 교체 (2026-08-20 사장님 지시)
-              · 손님 태블릿 = 대기 화면(MISSION TRACKER SYSTEM). 진행 중 화면은 문제·힌트가 보여서 못 쓴다.
-              · GM 뷰어 = 실제 운영 중인 화면. 폰 2대 연결·힌트 사용 횟수가 그대로 보인다.
-              ⚠️ 뷰어 화면에는 락다운시티 **진행 단계 이름이 전부** 들어 있었다(안전가옥·소독실·박사방…).
-                 공개 페이지에 그대로 올리면 손님이 미리 보는 스포일러라, 단계 이름만 '미션 01…' 로
-                 바꿔서 찍었다. 화면 구조(체크·진행·힌트 사용 수)는 실물 그대로다. */}
-          <div className="shots duo reveal">
-            <figure className="shot">
-              <p className="s-title">손님이 보는 태블릿</p>
-              <div className="s-frame">
-                <Image src="/images/business/shot-tablet.webp" alt="방 안 태블릿의 대기 화면. 테마 이름과 미션 트래커 표시가 보인다." width={1200} height={900} sizes="(max-width: 900px) 92vw, 560px" />
-              </div>
-              <figcaption>
-                힌트를 종이로 주거나 직원이 문을 열고 들어갈 일이 없습니다. 남은 시간과 지금 할 일, 받은 힌트가 이 화면에 있습니다.
-                <span className="s-stamp">락다운시티 방 안 태블릿 실제 화면</span>
-              </figcaption>
-            </figure>
-            <figure className="shot">
-              <p className="s-title">직원이 보는 뷰어</p>
-              <div className="s-frame">
-                <Image src="/images/business/shot-gmviewer.webp" alt="직원용 진행 뷰어. 연결된 태블릿 수와 남은 시간, 진행 단계와 힌트 사용 횟수가 보인다." width={1440} height={900} sizes="(max-width: 900px) 92vw, 560px" />
-              </div>
-              <figcaption>
-                어느 방이 어디까지 왔는지 한 화면에서 보고, 필요하면 그 자리에서 힌트를 보냅니다. 태블릿이 꺼졌다 켜져도 진행과 남은 시간이 그대로 따라옵니다.
-                <span className="s-stamp">실제 운영중인 관리자 뷰어 페이지 (진행 단계 이름은 스포일러라 가림)</span>
-              </figcaption>
-            </figure>
-          </div>
-
-          <div className="ops" style={{ marginTop: 18 }}>
-            <div className="op reveal"><b>방 성격에 맞춰 만듭니다</b><span>카드를 대면 다음 할 일이 뜨는 방식, 코드를 넣으면 이야기가 오는 방식.<br />어떤 방식으로든 맞춤제작이 가능합니다.</span></div>
-            <div className="op reveal"><b>온라인, 오프라인 버전 둘다 가능합니다.</b><span>필요에 따라서는 온라인버전으로,<br />오프라인 버전은 끊길 우려가 전혀 없습니다.</span></div>
-            <div className="op reveal"><b>끊겨도 이어집니다</b><span>태블릿이 잠깐 꺼졌다 켜져도 어디까지 왔는지와 남은 시간이 그대로 따라옵니다.</span></div>
-            <div className="op reveal"><b>진행 속도가 빠른지, 느린지 손님에게 정보 전달 가능</b><span>손님이 입력하는 힌트코드나 다른 방식으로 손님에게 지금 진행이 빠른지 느린지 정보를 줘서<br />손님이 능동적으로 테마진행을 할 수 있도록 만들어줍니다.</span></div>
-          </div>
 
           <p className="note reveal">프로그램만 따로 도입하고 싶으신 분들은 운영프로그램만 상담도 가능합니다.</p>
         </section>

@@ -1522,3 +1522,17 @@
   .bizsys .pn-device .trv .cur { animation: trvCur 1s steps(2) infinite }
 }
 @keyframes trvCur { 50% { opacity: 0 } }
+
+/* ── 05 힌트폰 묶음 + 카드 안 소제목 ─────────────────────
+   힌트폰을 01~04 와 같은 색 이름표 카드로 승격(2026-08-21 사장님 지시).
+   색은 태블릿 화면의 초록을 따랐다 — 캡처와 이름표 색이 이어져 보인다. */
+.bizsys .app-hint { --app: #2fbf71; margin-top: 26px }
+/* 카드 안 소제목 — 묶음 카드 안에서 이야기 단락을 나눈다 */
+.bizsys .grp-sub { font-size: 16px; font-weight: 800; letter-spacing: -.02em; margin: 26px 0 0 }
+.bizsys .grp-more { margin-top: 6px }
+/* 기능 목록 제목 — 아래 항목들이 이 제품의 기능임을 못박는다 */
+.bizsys .ops-h {
+  margin: 22px 0 0; font-size: 13px; font-weight: 800; letter-spacing: .06em;
+  color: var(--app, var(--brand));
+}
+.bizsys .ops-h::after { content: ""; display: block; height: 1px; margin-top: 6px; background: var(--line) }
