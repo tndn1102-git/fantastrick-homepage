@@ -1490,8 +1490,8 @@
    ⚠️ 모션은 "끄기"가 아니라 "안 켜기"로 짠다(no-preference 안쪽에만 선언) — 이 페이지의 기존 규칙. */
 .bizsys .pn-device .satcurve svg { width: 100%; height: auto; display: block }
 .bizsys .pn-device .satcurve .axl { stroke: rgba(0,212,255,.2) }
-.bizsys .pn-device .satcurve .ax { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 10px; fill: var(--faint) }
-.bizsys .pn-device .satcurve .drop { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 10px; fill: #ff5d8f }
+.bizsys .pn-device .satcurve .ax { font-family: inherit; font-size: 11px; letter-spacing: .04em; fill: var(--faint) }
+.bizsys .pn-device .satcurve .drop { font-family: inherit; font-size: 11px; letter-spacing: .04em; fill: #ff5d8f }
 .bizsys .pn-device .satcurve polyline { fill: none; stroke: var(--brand); stroke-width: 2.5; stroke-linejoin: round }
 .bizsys .pn-device .satcurve .xm { stroke: #ff5d8f; stroke-width: 2.5 }
 .bizsys .pn-device .satcurve .dot { fill: #ff5d8f }
@@ -1510,12 +1510,12 @@
 }
 .bizsys .pn-device .trv-ex {
   position: absolute; top: 8px; right: 10px;
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 10px; color: var(--faint);
+  font-family: inherit; font-size: 11px; letter-spacing: .04em; color: var(--faint);
 }
 .bizsys .pn-device .trv-st { font-size: 20px; letter-spacing: .1em; color: var(--brand) }
 .bizsys .pn-device .trv-st .o { color: rgba(0,212,255,.16) }
 .bizsys .pn-device .trv-t {
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 13.5px; min-height: 3em; margin-top: 10px;
+  font-size: 14.5px; line-height: 1.75; min-height: 3em; margin-top: 10px; word-break: keep-all;
 }
 .bizsys .pn-device .trv .cur { color: var(--brand) }
 @media (prefers-reduced-motion: no-preference) {
