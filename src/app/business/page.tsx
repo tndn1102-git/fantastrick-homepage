@@ -563,7 +563,7 @@ export default function BusinessPage() {
                 </div>
                 <form className="bzform" onSubmit={sendInquiry}>
                   <div>
-                    <label htmlFor="bz-store">매장명</label>
+                    <label htmlFor="bz-store">매장명 or 성명</label>
                     <input id="bz-store" maxLength={60} placeholder="○○이스케이프" autoComplete="organization"
                       value={form.storeName} onChange={(e) => setForm({ ...form, storeName: e.target.value })} />
                   </div>
@@ -573,8 +573,8 @@ export default function BusinessPage() {
                       value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
                   </div>
                   <div>
-                    <label htmlFor="bz-rooms">방 개수</label>
-                    <input id="bz-rooms" inputMode="numeric" maxLength={4} placeholder="3"
+                    <label htmlFor="bz-rooms">규모</label>
+                    <input id="bz-rooms" maxLength={40} placeholder="예: 방 3개"
                       value={form.rooms} onChange={(e) => setForm({ ...form, rooms: e.target.value })} />
                   </div>
                   <div>
@@ -933,7 +933,7 @@ export default function BusinessPage() {
                 </div>
                 <form className="bzform" onSubmit={sendInquiry}>
                   <div>
-                    <label htmlFor="bz-store">매장명</label>
+                    <label htmlFor="bz-store">매장명 or 성명</label>
                     <input id="bz-store" maxLength={60} placeholder="○○이스케이프" autoComplete="organization"
                       value={form.storeName} onChange={(e) => setForm({ ...form, storeName: e.target.value })} />
                   </div>
@@ -943,8 +943,8 @@ export default function BusinessPage() {
                       value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
                   </div>
                   <div>
-                    <label htmlFor="bz-rooms">방 개수</label>
-                    <input id="bz-rooms" inputMode="numeric" maxLength={4} placeholder="3"
+                    <label htmlFor="bz-rooms">규모</label>
+                    <input id="bz-rooms" maxLength={40} placeholder="예: 방 3개"
                       value={form.rooms} onChange={(e) => setForm({ ...form, rooms: e.target.value })} />
                   </div>
                   <div>
@@ -1161,7 +1161,7 @@ export default function BusinessPage() {
                 </div>
                 <form className="bzform" onSubmit={sendInquiry}>
                   <div>
-                    <label htmlFor="bz-store">매장명</label>
+                    <label htmlFor="bz-store">매장명 or 성명</label>
                     <input id="bz-store" maxLength={60} placeholder="○○이스케이프" autoComplete="organization"
                       value={form.storeName} onChange={(e) => setForm({ ...form, storeName: e.target.value })} />
                   </div>
@@ -1171,8 +1171,8 @@ export default function BusinessPage() {
                       value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
                   </div>
                   <div>
-                    <label htmlFor="bz-rooms">방 개수</label>
-                    <input id="bz-rooms" inputMode="numeric" maxLength={4} placeholder="3"
+                    <label htmlFor="bz-rooms">규모</label>
+                    <input id="bz-rooms" maxLength={40} placeholder="예: 방 3개"
                       value={form.rooms} onChange={(e) => setForm({ ...form, rooms: e.target.value })} />
                   </div>
                   <div>
