@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>장치 에러 막대그래프 시안 10종</title>
+<style>
+  /* 02 장치 패널과 같은 카본+시안 톤 — 페이지에 앉힌 느낌 그대로 */
+  :root{
+    --bg:#0d0f12; --panel:#13161b; --line:#232830; --ink:#e8edf2; --mut:#8b95a1; --faint:#5c6672;
+    --cy:#00d4ff; --red:#ff5d5d; --amber:#f0a500;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:'Pretendard','Malgun Gothic',sans-serif;line-height:1.6;padding:40px 20px 100px}
+  .wrap{max-width:1060px;margin:0 auto}
+  h1{font-size:26px;letter-spacing:-.02em;margin-bottom:6px}
+  .sub{color:var(--mut);font-size:14px;margin-bottom:26px}
+  .note{border:1px solid rgba(0,212,255,.35);background:rgba(0,212,255,.06);border-radius:10px;padding:14px 18px;font-size:13px;margin-bottom:34px;color:var(--mut)}
+  .note b{color:var(--cy)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin-bottom:30px;position:relative}
+  .no{position:absolute;top:-13px;left:20px;background:var(--cy);color:#04141a;font-weight:800;font-size:13px;padding:3px 12px;border-radius:20px;letter-spacing:.05em}
+  .card.reco{border-color:rgba(0,212,255,.5)}
+  .card.reco .tagreco{position:absolute;top:-13px;right:20px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.5);color:var(--cy);font-size:11.5px;font-weight:800;padding:3px 10px;border-radius:20px}
+  h2{font-size:17px;margin:6px 0 4px}
+  .why{color:var(--mut);font-size:13px;margin-bottom:20px}
+  .ct{font-size:14.5px;font-weight:800;margin-bottom:14px}
+  .ct small{display:block;font-weight:400;font-size:12px;color:var(--faint);margin-top:2px}
+  .chart{margin:6px 0}
+  /* 가로 막대 공통 */
+  .hb{display:grid;grid-template-columns:130px 1fr 90px;gap:10px 12px;align-items:center;font-size:13.5px;max-width:680px}
+  .hb .lb{text-align:right;color:var(--mut)}
+  .hb .lb.hot{color:var(--ink);font-weight:800}
+  .hb .tr{background:#1a1e25;border-radius:5px;height:26px;overflow:hidden}
+  .hb .fl{height:100%;border-radius:5px;background:#39424e;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:11.5px;color:#c8d0d9;font-weight:700}
+  .hb .fl.hot{background:linear-gradient(90deg,#0090b8,var(--cy));box-shadow:0 0 16px rgba(0,212,255,.5);color:#04141a}
+  .hb .fl.red{background:linear-gradient(90deg,#c93a3a,var(--red));box-shadow:0 0 16px rgba(255,93,93,.45);color:#2a0808}
+  .hb .vl{font-weight:800;font-variant-numeric:tabular-nums}
+  .hb .vl.hot{color:var(--cy)} .hb .vl.red{color:var(--red)}
+  /* 세로 막대 */
+  .vb{display:flex;gap:26px;align-items:flex-end;height:220px;padding:0 8px;max-width:560px}
+  .vb .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:8px;height:100%}
+  .vb .bar{width:100%;max-width:84px;border-radius:6px 6px 0 0;background:#39424e}
+  .vb .bar.hot{background:linear-gradient(180deg,var(--cy),#0088ad);box-shadow:0 0 22px rgba(0,212,255,.4)}
+  .vb .v{font-weight:800;font-size:15px}
+  .vb .v.hot{color:var(--cy)}
+  .vb .l{font-size:12px;color:var(--mut);text-align:center;line-height:1.3;min-height:32px}
+  .vb .l.hot{color:var(--ink);font-weight:700}
+  /* 블록 단위 막대 */
+  .blocks .row{display:grid;grid-template-columns:130px 1fr;gap:12px;align-items:center;font-size:13.5px;margin-bottom:12px}
+  .blocks .lb{text-align:right;color:var(--mut)}
+  .blocks .lb.hot{color:var(--ink);font-weight:800}
+  .blocks .bs{display:flex;gap:5px}
+  .blocks .b{width:34px;height:26px;border-radius:4px;background:#39424e}
+  .blocks .b.hot{background:var(--cy);box-shadow:0 0 12px rgba(0,212,255,.45)}
+  .foot{color:var(--faint);font-size:12px;margin-top:40px;text-align:center}
+  .badge{display:inline-block;background:rgba(255,93,93,.12);border:1px solid rgba(255,93,93,.4);color:var(--red);font-size:11.5px;font-weight:800;padding:2px 10px;border-radius:16px;margin-left:8px;vertical-align:2px}
+  @media(max-width:640px){.hb{grid-template-columns:100px 1fr 70px;font-size:12px}.vb{gap:12px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>장치 에러 막대그래프 · 시안 10종</h1>
+  <p class="sub">9번(빅넘버 3장)과 함께 들어갈 막대그래프 후보. 모두 <b>환불·보상 요구 사유</b> 축이라 장치가 <b>근소하게 1위인 게 실측 그대로</b>입니다. 요청대로 출처 표기는 전부 뺐습니다. 번호만 말씀해 주세요.</p>
+
+  <div class="note">수치 축은 두 가지만 씁니다 — <b>환불·보상 요구 사유</b>(장치·기기 고장 3 : 직원 응대 2 : 예약 착오 2 — 근소한 1위) 와 <b>말썽으로 번지는 비율</b>(장치 언급의 26%가 사고 글, 힌트는 0%). 둘 다 실제로 센 값이라 상담에서 "근거가 뭐냐"가 나와도 답이 있습니다(내부 조사 문서 보관).</div>
+
+  <!-- 01 -->
+  <div class="card reco">
+    <span class="no">01</span><span class="tagreco">추천 · 9번과 톤 일치</span>
+    <h2>기본 가로 막대 — 값 표시는 오른쪽</h2>
+    <p class="why">가장 담백한 형태. 장치만 시안색+글로우로 살아 있고 나머지는 회색으로 가라앉습니다.</p>
+    <div class="chart">
+      <p class="ct">환불까지 요구하게 만드는 원인<small>커뮤니티 환불·보상 요구 사례의 사유 분류</small></p>
+      <div class="hb">
+        <span class="lb hot">장치 에러</span><span class="tr"><span class="fl hot" style="width:86%"></span></span><span class="vl hot">3건</span>
+        <span class="lb">직원 응대</span><span class="tr"><span class="fl" style="width:57%"></span></span><span class="vl">2건</span>
+        <span class="lb">예약 착오</span><span class="tr"><span class="fl" style="width:57%"></span></span><span class="vl">2건</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 -->
+  <div class="card">
+    <span class="no">02</span>
+    <h2>퍼센트 가로 막대</h2>
+    <p class="why">건수 대신 비율(20% : 13% : 13%). 숫자가 커 보여서 막대 격차가 좀 더 벌어져 보입니다.</p>
+    <div class="chart">
+      <p class="ct">환불 요구 사유에서 차지하는 비중</p>
+      <div class="hb">
+        <span class="lb hot">장치 에러</span><span class="tr"><span class="fl hot" style="width:88%">20%</span></span><span class="vl hot">1위</span>
+        <span class="lb">직원 응대</span><span class="tr"><span class="fl" style="width:59%">13%</span></span><span class="vl"></span>
+        <span class="lb">예약 착오</span><span class="tr"><span class="fl" style="width:59%">13%</span></span><span class="vl"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 -->
+  <div class="card">
+    <span class="no">03</span>
+    <h2>세로 막대 — 시상대 느낌</h2>
+    <p class="why">세로형이라 "1위"가 물리적으로 제일 높이 섭니다. 폭이 넓은 자리에 어울립니다.</p>
+    <div class="chart">
+      <p class="ct">환불까지 요구하게 만드는 원인</p>
+      <div class="vb">
+        <div class="col"><span class="v hot">3건</span><span class="bar hot" style="height:78%"></span><span class="l hot">장치 에러</span></div>
+        <div class="col"><span class="v">2건</span><span class="bar" style="height:52%"></span><span class="l">직원 응대</span></div>
+        <div class="col"><span class="v">2건</span><span class="bar" style="height:52%"></span><span class="l">예약 착오</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 -->
+  <div class="card">
+    <span class="no">04</span>
+    <h2>가로 막대 + 결론 배지</h2>
+    <p class="why">01에 "환불 사유 1위" 빨간 배지를 얹어 결론을 못박는 형태. 제목만 훑는 사람도 메시지를 가져갑니다.</p>
+    <div class="chart">
+      <p class="ct">환불까지 요구하게 만드는 원인 <span class="badge">환불 사유 1위 = 장치 에러</span></p>
+      <div class="hb">
+        <span class="lb hot">장치 에러</span><span class="tr"><span class="fl red" style="width:86%"></span></span><span class="vl red">3건</span>
+        <span class="lb">직원 응대</span><span class="tr"><span class="fl" style="width:57%"></span></span><span class="vl">2건</span>
+        <span class="lb">예약 착오</span><span class="tr"><span class="fl" style="width:57%"></span></span><span class="vl">2건</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 -->
+  <div class="card">
+    <span class="no">05</span>
+    <h2>블록 막대 — 사례 1건 = 블록 1개</h2>
+    <p class="why">막대를 블록으로 쪼개 "실제 사례를 하나하나 셌다"는 인상을 줍니다. 값이 작아도(3:2:2) 옹색해 보이지 않는 게 장점.</p>
+    <div class="chart blocks">
+      <p class="ct">환불까지 요구하게 만드는 원인</p>
+      <div class="row"><span class="lb hot">장치 에러</span><span class="bs"><span class="b hot"></span><span class="b hot"></span><span class="b hot"></span></span></div>
+      <div class="row"><span class="lb">직원 응대</span><span class="bs"><span class="b"></span><span class="b"></span></span></div>
+      <div class="row"><span class="lb">예약 착오</span><span class="bs"><span class="b"></span><span class="b"></span></span></div>
+    </div>
+  </div>
+
+  <!-- 06 -->
+  <div class="card">
+    <span class="no">06</span>
+    <h2>비율 비교 막대 — "장치 이야기는 사고가 된다"</h2>
+    <p class="why">축을 바꾼 안. 같은 커뮤니티에서 '장치' 언급은 4건 중 1건이 사고 글인데, '힌트'는 0. 격차가 커서 막대가 극적입니다.</p>
+    <div class="chart">
+      <p class="ct">언급이 "사고·불만 글"로 번지는 비율</p>
+      <div class="hb">
+        <span class="lb hot">장치</span><span class="tr"><span class="fl hot" style="width:78%">26%</span></span><span class="vl hot">4건 중 1건</span>
+        <span class="lb">힌트 운영</span><span class="tr"><span class="fl" style="width:3%"></span></span><span class="vl" style="color:var(--faint)">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 -->
+  <div class="card">
+    <span class="no">07</span>
+    <h2>순위 리스트형 — 메달 넘버링</h2>
+    <p class="why">막대 앞에 ①②③ 순위를 박아 "랭킹"으로 읽히게. 스포츠 순위표처럼 직관적입니다.</p>
+    <div class="chart">
+      <p class="ct">환불까지 요구하게 만드는 원인</p>
+      <div class="hb" style="grid-template-columns:34px 120px 1fr 60px">
+        <span class="vl hot">1</span><span class="lb hot" style="text-align:left">장치 에러</span><span class="tr"><span class="fl hot" style="width:86%"></span></span><span class="vl hot">3건</span>
+        <span class="vl" style="color:var(--faint)">2</span><span class="lb" style="text-align:left">직원 응대</span><span class="tr"><span class="fl" style="width:57%"></span></span><span class="vl">2건</span>
+        <span class="vl" style="color:var(--faint)">2</span><span class="lb" style="text-align:left">예약 착오</span><span class="tr"><span class="fl" style="width:57%"></span></span><span class="vl">2건</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 08 -->
+  <div class="card">
+    <span class="no">08</span>
+    <h2>문장이 제목인 막대</h2>
+    <p class="why">차트 제목 자체를 세일즈 카피로. "불만은 참아도, 환불은 장치에서 나옵니다" 아래 근거 막대가 받쳐주는 구조.</p>
+    <div class="chart">
+      <p class="ct" style="font-size:17px">불만은 참아도, 환불은 장치에서 나옵니다<small>환불·보상 요구 사유 1위</small></p>
+      <div class="hb">
+        <span class="lb hot">장치 에러</span><span class="tr"><span class="fl hot" style="width:86%"></span></span><span class="vl hot">20%</span>
+        <span class="lb">직원 응대</span><span class="tr"><span class="fl" style="width:57%"></span></span><span class="vl">13%</span>
+        <span class="lb">예약 착오</span><span class="tr"><span class="fl" style="width:57%"></span></span><span class="vl">13%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 09 -->
+  <div class="card">
+    <span class="no">09</span>
+    <h2>이중 막대 — 잦기 vs 무게</h2>
+    <p class="why">유형마다 막대 2개(회색=불만 잦기 / 시안=환불 무게). 장치만 두 번째 막대가 첫 막대를 추월하는 그림이라, "빈도는 낮은데 무게가 다르다"는 9번 빅넘버와 논리가 이어집니다.</p>
+    <div class="chart">
+      <p class="ct">불만의 잦기(회색)와 환불로 가는 무게(파랑)</p>
+      <div class="hb" style="row-gap:4px 12px">
+        <span class="lb hot">장치 에러</span><span class="tr" style="height:16px"><span class="fl" style="width:16%"></span></span><span class="vl" style="font-size:11.5px;color:var(--faint)">불만 7%</span>
+        <span class="lb"></span><span class="tr" style="height:16px"><span class="fl hot" style="width:64%"></span></span><span class="vl hot" style="font-size:12.5px">환불 20%</span>
+        <span class="lb" style="margin-top:10px">퍼즐·콘텐츠</span><span class="tr" style="height:16px;margin-top:10px"><span class="fl" style="width:100%"></span></span><span class="vl" style="font-size:11.5px;color:var(--faint);margin-top:10px">불만 53%</span>
+        <span class="lb"></span><span class="tr" style="height:16px"><span class="fl" style="width:2%"></span></span><span class="vl" style="font-size:12.5px;color:var(--faint)">환불 0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10 -->
+  <div class="card">
+    <span class="no">10</span>
+    <h2>애니메이션 막대 — 화면에 들어오면 차오름</h2>
+    <p class="why">01과 같은 구성인데 스크롤로 보일 때 막대가 0→끝까지 차오릅니다(모션 줄임 설정이면 즉시 표시). 페이지의 reveal 효과와 결이 같습니다.</p>
+    <div class="chart">
+      <p class="ct">환불까지 요구하게 만드는 원인</p>
+      <div class="hb" id="anim">
+        <span class="lb hot">장치 에러</span><span class="tr"><span class="fl hot af" style="width:86%"></span></span><span class="vl hot">3건</span>
+        <span class="lb">직원 응대</span><span class="tr"><span class="fl af" style="width:57%"></span></span><span class="vl">2건</span>
+        <span class="lb">예약 착오</span><span class="tr"><span class="fl af" style="width:57%"></span></span><span class="vl">2건</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="foot">모든 수치는 내부 조사 문서(docs/조사-*.md)의 실측값 — 화면에는 출처를 표기하지 않되, 물어보면 답할 수 있는 상태로 보관합니다.</p>
+</div>
+<script>
+  // 10번 데모: 화면에 들어오면 차오르는 막대 (모션 줄임이면 즉시)
+  const bars=[...document.querySelectorAll('#anim .af')];
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches===false){
+    bars.forEach(b=>{b.dataset.w=b.style.width;b.style.width='0';b.style.transition='width 1.1s cubic-bezier(.2,.7,.2,1)'});
+    new IntersectionObserver((es,o)=>{es.forEach(e=>{if(e.isIntersecting){bars.forEach(b=>b.style.width=b.dataset.w);o.disconnect()}})},{threshold:.4}).observe(document.getElementById('anim'));
+  }
+</script>
+</body>
+</html>

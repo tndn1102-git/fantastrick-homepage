@@ -749,30 +749,28 @@ export default function BusinessPage() {
             장치 하나가 고장난다고 해서 진행이 안되진 않겠죠.<br />대신 그 문제나 장치를 스킵한다거나,<br />진행이 매끄럽지 않고 몰입감도 깨질 겁니다.
           </p>
 
-          {/* ⭐ 금액 계산기 → 만족도 곡선 + 타이핑 후기 (2026-08-21 사장님 선택: 시안 02+08 조합)
-              [왜 바꿨나] 금액 계산은 이 화면의 메시지("몰입과 후기가 무너진다")와 결이 달랐다.
-              돈 숫자 대신 ①만족도가 무너지는 순간의 곡선과 ②그 결과로 씌어지는 후기를 보여준다.
-              근거: 피크엔드 법칙(손님은 가장 나빴던 순간과 마지막 순간으로 경험을 기억한다).
-              시안 원본과 조사 출처: docs/시안-장치오류-만족도-10종.html (10안 중 02·08 채택) */}
-          <figure className="reveal satcurve">
-            <p className="ftitle">한 팀의 60분</p>
-            <svg viewBox="0 0 640 200" role="img"
-              aria-label="만족도 곡선. 오르다가 장치 정지 지점에서 급락한 뒤 끝까지 회복하지 못한다.">
-              <line className="axl" x1="40" y1="170" x2="620" y2="170" />
-              <line className="axl" x1="40" y1="20" x2="40" y2="170" />
-              <text className="ax" x="44" y="30">만족도 높음</text>
-              <text className="ax" x="44" y="164">낮음</text>
-              <text className="ax" x="60" y="188">입장</text>
-              <text className="ax" x="320" y="188">진행</text>
-              <text className="ax" x="580" y="188">탈출</text>
-              <polyline points="40,150 130,118 220,92 310,64 360,52 380,140 450,148 540,144 620,150" />
-              <line className="xm" x1="372" y1="44" x2="388" y2="60" />
-              <line className="xm" x1="388" y1="44" x2="372" y2="60" />
-              <text className="drop" x="396" y="52">장치 정지</text>
-              <circle className="dot" cx="380" cy="140" r="4" />
-            </svg>
-            <figcaption>손님은 가장 나빴던 순간과 마지막 순간으로 그날을 기억합니다.</figcaption>
+          {/* ⭐ 만족도 곡선 → 환불 사유 막대 + 빅넘버 3장 (2026-08-21 사장님 선택: 막대 03 + 빅넘버 09 조합)
+              수치는 전부 실측 — 근거는 docs/조사-빠방-저평점리뷰.md · 조사-잼핏-저평점리뷰.md.
+              화면에는 출처를 적지 않는다(사장님 지시). 상담에서 물으면 위 문서로 답한다.
+              ⚠️ 막대의 축은 "환불·보상 요구 사유"다. 불만 **빈도** 축에서는 장치가 1위가 아니라(6.8%·5위)
+              빈도 차트로 바꾸면 숫자 조작이 된다. 그 낮은 6.8%는 빅넘버 첫 칸에 일부러 그대로 내보인다 —
+              낮은 숫자를 숨기지 않아야 뒤의 20%가 신뢰를 얻는다. */}
+          <figure className="reveal devbars">
+            <p className="ftitle">환불까지 요구하게 만드는 원인</p>
+            <div className="db-cols" role="img"
+              aria-label="환불 요구 사유 막대그래프. 장치 에러 3건으로 1위, 직원 응대 2건, 예약 착오 2건.">
+              <div className="db-col"><span className="db-v hot">3건</span><span className="db-bar hot" style={{ height: "78%" }} /><span className="db-l hot">장치 에러</span></div>
+              <div className="db-col"><span className="db-v">2건</span><span className="db-bar" style={{ height: "52%" }} /><span className="db-l">직원 응대</span></div>
+              <div className="db-col"><span className="db-v">2건</span><span className="db-bar" style={{ height: "52%" }} /><span className="db-l">예약 착오</span></div>
+            </div>
+            <figcaption>불만은 참아도, 환불은 장치에서 나옵니다.</figcaption>
           </figure>
+
+          <div className="devstats reveal">
+            <div className="dstat"><b>6.8%</b><span>불만 후기에서의 비중<br />(빈도는 낮은 편)</span></div>
+            <div className="dstat bad"><b>20%</b><span>환불 요구 사유에서의 비중<br />(5건 중 1건)</span></div>
+            <div className="dstat bad"><b>20분</b><span>확인된 안전사고의 방치 시간<br />(원인 = 장치 에러)</span></div>
+          </div>
           
           <TypedReview />
         </section>

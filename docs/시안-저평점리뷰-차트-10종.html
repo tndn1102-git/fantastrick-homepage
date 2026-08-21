@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>저평점 리뷰 차트 시안 10종</title>
+<style>
+  /* 장치(02) 패널과 같은 세계 — 카본 블랙 + 시안. 페이지에 앉혔을 때의 느낌 그대로 보기 위함 */
+  :root{
+    --bg:#0d0f12; --panel:#13161b; --line:#232830; --ink:#e8edf2; --mut:#8b95a1; --faint:#5c6672;
+    --cy:#00d4ff; --cy-dim:rgba(0,212,255,.14); --red:#ff5d5d; --amber:#f0a500; --ok:#2fbf71;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:'Pretendard','Malgun Gothic',sans-serif;line-height:1.6;padding:40px 20px 100px}
+  .wrap{max-width:1060px;margin:0 auto}
+  h1{font-size:26px;letter-spacing:-.02em;margin-bottom:6px}
+  .sub{color:var(--mut);font-size:14px;margin-bottom:26px}
+  .honest{border:1px solid rgba(240,165,0,.4);background:rgba(240,165,0,.07);border-radius:10px;padding:16px 18px;font-size:13.5px;margin-bottom:34px}
+  .honest b{color:var(--amber)}
+  .honest p+p{margin-top:6px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin-bottom:30px;position:relative}
+  .no{position:absolute;top:-13px;left:20px;background:var(--cy);color:#04141a;font-weight:800;font-size:13px;padding:3px 12px;border-radius:20px;letter-spacing:.05em}
+  .card.reco{border-color:rgba(0,212,255,.5)}
+  .card.reco .tagreco{position:absolute;top:-13px;right:20px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.5);color:var(--cy);font-size:11.5px;font-weight:800;padding:3px 10px;border-radius:20px}
+  h2{font-size:17px;margin:6px 0 4px}
+  .why{color:var(--mut);font-size:13px;margin-bottom:20px}
+  .src{color:var(--faint);font-size:11.5px;margin-top:16px;border-top:1px solid var(--line);padding-top:10px}
+  .chart{margin:6px 0}
+  /* 가로 막대 공통 */
+  .hbar{display:grid;grid-template-columns:150px 1fr 84px;gap:8px 12px;align-items:center;font-size:13px}
+  .hbar .lb{text-align:right;color:var(--mut)}
+  .hbar .tr{background:#1a1e25;border-radius:4px;height:20px;overflow:hidden}
+  .hbar .fl{height:100%;border-radius:4px;background:#39424e}
+  .hbar .fl.hot{background:linear-gradient(90deg,#00a8cf,var(--cy));box-shadow:0 0 14px rgba(0,212,255,.45)}
+  .hbar .fl.red{background:linear-gradient(90deg,#c93a3a,var(--red));box-shadow:0 0 14px rgba(255,93,93,.4)}
+  .hbar .vl{font-weight:800;font-variant-numeric:tabular-nums}
+  .hbar .vl.hot{color:var(--cy)} .hbar .vl.red{color:var(--red)}
+  .legend{display:flex;gap:18px;font-size:12px;color:var(--mut);margin:0 0 14px}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+  /* 빅넘버 */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .stat{background:#171b21;border:1px solid var(--line);border-radius:10px;padding:20px 18px;text-align:center}
+  .stat b{display:block;font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
+  .stat span{display:block;font-size:12px;color:var(--mut);margin-top:8px}
+  .stat.hot{border-color:rgba(0,212,255,.45)} .stat.hot b{color:var(--cy)}
+  .stat.bad b{color:var(--red)}
+  /* 도트 매트릭스 */
+  .dots{display:grid;grid-template-columns:repeat(15,1fr);gap:10px;max-width:560px}
+  .dot{aspect-ratio:1;border-radius:50%;background:#2a3039}
+  .dot.on{background:var(--red);box-shadow:0 0 12px rgba(255,93,93,.55)}
+  /* 깔때기/체인 */
+  .chain{display:flex;flex-direction:column;gap:0;max-width:640px}
+  .chain .step{background:#171b21;border:1px solid var(--line);border-radius:10px;padding:14px 18px;font-size:13.5px}
+  .chain .step b{font-size:14.5px}
+  .chain .arrow{align-self:center;color:var(--faint);padding:2px 0;font-size:15px}
+  .chain .step.bad{border-color:rgba(255,93,93,.45);background:rgba(255,93,93,.06)}
+  /* 사분면 */
+  .quad{position:relative;height:340px;background:#12151a;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .quad .ax{position:absolute;background:var(--line)}
+  .quad .axx{left:0;right:0;top:50%;height:1px}.quad .axy{top:0;bottom:0;left:50%;width:1px}
+  .quad .zone{position:absolute;left:0;top:0;width:50%;height:50%;background:rgba(255,93,93,.06)}
+  .quad .albl{position:absolute;font-size:11px;color:var(--faint)}
+  .quad .pt{position:absolute;transform:translate(-50%,-50%);text-align:center;font-size:11.5px;color:var(--mut)}
+  .quad .pt i{display:block;width:14px;height:14px;border-radius:50%;background:#39424e;margin:0 auto 4px}
+  .quad .pt.hot{color:var(--ink);font-weight:700}
+  .quad .pt.hot i{width:22px;height:22px;background:var(--red);box-shadow:0 0 18px rgba(255,93,93,.65)}
+  /* 대비 2열 */
+  .vs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .vs .col{border:1px solid var(--line);border-radius:10px;padding:18px;font-size:13.5px}
+  .vs .col h3{font-size:14px;margin-bottom:12px;color:var(--mut)}
+  .vs .col.bad{border-color:rgba(255,93,93,.45)} .vs .col.bad h3{color:var(--red)}
+  .vs li{list-style:none;padding:7px 0;border-top:1px dashed var(--line)}
+  /* 타임라인 */
+  .tl{position:relative;padding-left:26px;max-width:640px}
+  .tl::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
+  .tl .ev{position:relative;padding:8px 0 8px 8px;font-size:13.5px}
+  .tl .ev::before{content:"";position:absolute;left:-24px;top:15px;width:10px;height:10px;border-radius:50%;background:#39424e}
+  .tl .ev.bad::before{background:var(--red);box-shadow:0 0 10px rgba(255,93,93,.6)}
+  .tl .ev b{margin-right:8px}
+  .tl .ev .t{color:var(--faint);font-size:11.5px;margin-right:10px}
+  /* 레이더 svg 텍스트 */
+  text{fill:var(--mut);font-size:11px;font-family:inherit}
+  .foot{color:var(--faint);font-size:12px;margin-top:40px;text-align:center}
+  @media(max-width:720px){.stats{grid-template-columns:1fr}.vs{grid-template-columns:1fr}.hbar{grid-template-columns:110px 1fr 66px;font-size:12px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>저평점 리뷰 → 장치 에러 차트 · 시안 10종</h1>
+  <p class="sub">비즈니스 페이지 02 장치 패널 맨 위(지금 만족도 곡선 자리)에 들어갈 후보. 실제 페이지와 같은 카본+시안 톤으로 그려서 앉힌 느낌 그대로 볼 수 있습니다. 번호만 말씀해 주세요 (조합 가능: 예 "4+9").</p>
+
+  <div class="honest">
+    <p><b>⚠️ 데이터가 말한 것 (조사 결과 먼저)</b></p>
+    <p>커뮤니티 후기 44건을 실제로 세어보니 <b>"불만 빈도"로는 장치 에러가 5위(6.8%)</b>입니다. 1위는 콘텐츠 완성도(34.1%). 그래서 <b>빈도 차트에서 장치를 1위로 그리면 숫자 조작</b>이 되고, 출처를 남기는 순간 들통납니다.</p>
+    <p>대신 <b>"터진 다음"을 재면 장치가 정당하게 1위</b>입니다 — 환불 요구 글 15건 중 3건(20%)이 장치·기기 고장 사유, 확인된 안전사고(20분 방치·폐쇄공포)의 직접 원인도 장치 에러. 아래 시안은 전부 이 <b>심각도 축</b>으로 장치를 맨 위에 세웁니다. 숫자는 전부 실측입니다.</p>
+  </div>
+
+  <!-- ════════ 01 ════════ -->
+  <div class="card">
+    <span class="no">01</span>
+    <h2>이중축 막대 — "불만은 흔한 순서, 사고는 다른 순서"</h2>
+    <p class="why">회색(불만 빈도)은 정직하게 두고, 빨강(환불·사고로 번진 비율)에서 장치가 튀어오르는 구성. 두 순서가 뒤집히는 게 한눈에 보입니다.</p>
+    <div class="chart">
+      <div class="legend"><span><i style="background:#39424e"></i>불만으로 언급된 비율</span><span><i style="background:var(--red)"></i>환불·사고로 번진 비율</span></div>
+      <div class="hbar">
+        <span class="lb">장치 에러</span><span class="tr"><span class="fl" style="width:14%"></span></span><span class="vl">6.8%</span>
+        <span class="lb"></span><span class="tr"><span class="fl red" style="width:40%"></span></span><span class="vl red">환불 사유 20%</span>
+        <span class="lb">콘텐츠 완성도</span><span class="tr"><span class="fl" style="width:68%"></span></span><span class="vl">34.1%</span>
+        <span class="lb"></span><span class="tr"><span class="fl red" style="width:2%"></span></span><span class="vl">환불 0건</span>
+        <span class="lb">퍼즐 난이도</span><span class="tr"><span class="fl" style="width:36%"></span></span><span class="vl">18.2%</span>
+        <span class="lb"></span><span class="tr"><span class="fl red" style="width:2%"></span></span><span class="vl">환불 0건</span>
+        <span class="lb">인테리어 노후</span><span class="tr"><span class="fl" style="width:23%"></span></span><span class="vl">11.4%</span>
+        <span class="lb"></span><span class="tr"><span class="fl red" style="width:2%"></span></span><span class="vl">환불 0건</span>
+      </div>
+    </div>
+    <p class="src">출처: 국내 방탈출 커뮤니티(디시 방탈출 갤러리·더쿠·블라인드) 후기 44건 + 환불 관련 글 15건 분류 — 판타스트릭 자체 조사, 2026.08</p>
+  </div>
+
+  <!-- ════════ 02 ════════ -->
+  <div class="card">
+    <span class="no">02</span>
+    <h2>사분면 — 낮은 빈도, 최악의 결과</h2>
+    <p class="why">가로=얼마나 자주 불평받나, 세로=터졌을 때 얼마나 심각한가. 장치 에러만 왼쪽 위 "사고 구역"에 혼자 있습니다.</p>
+    <div class="chart quad">
+      <span class="zone"></span>
+      <span class="ax axx"></span><span class="ax axy"></span>
+      <span class="albl" style="left:10px;top:8px">사고 구역 (드물지만 치명적)</span>
+      <span class="albl" style="right:10px;bottom:8px">잦지만 회복 가능 →</span>
+      <span class="albl" style="left:10px;bottom:8px">← 불만 빈도 낮음</span>
+      <span class="albl" style="right:10px;top:8px">심각도 높음 ↑</span>
+      <span class="pt hot" style="left:22%;top:20%"><i></i>장치 에러<br>환불·안전사고 직행</span>
+      <span class="pt" style="left:78%;top:62%"><i></i>콘텐츠 완성도</span>
+      <span class="pt" style="left:62%;top:72%"><i></i>퍼즐 난이도</span>
+      <span class="pt" style="left:48%;top:64%"><i></i>인테리어 노후</span>
+      <span class="pt" style="left:30%;top:70%"><i></i>가격</span>
+      <span class="pt" style="left:38%;top:80%"><i></i>운영·동선</span>
+    </div>
+    <p class="src">위치 근거: 빈도=불만 44건 내 비중 실측 · 심각도=환불 유발(20%)·안전사고 사례 유무 — 판타스트릭 자체 조사, 2026.08</p>
+  </div>
+
+  <!-- ════════ 03 ════════ -->
+  <div class="card">
+    <span class="no">03</span>
+    <h2>사건 전개 체인 — 장치 에러 한 번의 경로</h2>
+    <p class="why">차트가 아니라 "그날 무슨 일이 벌어지는가"를 단계로 보여주는 안. 숫자보다 이야기가 앞서는 구성입니다.</p>
+    <div class="chart chain">
+      <div class="step"><b>장치 에러 발생</b> — 진행이 그 자리에서 멈춥니다</div>
+      <span class="arrow">▼</span>
+      <div class="step">직원이 눈치채지 못하면 손님은 <b>같은 자리에서 계속 대기</b> (실제 사례: 20분 이상 방치)</div>
+      <span class="arrow">▼</span>
+      <div class="step bad"><b>환불 요구</b> — 커뮤니티 환불 요구 글 15건 중 <b style="color:var(--red)">3건(20%)</b>이 장치·기기 고장 사유</div>
+      <span class="arrow">▼</span>
+      <div class="step bad"><b>커뮤니티 낙인</b> — "장치 오류도 빈번하기 때문에, 지금 그다지 추천하지 않음" (실제 후기)</div>
+    </div>
+    <p class="src">출처: 디시 방탈출 갤러리 환불·사고 글, 커뮤니티 후기 44건 — 판타스트릭 자체 조사, 2026.08</p>
+  </div>
+
+  <!-- ════════ 04 ════════ -->
+  <div class="card reco">
+    <span class="no">04</span><span class="tagreco">추천 · 메인용</span>
+    <h2>환불까지 간 사건만 세면 — 장치가 1위</h2>
+    <p class="why">축을 "불만"이 아니라 <b>"환불 요구"</b>로 바꾼 막대. 장치가 맨 위인 게 실측 그대로라 출처를 붙여도 떳떳합니다.</p>
+    <div class="chart">
+      <div class="legend"><span>환불 요구 글 15건의 사유 분류 (사유가 확인된 것)</span></div>
+      <div class="hbar">
+        <span class="lb"><b style="color:var(--cy)">장치·기기 고장</b></span><span class="tr"><span class="fl hot" style="width:80%"></span></span><span class="vl hot">3건 · 20%</span>
+        <span class="lb">직원 응대</span><span class="tr"><span class="fl" style="width:53%"></span></span><span class="vl">2건</span>
+        <span class="lb">예약 착오</span><span class="tr"><span class="fl" style="width:53%"></span></span><span class="vl">2건</span>
+        <span class="lb">기타·확인 불가</span><span class="tr"><span class="fl" style="width:26%;opacity:.5"></span></span><span class="vl" style="color:var(--faint)">8건</span>
+      </div>
+    </div>
+    <p class="src">출처: 디시인사이드 방탈출 마이너 갤러리 '환불' 제목 검색 15건 전수 분류 (2026.08 기준) — 판타스트릭 자체 조사 ※ 기타 8건은 본문에 사유 미기재</p>
+  </div>
+
+  <!-- ════════ 05 ════════ -->
+  <div class="card">
+    <span class="no">05</span>
+    <h2>대비 2열 — 다른 불만 vs 장치 에러</h2>
+    <p class="why">차트 없이 결과의 "격"을 대비. 왼쪽은 아쉬움으로 끝나고, 오른쪽은 돈과 안전 문제가 됩니다.</p>
+    <div class="chart vs">
+      <div class="col">
+        <h3>다른 불만이 남기는 것</h3>
+        <li>"특색이 없다" — 다음에 안 감</li>
+        <li>"문제가 너무 쉽다" — 아쉬움</li>
+        <li>"인테리어가 낡았다" — 감점</li>
+      </div>
+      <div class="col bad">
+        <h3>장치 에러가 남기는 것</h3>
+        <li><b>환불 요구</b> — 환불 사유 20%</li>
+        <li><b>안전사고</b> — 암전 밀폐공간 20분 방치 사례</li>
+        <li><b>낙인</b> — "장치 오류 빈번, 추천 안 함"</li>
+      </div>
+    </div>
+    <p class="src">출처: 커뮤니티 후기 44건·환불 글 15건·사고 사례 글 — 판타스트릭 자체 조사, 2026.08</p>
+  </div>
+
+  <!-- ════════ 06 ════════ -->
+  <div class="card">
+    <span class="no">06</span>
+    <h2>도트 매트릭스 — 환불 요구 5건 중 1건</h2>
+    <p class="why">환불 요구 글 15개를 점 15개로. 빨간 점 3개가 장치 에러. "5건 중 1건"이 몸으로 느껴지는 안.</p>
+    <div class="chart">
+      <div class="dots">
+        <span class="dot on"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="dot"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="dot"></span><span class="dot"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+      <p style="margin-top:14px;font-size:13.5px;color:var(--mut)">환불 요구 글 15건 중 <b style="color:var(--red)">3건</b>의 사유가 장치·기기 고장 — <b style="color:var(--ink)">5건 중 1건</b>입니다.</p>
+    </div>
+    <p class="src">출처: 디시 방탈출 갤러리 '환불' 검색 15건 (2026.08) — 판타스트릭 자체 조사</p>
+  </div>
+
+  <!-- ════════ 07 ════════ -->
+  <div class="card">
+    <span class="no">07</span>
+    <h2>실화 타임라인 — 방치된 20분</h2>
+    <p class="why">실제 사고 하나를 시간순으로. 숫자 대신 사건 하나가 심각성을 다 말해주는 안. (매장명은 안 씁니다)</p>
+    <div class="chart tl">
+      <div class="ev"><span class="t">당일 오전</span><b>장치 수리</b> "고쳤으니 괜찮겠지"</div>
+      <div class="ev bad"><span class="t">게임 중</span><b>같은 장치가 다시 에러</b> — 암전된 밀폐 공간에서 진행 정지</div>
+      <div class="ev bad"><span class="t">+20분</span><b>손님 혼자 방치</b> — CCTV 사각지대라 직원이 상황을 모름</div>
+      <div class="ev"><span class="t">이후</span><b>보상은 5,000원 환불</b> · 엔딩도 못 봄</div>
+      <div class="ev bad"><span class="t">1년 뒤</span><b>손님은 아직 폐쇄공포 증상</b> — 후기가 커뮤니티에 남아 있음</div>
+    </div>
+    <p class="src">출처: 디시 방탈출 갤러리 실제 사고 후기 (2026.08 확인) — 판타스트릭 자체 조사</p>
+  </div>
+
+  <!-- ════════ 08 ════════ -->
+  <div class="card">
+    <span class="no">08</span>
+    <h2>언급 성격 비교 — "장치 이야기는 사고가 된다"</h2>
+    <p class="why">커뮤니티에서 키워드가 어떤 문맥으로 쓰이나. '힌트' 이야기는 사고가 0인데 '장치' 이야기는 4건 중 1건이 사고 글입니다.</p>
+    <div class="chart">
+      <div class="hbar">
+        <span class="lb">'장치' 언급 27건</span><span class="tr"><span class="fl red" style="width:26%"></span><span class="fl" style="width:74%;float:right;border-radius:0 4px 4px 0"></span></span><span class="vl red">사고 26%</span>
+        <span class="lb">'힌트' 언급 20건+</span><span class="tr"><span class="fl" style="width:100%"></span></span><span class="vl" style="color:var(--faint)">사고 0%</span>
+      </div>
+      <p style="margin-top:12px;font-size:12.5px;color:var(--mut)">'장치' 검색 27건 중 7건이 오류·사고 성격 글. '힌트' 20여 건은 전부 "몇 개 주나요" 같은 문의.</p>
+    </div>
+    <p class="src">출처: 디시 방탈출 갤러리 제목 검색 (2026.08 기준) — 판타스트릭 자체 조사</p>
+  </div>
+
+  <!-- ════════ 09 ════════ -->
+  <div class="card reco">
+    <span class="no">09</span><span class="tagreco">추천 · 보조용</span>
+    <h2>빅넘버 3장 — 빈도는 낮아도, 터지면 가장 비싸다</h2>
+    <p class="why">정직한 수치 3개를 나란히. 첫 칸이 낮은 숫자라 오히려 "숨길 게 없다"는 신뢰가 생기고, 뒤 두 칸이 본론을 칩니다.</p>
+    <div class="chart stats">
+      <div class="stat"><b>6.8%</b><span>불만 후기에서의 비중<br>(빈도는 낮은 편)</span></div>
+      <div class="stat bad"><b>20%</b><span>환불 요구 사유에서의 비중<br>(5건 중 1건)</span></div>
+      <div class="stat bad"><b>20분</b><span>확인된 안전사고의 방치 시간<br>(원인 = 장치 에러)</span></div>
+    </div>
+    <p class="src">출처: 커뮤니티 후기 44건 · 환불 글 15건 · 사고 사례 — 판타스트릭 자체 조사, 2026.08</p>
+  </div>
+
+  <!-- ════════ 10 ════════ -->
+  <div class="card">
+    <span class="no">10</span>
+    <h2>레이더 — 불만 유형별 "리스크 모양"</h2>
+    <p class="why">환불 위험·안전 위험·낙인·즉시성 4축. 장치 에러(빨강)의 면적이 가장 넓게 퍼지는 구성. 근사한 대신 읽는 데 한 박자 걸립니다.</p>
+    <div class="chart" style="text-align:center">
+      <svg viewBox="0 0 360 300" style="max-width:420px;width:100%">
+        <g stroke="#232830" fill="none">
+          <polygon points="180,40 300,150 180,260 60,150"/>
+          <polygon points="180,76 264,150 180,224 96,150"/>
+          <polygon points="180,113 227,150 180,187 133,150"/>
+          <line x1="180" y1="40" x2="180" y2="260"/><line x1="60" y1="150" x2="300" y2="150"/>
+        </g>
+        <text x="180" y="28" text-anchor="middle">환불 위험</text>
+        <text x="310" y="154">안전 위험</text>
+        <text x="180" y="280" text-anchor="middle">커뮤니티 낙인</text>
+        <text x="10" y="154">즉시 진행 중단</text>
+        <polygon points="180,55 285,150 180,235 75,150" fill="rgba(255,93,93,.18)" stroke="#ff5d5d" stroke-width="2"/>
+        <polygon points="180,120 215,150 180,215 120,150" fill="rgba(139,149,161,.12)" stroke="#5c6672" stroke-width="1.5"/>
+        <text x="240" y="100" fill="#ff5d5d" font-weight="700">장치 에러</text>
+        <text x="150" y="188" fill="#8b95a1">콘텐츠 불만</text>
+      </svg>
+    </div>
+    <p class="src">축 구성 근거: 환불 20%·안전사고 사례·"추천 안 함" 낙인 후기·진행 정지 특성 — 판타스트릭 자체 조사, 2026.08</p>
+  </div>
+
+  <p class="foot">모든 수치는 docs/조사-빠방-저평점리뷰.md · 조사-잼핏-저평점리뷰.md 의 실측값입니다. 번호를 알려주시면 그 구성으로 02 장치 패널에 실제 구현합니다.</p>
+</div>
+</body>
+</html>
