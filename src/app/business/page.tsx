@@ -1079,13 +1079,6 @@ export default function BusinessPage() {
             ))}
           </div>
 
-          {/* 견적 버튼은 캡처 바로 아래에 둔다 — 가격을 비공개로 두는 곳(조사 11곳 중 6곳)이
-              예외 없이 화면 옆에 견적·상담 버튼을 붙여 둔다. 캡처를 보고 마음이 움직인 자리에
-              버튼이 없으면 한참 스크롤해야 해서 그대로 닫힌다.
-              ⚠️ 처리량 숫자(157건·97%)는 뺐다 — 캡처 내용과 숫자가 서로 안 맞아 눈으로 대조가 안 됐다(2026-08-20 사장님 지시). */}
-          <div className="proof reveal">
-            <a className="btn primary pf-cta" href="#cta">우리 매장 기준으로 견적 받기</a>
-          </div>
 
           <p className="lead reveal" style={{ margin: "22px 0 0" }}>
             모든 프로그램은 매장에 맞게 설계해드립니다.
