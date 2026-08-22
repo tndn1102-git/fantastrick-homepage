@@ -76,7 +76,8 @@ export async function POST(req: NextRequest) {
 
   // A안 규칙: 시작 24시간 넘게 남았을 때만 변경 가능 (refundRateFor === 100 이 곧 "24시간 초과")
   if (refundRateFor(before.date, before.time) !== 100) {
-    return NextResponse.json({ error: "예약 변경은 시작 24시간 전까지만 가능해요. 임박한 예약은 매장으로 문의해 주세요." }, { status: 409 });
+    // "매장으로 문의" 안내는 뺐다(2026-08-22 사장님 지시) — 매장에서도 24시간 이내 변경은 안 해준다.
+    return NextResponse.json({ error: "예약 변경은 시작 24시간 전까지만 가능해요. 24시간 이내에는 변경이 불가능합니다." }, { status: 409 });
   }
 
   // 지금과 같은 시간으로는 변경 의미 없음
