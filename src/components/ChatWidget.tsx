@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { THEMES } from "@/lib/data";
 import { BOOKING_INFO } from "@/lib/theme-content";
 import { PAY_BANK, PAY_ACCT, PAY_HOLDER } from "@/lib/pay";
@@ -165,6 +166,7 @@ function answer(id: TopicId): Msg[] {
 }
 
 export default function ChatWidget() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([
     { who: "bot", text: "안녕하세요, 판타스트릭입니다! 🗝️\n궁금하신 것을 눌러주세요. 직접 입력하셔도 돼요." },
@@ -206,6 +208,9 @@ export default function ChatWidget() {
       ]);
     }
   }
+
+  // /w/ = 세계관 몰입 페이지(아벨 연구소 내부망). 판타스트릭 챗봇이 떠 있으면 위장이 깨진다.
+  if (pathname?.startsWith("/w/")) return null;
 
   return (
     <>

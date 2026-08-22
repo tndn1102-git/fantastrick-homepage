@@ -43,7 +43,8 @@ export default function Header() {
     };
   }, [open]);
 
-  if (pathname?.startsWith("/admin")) return null;
+  // /w/ = 세계관 몰입 페이지(아벨 연구소 내부망). 판타스트릭 헤더가 보이면 위장이 깨진다.
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/w/")) return null;
 
   // 모든 페이지가 어두운 파랑 배경 → 스크롤 전(최상단)에는 헤더를 흰색 버전으로. 스크롤하면 흰 배경 헤더.
   const overDark = !scrolled;

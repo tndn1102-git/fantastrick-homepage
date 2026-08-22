@@ -4,7 +4,8 @@ import { usePathname } from "next/navigation";
 
 export default function Footer() {
   const pathname = usePathname();
-  if (pathname?.startsWith("/admin")) return null;
+  // /w/ = 세계관 몰입 페이지 — 푸터(판타스트릭 브랜드)도 숨긴다.
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/w/")) return null;
   // 관리자 외 전 페이지가 다크 테마라 푸터도 이어지는 딥블루로.
   return (
     <footer className="foot-dark">
