@@ -9,7 +9,8 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
       // 손님용이 아닌 화면들. 검색에 나오면 안 되는 곳.
-      disallow: ["/admin", "/api/"],
+      // /w/ = 알림톡으로만 들어오는 숨은 세계관 페이지. 열쇠는 안 적으므로 주소가 새지 않는다.
+      disallow: ["/admin", "/api/", "/w/"],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import RevealOnScroll from "@/components/RevealOnScroll";
+import { WORLD_KEYS } from "@/lib/world";
 import "./universe.css";
 
 /* 세계관 아카이브 — 〈사자의 서 / Book of Duat〉(2호점)
@@ -19,7 +21,10 @@ export const metadata: Metadata = {
   title: "아벨 연구소 자료실 — 사자의 서 세계관 | 판타스트릭",
   description:
     "ADAM Inc., 아벨 연구소, 성물, 그리고 만병통치약 〈레드크라운〉. 판타스트릭 2호점 방탈출 테마 〈사자의 서 / Book of Duat〉의 세계관 아카이브.",
-  alternates: { canonical: "/universe" },
+  /* 🔒 숨은 페이지 — 검색·공유 미리보기 어디에도 실리지 않게 한다.
+     이 페이지는 알림톡 링크로 들어온 손님만 보는 곳이다(sitemap 에도 없고, 사이트 안에 링크도 없다). */
+  robots: { index: false, follow: false, nocache: true,
+    googleBot: { index: false, follow: false } },
   openGraph: {
     title: "아벨 연구소 자료실 — 사자의 서 세계관",
     description: "'질병 없는 세상을 만들어 갑니다.' 생명과학의 선두주자 〈아벨 연구소〉 공식 자료실",
@@ -71,7 +76,18 @@ const POSTS = [
   { date: "릴스", t: "인류의 희망, 레드크라운", s: "영상 · 프로젝트 발표", url: "https://www.instagram.com/reel/DBOPjLOs0lC/" },
 ];
 
-export default function UniversePage() {
+/* 열쇠(key)가 맞을 때만 페이지를 준다. 틀리면 그냥 '없는 주소'(404)로 보인다 —
+   "비밀번호가 틀렸습니다" 같은 말을 하면 여기에 뭔가 있다는 걸 알려주는 셈이라 그러지 않는다. */
+export function generateStaticParams() {
+  return WORLD_KEYS.map((key) => ({ key }));
+}
+// 목록에 없는 열쇠는 서버를 거치지도 않고 바로 404. (요청 낭비 0)
+export const dynamicParams = false;
+
+export default async function UniversePage({ params }: { params: Promise<{ key: string }> }) {
+  const { key } = await params;
+  if (!(WORLD_KEYS as readonly string[]).includes(key)) notFound();
+
   return (
     <div className="uv">
       <RevealOnScroll />

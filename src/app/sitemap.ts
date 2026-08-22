@@ -5,13 +5,14 @@ import { SITE_URL } from "@/lib/site";
 /* 검색엔진에게 "우리 사이트에 이런 페이지들이 있다"고 알려주는 지도.
    도메인 이전 뒤 네이버·구글 서치콘솔에 이 주소(/sitemap.xml)를 제출한다. */
 export default function sitemap(): MetadataRoute.Sitemap {
+  /* ⚠️ 세계관 페이지(/w/<열쇠>)는 여기 넣지 말 것 — 알림톡 링크로만 들어오는 숨은 페이지다.
+     sitemap 에 넣는 순간 검색에 실려 누구나 보게 된다. (lib/world.ts 참고) */
   const pages = [
     { path: "", priority: 1.0 },          // 홈
     { path: "/reserve", priority: 0.9 },  // 예약 — 손님이 제일 많이 찾는 곳
     { path: "/rooms", priority: 0.8 },    // (테마 상세는 아래에서 개별 추가)
     { path: "/reviews", priority: 0.7 },
     { path: "/about", priority: 0.6 },
-    { path: "/universe", priority: 0.6 },  // 사자의 서 세계관 아카이브
     { path: "/events", priority: 0.6 },
     { path: "/faq", priority: 0.5 },
     { path: "/business", priority: 0.5 },
