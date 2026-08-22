@@ -41,6 +41,17 @@ const RELIC_STATES = [
   { code: "상태 C", k: "개인 소지", d: "개인에 의해 보관 혹은 사용되고 있는 것들." },
 ];
 
+// LET'S GET 선발 기준 — 출처: 인스타 「LET'S GET 캠페인」(2023-01-09) 3번째 슬라이드 원문.
+// flag = 뒤집으면 섬뜩한 세 기준 — 배지 없이 붉은 테두리로만 조용히 표시(세계관의 복선).
+const LETS = [
+  { k: "L", en: "LESS PEOPLE", d: "친인척이 없고 불우한 이웃을 대상으로 가산점 부여", flag: true },
+  { k: "E", en: "ENROLL", d: "캠페인 신청 시 내부 심사 후 개별 연락", flag: false },
+  { k: "T'S", en: "TARGET SICKER", d: "건강에 이상 있는 자 대상으로 진행", flag: true },
+  { k: "G", en: "GENERAL PRACTITIONER", d: "아벨연구소 소속 의사 라이센스를 지닌 D급 연구원들을 담당의로 배치", flag: true },
+  { k: "E", en: "EXPERIMENT", d: "임상실험 용도로 신약 '레드크라운' 투약", flag: false },
+  { k: "T", en: "TURN", d: "성물을 기반으로 한 약물로, 부작용이 없어 투약 후 안전한 일상으로 복귀 보장", flag: false },
+];
+
 /* DNA 이중나선 장식 — 위장 표면(파랑)과 성물 문서(금색)에서 재사용. 순수 장식이라 aria-hidden. */
 function DnaSvg({ className }: { className?: string }) {
   return (
@@ -166,7 +177,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               <div className="sys-t">ABEL LABORATORY // INTERNAL ARCHIVE</div>
               <div className="sys-row">
                 <span>열람등급 <b>LEVEL D</b></span>
-                <span>문서 <b>4건</b> · 첨부 <b>2건</b></span>
+                <span>문서 <b>5건</b> · 첨부 <b>2건</b></span>
                 <span>사본 생성 <b>차단됨</b></span>
               </div>
             </div>
@@ -349,8 +360,33 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
             </figure>
           </article>
 
-          {/* 문서 05(선발 기준)·대조 결과·대외 유포 기록은 2026-08-22 사장님 지시로 삭제.
-              내용이 필요하면 git 역사 또는 인스타 @abellaboratory 원문 참조. */}
+          {/* ── 문서 05 · LET'S GET — 간단판 (2026-08-22 삭제했다가 같은 날 복원 지시).
+              인스타 원문(캠페인 정의 + L·E·T'S·G·E·T 여섯 기준)만 압축해 담는다.
+              대조 결과·대외 유포 기록은 삭제 유지. */}
+          <article className="uv-doc reveal">
+            <div className="uv-doc-head">
+              <span className="uv-doc-no">AL-DOC-05</span>
+              <h2>LET&rsquo;S GET 캠페인</h2>
+              <span className="uv-stamp">대외비</span>
+            </div>
+            <div className="uv-doc-meta">
+              <span>성격: 참여형 캠페인 · 시판 전 임상실험</span><span>대상자 선발 기준: 6항</span>
+            </div>
+            <p className="uv-doc-lead">
+              신약 레드크라운의 임상실험을 위한 참여형 캠페인 —
+              <b> &ldquo;캠페인에 참여하고 건강을 되찾으세요.&rdquo;</b>
+            </p>
+
+            <div className="uv-lg">
+              {LETS.map((l, i) => (
+                <div className={"cell" + (l.flag ? " flag" : "")} key={i}>
+                  <span className="k" aria-hidden="true">{l.k}</span>
+                  <b>{l.en}</b>
+                  <p>{l.d}</p>
+                </div>
+              ))}
+            </div>
+          </article>
 
           {/* ── 가상 창작물 고지 — 계정의 약속. 지우지 말 것. ──
               (캠페인 참여 신청/예약 CTA 섹션은 2026-08-22 사장님 지시로 삭제 — 되살리지 말 것) */}

@@ -453,6 +453,17 @@
 .uv-lab-log .ll-d { color: var(--lab-muted); font-family: inherit; }
 .uv-lab-log .ll-row.dead .ll-t { color: var(--lab-red); }
 .uv-lab-log .ll-row.dead .ll-d { color: #ffc9cc; }
+/* LET'S GET 여섯 기준 — 간단판 격자. 붉은 테두리 셋 = 뒤집으면 섬뜩한 기준(배지 없이 색으로만). */
+.uv-lg { margin-top: 22px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+@media (max-width: 860px) { .uv-lg { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .uv-lg { grid-template-columns: 1fr; } }
+.uv-lg .cell { border: 1px solid var(--lab-line2); background: var(--lab-panel2); padding: 16px 16px 14px; }
+.uv-lg .cell .k { display: block; font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--lab-green); line-height: 1; }
+.uv-lg .cell b { display: block; margin: 8px 0 5px; font-family: var(--mono); font-size: 11px; letter-spacing: .1em; color: var(--lab-text); }
+.uv-lg .cell p { margin: 0; font-size: 13px; line-height: 1.68; color: var(--lab-muted); }
+.uv-lg .cell.flag { border-color: rgba(255, 107, 115, .35); background: rgba(255, 107, 115, .045); }
+.uv-lg .cell.flag .k { color: var(--lab-red); }
+
 /* 패널을 대신하는 한 줄 요약(글 줄이기) */
 .uv-note-line {
   margin: 14px 0 0; font-size: 13.8px; line-height: 1.75; color: var(--lab-muted);
