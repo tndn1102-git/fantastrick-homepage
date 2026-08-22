@@ -355,10 +355,6 @@
   .uv-org-link { flex-direction: row; padding: 2px 0; }
   .uv-org-link::before, .uv-org-link::after { width: auto; height: 1px; min-height: 0; background: linear-gradient(90deg, transparent, var(--lab-green-dim), transparent); }
 }
-.uv-roles { margin-top: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
-.uv-role { border: 1px solid var(--lab-line); background: var(--lab-panel2); padding: 17px 18px; }
-.uv-role b { display: block; font-size: 14.5px; margin-bottom: 6px; color: var(--lab-text); }
-.uv-role p { margin: 0; font-size: 13.5px; color: var(--lab-muted); }
 
 /* 성물 상태 분류 — 격납 코드 표 */
 .uv-defs { margin-top: 22px; display: grid; gap: 10px; }
@@ -409,6 +405,13 @@
 }
 .uv-news blockquote cite { display: block; margin-top: 7px; font-style: normal; font-size: 11.5px; color: #6a665d; }
 .uv-news .byline { margin: 14px 0 0; text-align: right; font-family: var(--mono); font-size: 10.5px; color: #6a665d; }
+/* 기사 속 현장 사진 — 신문 지면답게 살짝 바랜 톤 + 캡션 */
+.uv-news .np-photo { margin: 16px 0 14px; }
+.uv-news .np-photo img {
+  display: block; width: 100%; height: auto; border: 1px solid rgba(0, 0, 0, .18);
+  filter: grayscale(.35) sepia(.12) contrast(1.04);
+}
+.uv-news .np-photo figcaption { margin-top: 7px; font-size: 11.5px; color: #4d4a43; }
 
 /* 생체 신호(ECG) — 세 번 뛰고, 멎는다. 선이 그려지는 애니메이션. */
 .uv-ecg { margin-top: 20px; border: 1px solid var(--lab-line2); background: var(--lab-panel2); padding: 14px 16px 10px; }
@@ -450,16 +453,19 @@
 .uv-lab-log .ll-d { color: var(--lab-muted); font-family: inherit; }
 .uv-lab-log .ll-row.dead .ll-t { color: var(--lab-red); }
 .uv-lab-log .ll-row.dead .ll-d { color: #ffc9cc; }
+/* 패널을 대신하는 한 줄 요약(글 줄이기) */
+.uv-note-line {
+  margin: 14px 0 0; font-size: 13.8px; line-height: 1.75; color: var(--lab-muted);
+  border-left: 2px solid var(--lab-line2); padding-left: 12px;
+}
+.uv-note-line b { color: var(--lab-text); }
+/* 발표 인용 한 줄 */
+.uv-quote-line {
+  margin: 16px 0 0; font-size: 14.3px; font-weight: 700; color: var(--lab-text);
+  border-left: 2px solid var(--lab-green-dim); padding-left: 12px; line-height: 1.75;
+}
 @media (max-width: 560px) { .uv-lab-log .ll-row { grid-template-columns: 1fr; gap: 3px; } }
 
-/* 두 칼럼 패널(레드크라운 반응) */
-.uv-2col { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-@media (max-width: 760px) { .uv-2col { grid-template-columns: 1fr; } }
-.uv-panel { border: 1px solid var(--lab-line2); background: var(--lab-panel2); padding: 20px 20px; }
-.uv-panel h3 { margin: 0 0 10px; font-size: 15.5px; font-weight: 800; color: var(--lab-text); }
-.uv-panel p { margin: 0 0 9px; font-size: 13.8px; color: var(--lab-muted); }
-.uv-panel p:last-child { margin-bottom: 0; }
-.uv-panel .em { color: var(--lab-text); font-weight: 700; }
 
 /* 영상 — ⚠️ 원본(9:16)의 실화면 띠 안에 자막이 구워져 있다.
    16:9 로 꽉 자르면 자막 끝이 잘리고 재생바에도 가려진다(2026-08-22 사장님 지적).
@@ -536,6 +542,13 @@
 
 /* SNS 유포 기록 */
 .uv-log { margin-top: 72px; }
+.uv-log-fold { margin-top: 18px; }
+.uv-log-fold summary {
+  cursor: pointer; display: inline-block; padding: 8px 0;
+  font-family: var(--mono); font-size: 12px; letter-spacing: .08em; color: var(--lab-green);
+}
+.uv-log-fold summary:hover { text-decoration: underline; text-underline-offset: 3px; }
+.uv-log-fold .uv-log-list { margin-top: 10px; }
 .uv-log-list { margin-top: 20px; border: 1px solid var(--lab-line); }
 .uv-log-item {
   display: grid; grid-template-columns: 110px 1fr auto; gap: 16px; align-items: center;

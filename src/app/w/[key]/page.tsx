@@ -34,22 +34,6 @@ export const metadata: Metadata = {
   },
 };
 
-// ADAM 의 역할 3가지 — 출처: 「ADAM Inc.는 무슨 일을 하나요?」
-const ROLES = [
-  {
-    t: "세계 기구적인 역할 수행",
-    d: "강대국의 지원을 받아 운영되며, 어느 한 국가가 성물을 이용해 국가 간 힘의 균형을\n깨는 것을 방지합니다.",
-  },
-  {
-    t: "보호관리시설 설치",
-    d: "성물은 아담이 직접 설계·관리하는 보호관리시설에서 관리됩니다. 각국의 이해관계를 고려해 시설은 비밀리에 설치되었으며,\n어떤 성물을 보관 중인지는 기밀사항입니다.",
-  },
-  {
-    t: "성물 연구",
-    d: "성물의 특성과 힘을 연구해 인류 발전에 기여할 방안을 모색합니다. 이를 위해 자회사\nABEL LAB 을 설립했습니다.",
-  },
-];
-
 // 성물의 세 가지 상태 — 출처: 「성물이란 무엇인가?」 (분류 코드는 UI 장식)
 const RELIC_STATES = [
   { code: "상태 A", k: "규명되지 않음", d: "발견되지 않거나 규명되지 않아, 단지 신비한 현상으로만 치부되고 있는 것들." },
@@ -77,15 +61,6 @@ const POSTS = [
   { date: "2023. 02. 16.", t: "아벨연구소, 인류의 미래를 지키다", s: "3장 · 성물공학 특별기획 지면 — 〈사자의 서〉 발견 경위", url: "https://www.instagram.com/p/CosDkd0PsVL/" },
   { date: "릴스", t: "인류의 희망, 레드크라운", s: "영상 · 프로젝트 발표", url: "https://www.instagram.com/reel/DBOPjLOs0lC/" },
 ];
-
-/* 문자열 속 \n 을 PC 전용 줄바꿈으로 — 폰(≤600px)에서는 br 이 숨고 공백으로 흐른다.
-   화면 편집 도구가 배열 속 문장의 줄바꿈을 소스에 못 적는 한계를 메우는 렌더 짝. */
-function withBr(text: string) {
-  const parts = text.split("\n");
-  return parts.map((p, i) => (
-    <span key={i}>{p.trim()}{i < parts.length - 1 ? " " : ""}{i < parts.length - 1 && <br className="pc-br" />}</span>
-  ));
-}
 
 /* DNA 이중나선 장식 — 위장 표면(파랑)과 성물 문서(금색)에서 재사용. 순수 장식이라 aria-hidden. */
 function DnaSvg({ className }: { className?: string }) {
@@ -212,7 +187,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               <div className="sys-t">ABEL LABORATORY // INTERNAL ARCHIVE</div>
               <div className="sys-row">
                 <span>열람등급 <b>LEVEL D</b></span>
-                <span>문서 <b>5건</b> · 첨부 <b>3건</b> · 감사메모 <b>1건</b></span>
+                <span>문서 <b>5건</b> · 첨부 <b>2건</b> · 감사메모 <b>1건</b></span>
                 <span>사본 생성 <b>차단됨</b></span>
               </div>
             </div>
@@ -223,10 +198,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
             </div>
           </div>
 
-          <div className="uv-warn">
-            <b>대외비</b> — 본 자료망의 모든 기록은 대외 공개가 금지되어 있습니다.
-            무단 열람·복제·유출이 확인될 경우 내부 규정에 따라 처리됩니다.
-          </div>
+          <div className="uv-warn"><b>대외비</b> — 무단 열람·복제·유출 금지.</div>
 
           {/* ── 문서 01 · 모기업 ── */}
           <article className="uv-doc reveal">
@@ -259,14 +231,6 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               </div>
             </div>
 
-            <div className="uv-roles">
-              {ROLES.map((r) => (
-                <div className="uv-role" key={r.t}>
-                  <b>{r.t}</b>
-                  <p>{withBr(r.d)}</p>
-                </div>
-              ))}
-            </div>
           </article>
 
           {/* ── 문서 02 · 성물 ── */}
@@ -281,9 +245,8 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               <span>분류: 연구 기초</span><span>관리: ADAM 보호관리시설</span><span>보관 목록: 기밀</span>
             </div>
             <p className="uv-doc-lead">
-              성물이라 불리는 물질 혹은 현상들은 각국의 신화·설화뿐 아니라, 여러 종교에서 말하는
-              신성한 물건 및 이적들을 통칭하는 개념이다. 성물은 각각의 고유한 능력이 깃들어 있으며,
-              과거에 이 성물들이 보여준 능력이나 <br className="pc-br" />초자연적 현상들이 후대에 신화·설화 등으로 전해진 것들도 있다.
+              각국의 신화·설화, 여러 종교의 신성한 물건과 이적들을 통칭하는 개념.
+              성물에는 각각의 고유한 능력이 깃들어 있다.
             </p>
 
             <dl className="uv-defs">
@@ -307,10 +270,12 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               <span>발견: 2031년 · 이집트</span><span>지정: 성물 · ADAM 관리</span><span>활용: 레드크라운 베이스</span>
             </div>
             <p className="uv-doc-lead">
-              레드크라운의 베이스로 사용되는 성물. 2031년 이집트의 버려진 사원 지하에서 발견되었다. <br className="pc-br" />회수 경위는 아래 대외 배포 기사와 같다.
+              레드크라운의 베이스로 사용되는 성물. 2031년, 이집트의 버려진 사원 지하에서 발견되었다.
             </p>
 
-            <p className="uv-attach"><b>첨부 1</b> — 대외 배포 기사 사본 (성물공학 특별기획)</p>
+            <p className="uv-attach"><b>첨부 1</b> — 대외 배포 기사 사본</p>
+            {/* 기사 압축판(2026-08-22 사장님 지시 — 글 줄이기): 제목 + 현장 사진 + 핵심 증언만.
+                원문 전문은 SNS-LOG 의 인스타 원본에서 볼 수 있다. */}
             <article className="uv-news">
               <div className="uv-news-top">
                 <span>제20XX호 X판</span>
@@ -321,44 +286,24 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               <h3>아벨연구소, 인류의 미래를 지키다</h3>
               <p className="sub">모든 질병을 치료할 수 있다는 만병통치제, 레드크라운 개발</p>
 
-              <div className="cols">
-                <p>
-                  ABEL LAB 이 올해 연구를 거듭한 결과 치료제인 <mark>레드크라운을 개발</mark>해냈다고 발표했다.
-                  레드크라운의 베이스로 사용되는 성물은 <mark>사자의 서</mark>로, 이집트의 한 사원에서 발견되어 주목을 받았다.
-                </p>
-                <p>
-                  버려진 사원을 조사하던 탐험가 A씨(36) 등 5명이 실종되었다는 신고를 받고 출동한 ADAM Inc.의 직원이
-                  사원 내부를 조사하던 중, 사원 지하에서 실종자 전원과 사자의 서를 발견하였다고 밝혔다.
-                </p>
-                <p>
-                  당시 A씨는 &ldquo;사원을 살펴보던 중 바닥이 무너지면서 탐험가들이 지하로 추락하였는데,
-                  그 충격으로 한 명이 사망하고 여러 명이 부상을 당해 생존을 장담할 수 없는 상황&rdquo;이었다고 증언했다.
-                </p>
-                <p>A씨는 &ldquo;당시 주변에는 사자의 서가 있었다&rdquo;고 당시 상황 설명을 이어갔다.</p>
-              </div>
+              <figure className="np-photo">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/videos/duat-relic.webp" alt="사원 지하에서 발견된 사자의 서" width={720} height={330} loading="lazy" />
+                <figcaption>▲ 사원 지하에서 발견된 성물 〈사자의 서〉</figcaption>
+              </figure>
 
               <blockquote>
-                &ldquo;목이 너무 말랐던 탐험가 동료들이 주변을 살펴보던 중 사자의 서 주변에 고여 있는 붉은 액체를
-                발견하고는 바로 마셨어요. <br className="pc-br" />그랬더니 갑자기 그 액체를 마신 동료들의 모든 상처가 치유됐습니다.
-                덕분에 구출될 때까지 버틸 수 있었어요.&rdquo;
-                <cite>— 탐험가 A씨(36)</cite>
+                &ldquo;추락한 동료들이 <mark>사자의 서</mark> 주변에 고여 있는 붉은 액체를 발견하고는 바로 마셨어요.
+                그랬더니 갑자기 그 액체를 마신 동료들의 <mark>모든 상처가 치유</mark>됐습니다.&rdquo;
+                <cite>— 실종됐다 구조된 탐험가 A씨(36)</cite>
               </blockquote>
 
               <p>
-                탐험가 A씨의 인터뷰 이후 사자의 서는 성물로 지정되어 ADAM Inc.에서 관리하게 되었으며,
-                자회사인 ABEL LAB 에서 연구를 통해 레드크라운 치료제를 개발하는 큰 성과를 거두었다.
-                ABEL LAB 에서는 &ldquo;〈레드크라운〉 프로젝트를 통해 질병 없는 세상을 만들기 위해 노력하겠다&rdquo;고 밝혔다.
+                인터뷰 이후 사자의 서는 성물로 지정되어 ADAM Inc.에서 관리하게 되었으며,
+                ABEL LAB 이 이를 베이스로 레드크라운 치료제를 개발했다.
               </p>
               <p className="byline">XXX 기자(XXX@XXX.XX.XX)</p>
             </article>
-
-            <p className="uv-attach"><b>첨부 2</b> — 회수 현장 촬영 자료</p>
-            <figure className="uv-shot">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/videos/duat-relic.webp" alt="사원 지하에서 발견된 사자의 서" width={720} height={330} loading="lazy" />
-              <span className="sh-a">● REC</span>
-              <span className="sh-b">SITE: EGY · 2031</span>
-            </figure>
           </article>
 
           {/* ── 문서 04 · 레드크라운 ── */}
@@ -372,7 +317,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               <span>기반: 성물 〈사자의 서〉</span><span>구분: 신약 · 임상 전</span><span>통칭: 만병통치약</span>
             </div>
             <p className="uv-doc-lead">
-              다른 약들처럼 특정 질병이나 증상에만 적용되는 것이 아닌, 어떤 상태에서도 약을 먹게 되면 <br className="pc-br" />건강해지는 이른바 <b>&lsquo;만병통치약&rsquo;</b>이라고 알려져 있다.
+              어떤 상태에서도 약을 먹게 되면 건강해지는, 이른바 <b>&lsquo;만병통치약&rsquo;</b>.
             </p>
 
             {/* 생체 신호 곡선 — 아래 실험 기록(활성 → 정지)을 그림으로 옮긴 것. 뛰다가, 멎는다. */}
@@ -399,23 +344,12 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               </div>
             </div>
 
-            <div className="uv-2col">
-              <div className="uv-panel">
-                <h3>공개 이후</h3>
-                <p>해당 동영상은 순식간에 SNS 를 통해 퍼져나갔고, 실험에 대한 <br className="pc-br" />윤리문제를 제기하는 등 부정적인 시선도 많았다.</p>
-                <p>
-                  <span className="em">그러나</span> 해당 동영상을 통해 많은 사람들이 레드크라운에 대해 알게 되었고,
-                  레드크라운 프로젝트는 수많은 사람들의 응원과 지원 속에 지금의 <br className="pc-br" />결과를 가져올 수 있었다.
-                </p>
-              </div>
-              <div className="uv-panel">
-                <h3>현재</h3>
-                <p>부정적인 시선은 현재 완전히 사라진 상황이다. 그 이유는 <br className="pc-br" />LET&rsquo;S GET 캠페인 — 문서 05.</p>
-                <p>전문가들은 이미 안정성 테스트는 완료되었다고 보고하고 있다.</p>
-              </div>
-            </div>
+            {/* 공개 반응 — 원문 두 문단을 한 줄로 압축(글 줄이기) */}
+            <p className="uv-note-line">
+              공개 직후 윤리 논란이 일었으나 — 부정적인 시선은 현재 <b>완전히 사라진 상황</b>이다. 문서 05 참조.
+            </p>
 
-            <p className="uv-attach"><b>첨부 3</b> — 대외 홍보 영상 (배포 승인본 · 59초)</p>
+            <p className="uv-attach"><b>첨부 2</b> — 대외 홍보 영상 (배포 승인본 · 59초)</p>
             <figure className="uv-video">
               {/* 큰 중앙 재생 버튼 포함 플레이어 — 영상 파일·포스터 경로는 WorldVideo.tsx 안에 */}
               <WorldVideo />
@@ -447,7 +381,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               <span>성격: 참여형 캠페인 · 시판 전 임상실험</span><span>대외 명분: 사회 공익 실현</span>
             </div>
             <p className="uv-doc-lead">
-              성물을 기반한 기술로 개발한 신약 레드크라운의 임상실험을 위한 참여형 캠페인. <br className="pc-br" />의료서비스를 받기 힘든 사회적 약자들에게 레드크라운을 제공하여 <br className="pc-br" />사회 공익을 실현하겠다는 취지로 진행하고 있다.
+              신약 레드크라운의 임상실험을 위한 참여형 캠페인 — 대외 명분은 &lsquo;사회 공익 실현&rsquo;.
             </p>
 
             <div className="uv-lets">
@@ -463,18 +397,9 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               ))}
             </div>
 
-            <div className="uv-panel" style={{ marginTop: 16 }}>
-              <p>
-                해당 캠페인은 시판 전 임상실험으로써의 성격도 같이 하고 있기 때문에 절실한 사람들을
-                실험 쥐로 이용하고 있다는 비판도 있으나, <br className="pc-br" />전문가들은 사회적 약자에게 조금 더 봉사하기 위한
-                아벨연구소의 선행을 매도해선 안 된다고 평가하고 있다.
-              </p>
-              <p>
-                <span className="em">
-                  아벨 연구소는 &ldquo;레드크라운의 정식 출시 후에도 LET&rsquo;S GET 캠페인은 계속 될 것&rdquo;이라고 발표했다.
-                </span>
-              </p>
-            </div>
+            <p className="uv-quote-line">
+              &ldquo;레드크라운의 정식 출시 후에도 LET&rsquo;S GET 캠페인은 계속 될 것&rdquo; — 아벨 연구소 발표
+            </p>
           </article>
 
           {/* ── 감사 메모 — 문서끼리 부딪히는 지점 ── */}
@@ -484,41 +409,28 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               <h2>대조 결과 — 불일치 3건</h2>
             </div>
             <p className="uv-audit-lead reveal">
-              여기까지가 연구소가 공개한 전부다. 새로 밝혀진 것은 없다.
-              다만 위 문서들을 나란히 놓으면, <br className="pc-br" />서로 맞지 않는 문장이 셋 남는다.
+              공개된 기록은 여기까지다. 다만 문서를 나란히 놓으면, 맞지 않는 문장이 셋 남는다.
             </p>
 
             <div className="uv-cracks">
               <div className="uv-crack-item reveal">
                 <h3>불일치 1 — 다섯 명이 내려갔고, 다섯 명이 발견되었다</h3>
                 <p>
-                  기사는 &ldquo;그 충격으로 <span className="quote">한 명이 사망하고</span> 여러 명이 부상을 당해&rdquo;라고
-                  적은 뒤, 곧바로 &ldquo;사원 지하에서 <span className="quote">실종자 전원</span>과 사자의 서를 발견&rdquo;했다고 적는다.
-                </p>
-                <p>
-                  붉은 액체는 마신 동료들의 <span className="quote">모든 상처</span>를 치유했다.
-                  사망한 한 명이 그 뒤 어떻게 되었는지는, 기사 어디에도 없다.
+                  &ldquo;<span className="quote">한 명이 사망하고</span>&rdquo;와 &ldquo;<span className="quote">실종자 전원</span> 발견&rdquo;은
+                  같은 기사 안에 있다. 사망한 한 명의 행방은 어디에도 없다.
                 </p>
               </div>
-
               <div className="uv-crack-item reveal">
                 <h3>불일치 2 — 홍보 영상의 결말은 죽음이다</h3>
                 <p>
-                  레드크라운을 주입받은 토끼는 <span className="quote">몇 초 뒤 뛰어다녔고, 몇 분 뒤 움직이지 않게</span> 되었다.
-                  연구소는 이 영상을 실패 기록이 아니라 &lsquo;대중에게 친숙한 이름이 된 계기&rsquo;로 소개한다.
+                  토끼는 <span className="quote">몇 초 뒤 뛰었고, 몇 분 뒤 움직이지 않았다</span>.
+                  연구소는 이 영상을 &lsquo;친숙한 이름이 된 계기&rsquo;라 부른다.
                 </p>
-                <p>영상에서 달라진 것은 하나뿐이다. 죽은 듯 꼼짝않던 토끼가, 잠깐 건강해 보였다는 것.</p>
               </div>
-
               <div className="uv-crack-item reveal">
                 <h3>불일치 3 — 찾을 사람이 없는 사람</h3>
                 <p>
-                  선발 기준은 <span className="quote">건강에 이상 있는 자</span>를 대상으로,
-                  <span className="quote"> 친인척이 없고 불우한 이웃</span>에게 가산점을 주고,
-                  담당의로는 의사 라이센스를 지닌 <span className="quote">D급 연구원</span>을 배치한다.
-                </p>
-                <p>
-                  &lsquo;사회 공익&rsquo;이라는 말로 설명되는 이 세 줄은, 뒤집으면 하나의 조건이 된다.
+                  선발 기준 세 줄을 뒤집으면 하나의 조건이 된다 —
                   아파서 절실하고, 사라져도 <span className="uv-redact">찾으러 올 사람이 없는</span> 사람.
                 </p>
               </div>
@@ -536,21 +448,21 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               <span className="uv-doc-no">SNS-LOG</span>
               <h2>대외 유포 기록</h2>
             </div>
-            <p className="uv-audit-lead reveal">
-              연구소가 SNS 채널 @abellaboratory 로 직접 유포한 기록 7건. 각 행을 누르면 원문으로 이동한다.
-            </p>
-            <div className="uv-log-list reveal">
-              {POSTS.map((p) => (
-                <a className="uv-log-item" key={p.url} href={p.url} target="_blank" rel="noopener noreferrer">
-                  <span className="date">{p.date}</span>
-                  <span className="ti">
-                    {p.t}
-                    <em>{p.s}</em>
-                  </span>
-                  <span className="go">원문 ↗</span>
-                </a>
-              ))}
-            </div>
+            <details className="uv-log-fold reveal">
+              <summary>&gt; 유포 기록 7건 열람 — SNS @abellaboratory (원문 링크)</summary>
+              <div className="uv-log-list">
+                {POSTS.map((p) => (
+                  <a className="uv-log-item" key={p.url} href={p.url} target="_blank" rel="noopener noreferrer">
+                    <span className="date">{p.date}</span>
+                    <span className="ti">
+                      {p.t}
+                      <em>{p.s}</em>
+                    </span>
+                    <span className="go">원문 ↗</span>
+                  </a>
+                ))}
+              </div>
+            </details>
           </section>
 
           {/* ── 가상 창작물 고지 — 계정의 약속. 지우지 말 것. ──
