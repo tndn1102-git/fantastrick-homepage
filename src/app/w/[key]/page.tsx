@@ -41,27 +41,6 @@ const RELIC_STATES = [
   { code: "상태 C", k: "개인 소지", d: "개인에 의해 보관 혹은 사용되고 있는 것들." },
 ];
 
-// LET'S GET 선발 기준 — 출처: 「LET'S GET 캠페인」 3번째 슬라이드. flag = '대조 결과'에서 다시 지목.
-const LETS = [
-  { k: "L", en: "LESS PEOPLE", d: "친인척이 없고 불우한 이웃을 대상으로 가산점 부여", flag: true },
-  { k: "E", en: "ENROLL", d: "캠페인 신청 시 내부 심사 후 개별 연락", flag: false },
-  { k: "T'S", en: "TARGET SICKER", d: "건강에 이상 있는 자 대상으로 진행", flag: true },
-  { k: "G", en: "GENERAL PRACTITIONER", d: "아벨연구소 소속 의사 라이센스를 지닌 D급 연구원들을 담당의로 배치", flag: true },
-  { k: "E", en: "EXPERIMENT", d: "임상실험 용도로 신약 '레드크라운' 투약", flag: false },
-  { k: "T", en: "TURN", d: "성물을 기반으로 한 약물로, 부작용이 없어 투약 후 안전한 일상으로 복귀 보장", flag: false },
-];
-
-// 대외 유포 기록 — 인스타그램 원문 7건(오래된 것부터)
-const POSTS = [
-  { date: "2022. 02. 17.", t: "〈아벨 연구소〉", s: "계정 개설 — 연구소 소개", url: "https://www.instagram.com/p/CaEKdMavTP0/" },
-  { date: "2022. 12. 30.", t: "나의 삶을 바꾸는 신약, 레드크라운", s: "6장 · 레드크라운이란 / 실험 영상 / LET'S GET", url: "https://www.instagram.com/p/CmyhpT1LL9D/" },
-  { date: "2023. 01. 09.", t: "LET'S GET 캠페인", s: "3장 · 캠페인 안내 / 선발 기준 L·E·T·S·G·E·T", url: "https://www.instagram.com/p/CnMNQhHrOhW/" },
-  { date: "2023. 02. 14.", t: "성물이란 무엇인가?", s: "3장 · 성물의 정의와 세 가지 상태", url: "https://www.instagram.com/p/CooeJcePyhM/" },
-  { date: "2023. 02. 16.", t: "ADAM Inc.는 무슨 일을 하나요?", s: "4장 · 모기업 / 보호관리시설 / 자회사 ABEL LAB", url: "https://www.instagram.com/p/CosDTWMvIt0/" },
-  { date: "2023. 02. 16.", t: "아벨연구소, 인류의 미래를 지키다", s: "3장 · 성물공학 특별기획 지면 — 〈사자의 서〉 발견 경위", url: "https://www.instagram.com/p/CosDkd0PsVL/" },
-  { date: "릴스", t: "인류의 희망, 레드크라운", s: "영상 · 프로젝트 발표", url: "https://www.instagram.com/reel/DBOPjLOs0lC/" },
-];
-
 /* DNA 이중나선 장식 — 위장 표면(파랑)과 성물 문서(금색)에서 재사용. 순수 장식이라 aria-hidden. */
 function DnaSvg({ className }: { className?: string }) {
   return (
@@ -187,7 +166,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               <div className="sys-t">ABEL LABORATORY // INTERNAL ARCHIVE</div>
               <div className="sys-row">
                 <span>열람등급 <b>LEVEL D</b></span>
-                <span>문서 <b>5건</b> · 첨부 <b>2건</b> · 감사메모 <b>1건</b></span>
+                <span>문서 <b>4건</b> · 첨부 <b>2건</b></span>
                 <span>사본 생성 <b>차단됨</b></span>
               </div>
             </div>
@@ -346,7 +325,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
 
             {/* 공개 반응 — 원문 두 문단을 한 줄로 압축(글 줄이기) */}
             <p className="uv-note-line">
-              공개 직후 윤리 논란이 일었으나 — 부정적인 시선은 현재 <b>완전히 사라진 상황</b>이다. 문서 05 참조.
+              공개 직후 윤리 논란이 일었으나 — 부정적인 시선은 현재 <b>완전히 사라진 상황</b>이다.
             </p>
 
             <p className="uv-attach"><b>첨부 2</b> — 대외 홍보 영상 (배포 승인본 · 59초)</p>
@@ -370,100 +349,8 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
             </figure>
           </article>
 
-          {/* ── 문서 05 · LET'S GET ── */}
-          <article className="uv-doc reveal">
-            <div className="uv-doc-head">
-              <span className="uv-doc-no">AL-DOC-05</span>
-              <h2>LET&rsquo;S GET — 대상자 선발 기준</h2>
-              <span className="uv-stamp">대외비</span>
-            </div>
-            <div className="uv-doc-meta">
-              <span>성격: 참여형 캠페인 · 시판 전 임상실험</span><span>대외 명분: 사회 공익 실현</span>
-            </div>
-            <p className="uv-doc-lead">
-              신약 레드크라운의 임상실험을 위한 참여형 캠페인 — 대외 명분은 &lsquo;사회 공익 실현&rsquo;.
-            </p>
-
-            <div className="uv-lets">
-              {LETS.map((l, i) => (
-                <div className={"uv-let" + (l.flag ? " flag" : "")} key={i}>
-                  <span className="k" aria-hidden="true">{l.k}</span>
-                  <span className="txt">
-                    <b>{l.en}</b>
-                    <span className="d">{l.d}</span>
-                  </span>
-                  <span className="tag">{l.flag ? "감사 지목" : "기준"}</span>
-                </div>
-              ))}
-            </div>
-
-            <p className="uv-quote-line">
-              &ldquo;레드크라운의 정식 출시 후에도 LET&rsquo;S GET 캠페인은 계속 될 것&rdquo; — 아벨 연구소 발표
-            </p>
-          </article>
-
-          {/* ── 감사 메모 — 문서끼리 부딪히는 지점 ── */}
-          <section className="uv-audit">
-            <div className="uv-audit-head reveal">
-              <span className="uv-doc-no">AUDIT</span>
-              <h2>대조 결과 — 불일치 3건</h2>
-            </div>
-            <p className="uv-audit-lead reveal">
-              공개된 기록은 여기까지다. 다만 문서를 나란히 놓으면, 맞지 않는 문장이 셋 남는다.
-            </p>
-
-            <div className="uv-cracks">
-              <div className="uv-crack-item reveal">
-                <h3>불일치 1 — 다섯 명이 내려갔고, 다섯 명이 발견되었다</h3>
-                <p>
-                  &ldquo;<span className="quote">한 명이 사망하고</span>&rdquo;와 &ldquo;<span className="quote">실종자 전원</span> 발견&rdquo;은
-                  같은 기사 안에 있다. 사망한 한 명의 행방은 어디에도 없다.
-                </p>
-              </div>
-              <div className="uv-crack-item reveal">
-                <h3>불일치 2 — 홍보 영상의 결말은 죽음이다</h3>
-                <p>
-                  토끼는 <span className="quote">몇 초 뒤 뛰었고, 몇 분 뒤 움직이지 않았다</span>.
-                  연구소는 이 영상을 &lsquo;친숙한 이름이 된 계기&rsquo;라 부른다.
-                </p>
-              </div>
-              <div className="uv-crack-item reveal">
-                <h3>불일치 3 — 찾을 사람이 없는 사람</h3>
-                <p>
-                  선발 기준 세 줄을 뒤집으면 하나의 조건이 된다 —
-                  아파서 절실하고, 사라져도 <span className="uv-redact">찾으러 올 사람이 없는</span> 사람.
-                </p>
-              </div>
-            </div>
-
-            <div className="uv-audit-close reveal">
-              <p>그리고 아벨 연구소는 지금도, <br className="pc-br" />당신의 많은 관심과 참여를 기다리고 있다.</p>
-              <div className="sig">Let&rsquo;s get — bring out the health and happy</div>
-            </div>
-          </section>
-
-          {/* ── 대외 유포 기록 (원본 게시물) ── */}
-          <section className="uv-log">
-            <div className="uv-audit-head reveal">
-              <span className="uv-doc-no">SNS-LOG</span>
-              <h2>대외 유포 기록</h2>
-            </div>
-            <details className="uv-log-fold reveal">
-              <summary>&gt; 유포 기록 7건 열람 — SNS @abellaboratory (원문 링크)</summary>
-              <div className="uv-log-list">
-                {POSTS.map((p) => (
-                  <a className="uv-log-item" key={p.url} href={p.url} target="_blank" rel="noopener noreferrer">
-                    <span className="date">{p.date}</span>
-                    <span className="ti">
-                      {p.t}
-                      <em>{p.s}</em>
-                    </span>
-                    <span className="go">원문 ↗</span>
-                  </a>
-                ))}
-              </div>
-            </details>
-          </section>
+          {/* 문서 05(선발 기준)·대조 결과·대외 유포 기록은 2026-08-22 사장님 지시로 삭제.
+              내용이 필요하면 git 역사 또는 인스타 @abellaboratory 원문 참조. */}
 
           {/* ── 가상 창작물 고지 — 계정의 약속. 지우지 말 것. ──
               (캠페인 참여 신청/예약 CTA 섹션은 2026-08-22 사장님 지시로 삭제 — 되살리지 말 것) */}

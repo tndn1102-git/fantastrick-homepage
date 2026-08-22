@@ -459,11 +459,6 @@
   border-left: 2px solid var(--lab-line2); padding-left: 12px;
 }
 .uv-note-line b { color: var(--lab-text); }
-/* 발표 인용 한 줄 */
-.uv-quote-line {
-  margin: 16px 0 0; font-size: 14.3px; font-weight: 700; color: var(--lab-text);
-  border-left: 2px solid var(--lab-green-dim); padding-left: 12px; line-height: 1.75;
-}
 @media (max-width: 560px) { .uv-lab-log .ll-row { grid-template-columns: 1fr; gap: 3px; } }
 
 
@@ -510,58 +505,8 @@
 .uv-video summary:hover { text-decoration: underline; text-underline-offset: 3px; }
 .uv-video ol { margin: 8px 0 0; padding: 18px 20px 18px 38px; display: grid; gap: 8px; border: 1px solid var(--lab-line); background: var(--lab-panel2); font-size: 13.8px; color: var(--lab-muted); }
 
-/* LET'S GET 선발 매트릭스 */
-.uv-lets { margin-top: 22px; display: grid; gap: 9px; }
-.uv-let { display: grid; grid-template-columns: 52px 1fr auto; gap: 14px; align-items: center; border: 1px solid var(--lab-line2); background: var(--lab-panel2); padding: 14px 16px; }
-.uv-let .k { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--lab-green); text-align: center; border-right: 1px solid var(--lab-line2); padding-right: 12px; }
-.uv-let .txt b { display: block; font-family: var(--mono); font-size: 12.5px; letter-spacing: .08em; color: var(--lab-text); margin-bottom: 3px; }
-.uv-let .txt .d { display: block; font-size: 13.5px; color: var(--lab-muted); }
-.uv-let .tag { font-family: var(--mono); font-size: 10px; letter-spacing: .14em; color: var(--lab-muted); border: 1px solid var(--lab-line2); padding: 3px 8px; white-space: nowrap; }
-.uv-let.flag { border-color: rgba(255, 107, 115, .4); background: rgba(255, 107, 115, .05); }
-.uv-let.flag .k { color: var(--lab-red); border-right-color: rgba(255, 107, 115, .3); }
-.uv-let.flag .tag { color: var(--lab-red); border-color: rgba(255, 107, 115, .45); }
-@media (max-width: 560px) { .uv-let { grid-template-columns: 44px 1fr; } .uv-let .tag { display: none; } }
 
-/* 감사(audit) — 대조 불일치 */
-.uv-audit { margin-top: 72px; border-top: 2px solid rgba(255, 107, 115, .4); padding-top: 40px; }
-.uv-audit-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
-.uv-audit-head .uv-doc-no { color: var(--lab-red); border-color: rgba(255, 107, 115, .4); }
-.uv-audit-head h2 { margin: 0; font-size: clamp(21px, 3vw, 30px); font-weight: 800; }
-.uv-audit-lead { margin: 14px 0 0; color: var(--lab-muted); font-size: 14.8px; max-width: 44em; }
-.uv-cracks { margin-top: 26px; display: grid; gap: 13px; }
-.uv-crack-item { border: 1px solid rgba(255, 107, 115, .3); background: rgba(255, 107, 115, .045); padding: 22px 22px; }
-.uv-crack-item h3 { margin: 0 0 10px; font-size: clamp(16px, 2vw, 19px); font-weight: 800; color: var(--lab-red); }
-.uv-crack-item p { margin: 0 0 9px; font-size: 14.3px; color: var(--lab-muted); }
-.uv-crack-item p:last-child { margin-bottom: 0; }
-.uv-crack-item .quote { color: var(--lab-text); font-weight: 700; }
-/* 검열(레닥션) — 종이 문서의 검정 매직 느낌을 다크에선 밝은 바로 반전 */
-.uv-redact { background: #cfd8d0; color: transparent; border-radius: 2px; padding: 0 .32em; user-select: none; -webkit-user-select: none; }
-.uv-audit-close { margin-top: 34px; text-align: center; }
-.uv-audit-close p { margin: 0 auto; max-width: 24em; font-size: clamp(15.5px, 2.2vw, 20px); font-weight: 700; color: var(--lab-text); line-height: 1.7; }
-.uv-audit-close .sig { margin-top: 14px; font-family: var(--mono); font-size: 11px; letter-spacing: .22em; color: var(--lab-green); text-transform: uppercase; }
 
-/* SNS 유포 기록 */
-.uv-log { margin-top: 72px; }
-.uv-log-fold { margin-top: 18px; }
-.uv-log-fold summary {
-  cursor: pointer; display: inline-block; padding: 8px 0;
-  font-family: var(--mono); font-size: 12px; letter-spacing: .08em; color: var(--lab-green);
-}
-.uv-log-fold summary:hover { text-decoration: underline; text-underline-offset: 3px; }
-.uv-log-fold .uv-log-list { margin-top: 10px; }
-.uv-log-list { margin-top: 20px; border: 1px solid var(--lab-line); }
-.uv-log-item {
-  display: grid; grid-template-columns: 110px 1fr auto; gap: 16px; align-items: center;
-  padding: 14px 18px; border-bottom: 1px solid var(--lab-line); text-decoration: none;
-  transition: background .15s;
-}
-.uv-log-item:last-child { border-bottom: 0; }
-.uv-log-item:hover { background: rgba(111, 232, 163, .06); }
-.uv-log-item .date { font-family: var(--mono); font-size: 11.5px; color: var(--lab-muted); white-space: nowrap; }
-.uv-log-item .ti { font-size: 14px; font-weight: 700; color: var(--lab-text); }
-.uv-log-item .ti em { display: block; font-style: normal; font-weight: 400; font-size: 12.5px; color: var(--lab-muted); margin-top: 2px; }
-.uv-log-item .go { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; color: var(--lab-green); white-space: nowrap; }
-@media (max-width: 640px) { .uv-log-item { grid-template-columns: 1fr auto; } .uv-log-item .date { grid-column: 1 / -1; } }
 
 /* 가상 창작물 고지 — 세션 종료 뒤의 작은 활자. 반드시 남긴다(계정의 약속). */
 .uv-fine {
