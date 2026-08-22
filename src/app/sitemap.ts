@@ -11,6 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/rooms", priority: 0.8 },    // (테마 상세는 아래에서 개별 추가)
     { path: "/reviews", priority: 0.7 },
     { path: "/about", priority: 0.6 },
+    { path: "/universe", priority: 0.6 },  // 사자의 서 세계관 아카이브
     { path: "/events", priority: 0.6 },
     { path: "/faq", priority: 0.5 },
     { path: "/business", priority: 0.5 },

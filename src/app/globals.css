@@ -1758,6 +1758,12 @@ form.cform{border:1px solid rgba(122,59,184,.28);border-radius:var(--r-lg);paddi
 .rm-price .per{color:var(--muted);font-weight:400;font-size:13px}
 .rm-price .dep th,.rm-price .dep td{border-bottom:none;color:var(--brand)}
 .rm-note{font-size:13.5px;color:var(--muted);margin:10px 0 0;line-height:1.7}
+/* 세계관 자료실로 넘어가는 카드(테마 상세 · 사자의 서). 카드 전체가 링크라 hover 를 준다. */
+.rm-universe{display:block;text-decoration:none;transition:border-color .18s,background .18s,transform .18s}
+.rm-universe:hover{border-color:rgba(201,182,255,.5);background:rgba(201,182,255,.08);transform:translateY(-1px)}
+.rm-universe .eyebrow{color:var(--gold);display:block;margin-bottom:8px}
+.rm-universe-go{display:inline-block;margin-top:14px;font-size:13.5px;font-weight:800;color:var(--gold)}
+@media(prefers-reduced-motion:reduce){.rm-universe:hover{transform:none}}
 .rm-acct{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;padding:10px 14px;
   border-radius:var(--r-sm);background:var(--bg2);border:1px solid var(--line);font-size:14px}
 .rm-acct span{color:var(--muted);font-size:12.5px;font-weight:700}

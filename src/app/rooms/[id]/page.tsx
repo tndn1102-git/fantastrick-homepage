@@ -101,6 +101,20 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
           </div>
         </section>
 
+        {/* 세계관 아카이브 — 지금은 〈사자의 서〉만 있다(인스타 @abellaboratory 원문 기반).
+            다른 테마도 세계관 페이지가 생기면 여기 조건을 늘린다. */}
+        {theme.id === "bookofduat" && (
+          <Link prefetch={false} href="/universe" className="rm-card rm-universe">
+            <span className="eyebrow">World · Abel Laboratory</span>
+            <h2 className="rm-h">들어가기 전에 읽는 배경</h2>
+            <p className="rm-note">
+              ADAM Inc., 아벨 연구소, 성물, 그리고 만병통치약 〈레드크라운〉.
+              연구소가 공개한 자료를 모아 뒀습니다. 진행·장치·정답은 담기지 않았습니다.
+            </p>
+            <span className="rm-universe-go">세계관 자료실 열기 →</span>
+          </Link>
+        )}
+
         {/* 이용 금액 — 손님이 제일 궁금한 것 */}
         <section className="rm-card">
           <h2 className="rm-h">이용 금액</h2>
