@@ -418,7 +418,7 @@ export const GABIA_VAR_ORDER = ["이름", "테마", "날짜", "시간"] as const
 // 카카오 알림톡 발송(NHN Cloud). resendParameter 로 알림톡 실패 시 문자 대체발송까지 함께 요청한다.
 //   미설정이면 null → 호출측이 SMS 폴백. body=문자 대체 본문, vars=템플릿 치환값(키는 #{} 없이).
 export async function sendAlimtalk(
-  phone: string, body: string, type: string, vars: Record<string, string>
+  phone: string, body: string, type: string, vars: Record<string, string>, themeId?: string
 ): Promise<{ ok: boolean } | null> {
   // 확정문자 말고는 보내지 않는다. {ok:false} 를 줘야 호출측이 SMS 로 폴백하지 않는다.
   if (!isSendableType(type)) {
@@ -436,7 +436,8 @@ export async function sendAlimtalk(
      알림톡 심사가 끝나 GABIA_TPL_CONFIRM 이 붙는 순간 자동으로 알림톡이 1순위가 된다. */
   if (useGabia()) {
     if (!gabiaAlimtalkConfigured()) return null; // 미설정 → SMS 폴백
-    const r = await gabiaSendAlimtalk(phone, GABIA_VAR_ORDER.map((k) => vars[k] ?? ""));
+    // themeId 를 넘기는 이유 — 〈사자의 서〉만 세계관 주소가 든 전용 템플릿으로 나간다.
+    const r = await gabiaSendAlimtalk(phone, GABIA_VAR_ORDER.map((k) => vars[k] ?? ""), themeId);
     await writeLog({
       phone, body, type, channel: "alimtalk",
       status: r.ok ? "sent" : "failed", error: r.ok ? null : `[가비아] ${r.error}`,
@@ -489,7 +490,7 @@ export async function sendReservationSms(
   }
 
   // 1순위 알림톡(실패 시 NHN 이 문자로 대체발송). 알림톡 미설정이면 SMS 경로.
-  const kakao = await sendAlimtalk(r.phone, body, type, vars);
+  const kakao = await sendAlimtalk(r.phone, body, type, vars, r.theme_id);
   if (kakao) return kakao;
   return sendSms(r.phone, body, type);
 }

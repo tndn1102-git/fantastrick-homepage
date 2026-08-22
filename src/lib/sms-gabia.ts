@@ -21,6 +21,9 @@
  *   GABIA_API_KEY     관리툴 › 관리자 › 서비스 정보 › API 인증키
  *   GABIA_SENDER      발신번호(숫자만, 관리툴에 등록된 번호여야 함)
  *   GABIA_TPL_CONFIRM 알림톡 템플릿 번호(관리툴 › 환경 설정 › 알림톡 템플릿)
+ *   GABIA_TPL_CONFIRM_DUAT (선택) 〈사자의 서〉 전용 템플릿 번호.
+ *                     기존 템플릿과 문구·변수 순서가 똑같고 **세계관 페이지 주소 한 줄만 더 있다.**
+ *                     없으면 자동으로 공용 템플릿(GABIA_TPL_CONFIRM)으로 나간다 — 안전한 기본값.
  *   GABIA_RELAY_URL   (선택) 중계 파일 주소. 있으면 직접 호출 대신 여기로 보낸다.
  *   GABIA_RELAY_KEY   (선택) 중계 파일과 나눠 갖는 비밀번호. 아무나 못 부르게 막는 열쇠.
  */
@@ -178,8 +181,21 @@ export async function gabiaSendSms(to: string, body: string, title: string): Pro
  * @param vars 템플릿 변수. 가비아는 이름표가 아니라 **순서**로 넣는다(변수1|변수2|변수3).
  *             그래서 템플릿을 만들 때 정한 순서와 이 배열의 순서가 반드시 같아야 한다.
  */
-export async function gabiaSendAlimtalk(to: string, vars: string[]): Promise<GabiaResult> {
-  const tpl = process.env.GABIA_TPL_CONFIRM;
+/* 테마에 맞는 템플릿 번호를 고른다.
+   〈사자의 서〉 예약자에게만 세계관 페이지 주소가 나가야 해서, 그 테마만 다른 템플릿을 쓴다.
+   ⚠️ 알림톡 템플릿은 카카오 심사를 받은 **본문 그 자체**라, 코드에서 문장을 바꿔 넣을 수 없다.
+      주소를 넣으려면 그 주소가 적힌 템플릿을 따로 등록하는 수밖에 없다.
+   ⚠️ 두 템플릿의 **변수 순서(#{이름}→#{테마}→#{날짜}→#{시간})는 반드시 같게** 등록할 것.
+      다르면 손님에게 "이름 자리에 날짜"가 찍혀 나간다. */
+function pickTemplate(themeId?: string): string | undefined {
+  if (themeId === "bookofduat" && process.env.GABIA_TPL_CONFIRM_DUAT) {
+    return process.env.GABIA_TPL_CONFIRM_DUAT;
+  }
+  return process.env.GABIA_TPL_CONFIRM;
+}
+
+export async function gabiaSendAlimtalk(to: string, vars: string[], themeId?: string): Promise<GabiaResult> {
+  const tpl = pickTemplate(themeId);
   if (!gabiaConfigured() || !tpl) return { ok: false, error: "가비아 알림톡 미설정" };
 
   const form: Record<string, string> = {

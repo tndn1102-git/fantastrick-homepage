@@ -61,6 +61,28 @@
 }
 .uv-disc b { color: var(--text); }
 
+/* ---------- 공개 영상 ---------- */
+.uv-film { border-top: 1px solid rgba(255, 255, 255, .1); padding: 84px 0 0; }
+.uv-video { margin: 34px 0 0; }
+/* 16:9 상자 + cover = 원본 9:16 파일에서 가운데 실화면 띠만 남는다(재인코딩 없이).
+   자세한 계산은 page.tsx 의 이 섹션 주석 참고. */
+.uv-video video {
+  display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #000;
+  border: 1px solid var(--line); border-radius: var(--r-lg);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .38);
+}
+.uv-video figcaption { margin-top: 14px; }
+.uv-video summary {
+  cursor: pointer; display: inline-block; font-family: var(--uv-mono); font-size: 12px;
+  letter-spacing: .1em; color: var(--uv-ink); padding: 8px 0;
+}
+.uv-video summary:hover { text-decoration: underline; text-underline-offset: 3px; }
+.uv-video ol {
+  margin: 10px 0 0; padding: 20px 22px 20px 40px; display: grid; gap: 9px;
+  border: 1px solid var(--line); border-radius: var(--r); background: rgba(255, 255, 255, .04);
+  color: var(--muted); font-size: 14.5px; line-height: 1.75;
+}
+
 /* ---------- 문서 카드 공통 ---------- */
 .uv-file { border-top: 1px solid rgba(255, 255, 255, .1); padding: 96px 0; }
 .uv-file-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; }

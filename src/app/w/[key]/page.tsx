@@ -131,6 +131,53 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
         </div>
       </section>
 
+      {/* ─────────── 공개 영상 (릴스 원본) ───────────
+          ⚠️ 원본 파일이 9:16(720×1280)인데 **실제 화면은 가운데 16:9 띠(720×404, y=438)뿐**이고
+             위아래는 검은 여백이다(전 구간 동일 — ffmpeg cropdetect 로 확인).
+             그래서 다시 인코딩하지 않고 CSS 로만 잘라 쓴다:
+             16:9 상자 + object-fit:cover 를 주면 브라우저가 정확히 그 띠만 남긴다
+             (계산: 1600×900 상자에 720×1280 을 cover → 원본 y 437~842 가 보인다 = 딱 그 띠).
+             재인코딩을 안 하니 화질 손실도 0 이다. */}
+      <section className="uv-film">
+        <div className="wrap">
+          <div className="uv-file-head reveal rv-left">
+            <span className="uv-no">FILM</span>
+            <h2>인류의 희망, 레드크라운</h2>
+          </div>
+          <p className="uv-lead reveal">아벨 연구소가 공개한 프로젝트 발표 영상입니다. 1분.</p>
+
+          <figure className="uv-video reveal">
+            <video
+              controls
+              preload="none"
+              playsInline
+              poster="/videos/redcrown-poster.webp"
+              width={720}
+              height={404}
+            >
+              <source src="/videos/redcrown-reel.mp4" type="video/mp4" />
+              이 브라우저는 영상을 재생하지 못합니다.
+            </video>
+            {/* 소리를 못 켜는 상황(사무실·지하철)이나 화면을 못 보는 손님을 위해 내레이션을 글로도 둔다.
+                영상 자막을 그대로 옮긴 것이다. */}
+            <figcaption>
+              <details>
+                <summary>내레이션 전문 보기</summary>
+                <ol>
+                  <li>인류의 역사는 항상 질병과의 전쟁으로 가득했습니다.</li>
+                  <li>수많은 사람들이 병마로 쓰러져 갈 때, 우리는 아무것도 할 수 없었습니다.</li>
+                  <li>하지만 이제는 다릅니다. 우리에겐 성물 &lsquo;사자의 서&rsquo;가 있기 때문이죠.</li>
+                  <li>2031년 이집트에서 발견된 사자의 서. 이 발견은 새로운 희망이 됐습니다.</li>
+                  <li>사자의 서는 모든 질병을 치료할 수 있는 만병통치약 [레드크라운]을 저희에게 안겨줬습니다.</li>
+                  <li>수많은 시행착오를 거쳐 완성한 레드크라운, 드디어 곧 여러분들에게 공개될 예정입니다.</li>
+                  <li>이 레드크라운만 있다면, 저희는 질병 없는 세상에서 살아가게 될 것입니다.</li>
+                </ol>
+              </details>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
       {/* ─────────── FILE 01 · ADAM Inc. ─────────── */}
       <section className="uv-file" id="file-01">
         <div className="wrap">
@@ -202,8 +249,10 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
             <h2>버려진 사원에서 발견된 것</h2>
           </div>
           <p className="uv-lead reveal">
-            레드크라운의 베이스로 사용되는 성물은 〈사자의 서〉입니다. 이집트의 한 사원에서 발견되어
-            주목을 받았습니다. 아래는 당시 지면 기사입니다.
+            레드크라운의 베이스로 사용되는 성물은 〈사자의 서〉입니다. <b>2031년 이집트</b>의 한 사원에서
+            발견되어 주목을 받았습니다. 아래는 당시 지면 기사입니다.
+            {/* 연도는 공개 영상 자막에서 온 것이다("2031년 이집트에서 발견된 사자의 서").
+                신문 지면은 원본이 '20XX년'으로 가려 두었으므로 거기는 그대로 둔다. */}
           </p>
 
           <article className="uv-news reveal">

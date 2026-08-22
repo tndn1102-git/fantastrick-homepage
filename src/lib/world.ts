@@ -23,3 +23,7 @@ export const WORLD_KEYS = [
 
 // 알림톡·안내에 붙일 주소를 만들 때 쓴다.
 export const WORLD_PATH = (key: string) => `/w/${key}`;
+
+/** 지금 손님에게 안내할 주소(문자·알림톡에 넣는 것). 목록의 **첫 번째**가 현재 주소다.
+ *  열쇠를 갈면 여기가 자동으로 새 주소가 되고, 목록에 남겨둔 옛 열쇠도 계속 열린다. */
+export const WORLD_URL_DUAT = `https://fantastrick.co.kr${WORLD_PATH(WORLD_KEYS[0])}`;
