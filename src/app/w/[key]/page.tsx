@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import RevealOnScroll from "@/components/RevealOnScroll";
@@ -121,9 +120,15 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
             <span>공지사항</span>
           </nav>
 
+          {/* 슬로건 히어로 — 회사의 얼굴. 명조 세리프 + 그라디언트 하이라이트 + 형광펜 밑줄.
+              등장 애니메이션은 CSS(uv-rise)로만 — 배지 → 슬로건 → 구분선 → 설명 순서로 떠오른다. */}
           <div className="uv-cover-hero">
-            <div className="ch-eyebrow">Abel Laboratory · Life Science</div>
-            <h1>&lsquo;질병 없는 세상을 만들어 갑니다.&rsquo;</h1>
+            <span className="ch-badge"><i aria-hidden="true" />OUR MISSION</span>
+            <h1 className="ch-slogan">
+              <em>질병 없는 세상</em>을<br className="ch-br" />
+              만들어 갑니다<span className="ch-dot">.</span>
+            </h1>
+            <div className="ch-rule" aria-hidden="true" />
             <p className="ch-sub">
               생명과학의 선두주자 〈아벨 연구소〉는 세균과 바이러스, 그리고 유전적 질병에 대한
               치료제를 연구 개발하고 있습니다.
@@ -543,26 +548,8 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
             </div>
           </section>
 
-          {/* ── 참여 신청 — 세계관 안에서 예약으로 이어지는 문 ── */}
-          <section className="uv-apply reveal">
-            <div className="ap-t">LET&rsquo;S GET CAMPAIGN</div>
-            <h2>캠페인 참여 신청</h2>
-            <p>
-              문서는 여기까지다. 나머지는 연구소 안에 있다.
-              직접 확인하려면 — 캠페인에 참여하는 방법뿐이다.
-            </p>
-            <div className="row">
-              <Link prefetch={false} href="/reserve?theme=bookofduat" className="uv-btn primary">
-                참여 신청 →
-              </Link>
-              <Link prefetch={false} href="/rooms/bookofduat" className="uv-btn ghost">
-                현장 정보
-              </Link>
-            </div>
-            <p className="ap-loc">현장 — 판타스트릭 2호점 〈사자의 서〉 · 서울 사평대로 353, B1 · 80분 · 2~4인</p>
-          </section>
-
-          {/* ── 가상 창작물 고지 — 계정의 약속. 지우지 말 것. ── */}
+          {/* ── 가상 창작물 고지 — 계정의 약속. 지우지 말 것. ──
+              (캠페인 참여 신청/예약 CTA 섹션은 2026-08-22 사장님 지시로 삭제 — 되살리지 말 것) */}
           <p className="uv-fine">
             본 페이지와 등장하는 기관·인물·사건은 모두 <b>가상의 창작물</b>로, 판타스트릭 방탈출의 두 번째 테마
             〈사자의 서 / Book of Duat〉를 위해 제작되었으며 실제와 아무 관련이 없습니다.
