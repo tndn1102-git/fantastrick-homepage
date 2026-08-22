@@ -470,6 +470,33 @@
   display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #000;
   border: 1px solid var(--lab-line2);
 }
+/* 큰 중앙 재생 버튼 — 시작 전에만 영상 전체를 덮는다(WorldVideo.tsx).
+   기본 재생 버튼(왼쪽 아래)이 작아 영상인 줄 모른다는 지적(2026-08-22)의 해결. */
+.uv-vwrap { position: relative; }
+.uv-vplay {
+  position: absolute; inset: 0; border: 0; cursor: pointer; padding: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  background: rgba(3, 6, 4, .34); transition: background .15s;
+}
+.uv-vplay:hover { background: rgba(3, 6, 4, .48); }
+.uv-vplay .ring {
+  width: 86px; height: 86px; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(111, 232, 163, .2); border: 2px solid var(--lab-green);
+  backdrop-filter: blur(2px);
+  animation: uv-vping 2.4s ease-out infinite;
+  transition: transform .15s, background .15s;
+}
+.uv-vplay:hover .ring { transform: scale(1.07); background: rgba(111, 232, 163, .32); }
+.uv-vplay .ring svg { width: 36px; height: 36px; fill: #eafff2; margin-left: 5px; }
+@keyframes uv-vping {
+  0% { box-shadow: 0 0 0 0 rgba(111, 232, 163, .45); }
+  70% { box-shadow: 0 0 0 18px rgba(111, 232, 163, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(111, 232, 163, 0); }
+}
+.uv-vplay .cap {
+  font-family: var(--mono); font-size: 12.5px; font-weight: 700; letter-spacing: .14em;
+  color: #eafff2; text-shadow: 0 1px 4px rgba(0, 0, 0, .7);
+}
 .uv-video summary {
   cursor: pointer; display: inline-block; margin-top: 12px; padding: 6px 0;
   font-family: var(--mono); font-size: 11.5px; letter-spacing: .1em; color: var(--lab-green);
@@ -546,5 +573,7 @@
   .ch-badge, .ch-slogan, .ch-rule, .uv-cover-hero .ch-sub { animation: none; }
   .ch-slogan em { animation: none; }
   .ch-scroll, .ch-scroll .mouse i, .ch-scroll .chev { animation: none; }
+  .uv-vplay .ring { animation: none; }
+  .uv-vplay:hover .ring { transform: none; }
   .uv-news { transform: none; }
 }

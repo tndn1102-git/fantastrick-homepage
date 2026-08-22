@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import RevealOnScroll from "@/components/RevealOnScroll";
 import { WORLD_KEYS } from "@/lib/world";
+import WorldVideo from "./WorldVideo";
 import "./universe.css";
 
 /* 세계관 페이지 — 〈사자의 서 / Book of Duat〉(2호점) · 아벨 연구소 내부망
@@ -416,17 +417,8 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
 
             <p className="uv-attach"><b>첨부 3</b> — 대외 홍보 영상 (배포 승인본 · 59초)</p>
             <figure className="uv-video">
-              <video
-                controls
-                preload="none"
-                playsInline
-                poster="/videos/redcrown-poster.webp"
-                width={720}
-                height={404}
-              >
-                <source src="/videos/redcrown-reel.mp4" type="video/mp4" />
-                이 브라우저는 영상을 재생하지 못합니다.
-              </video>
+              {/* 큰 중앙 재생 버튼 포함 플레이어 — 영상 파일·포스터 경로는 WorldVideo.tsx 안에 */}
+              <WorldVideo />
               <figcaption>
                 <details>
                   <summary>&gt; 내레이션 전문 열람</summary>
