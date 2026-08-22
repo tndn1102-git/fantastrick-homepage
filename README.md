@@ -7,6 +7,23 @@
 
 
 
+
+## 2026-08-22 (6차) — 🚀 세계관 페이지 배포 완료
+
+`npm run cf:deploy` → **https://fantastrick.co.kr/w/abel-eb2f565a19** 라이브.
+
+**배포에서 터진 것 1건** — 첫 배포에서 이 페이지만 404.
+원인: `dynamicParams = false`. Cloudflare(OpenNext)에선 미리 만든 페이지의 캐시 조회가
+빗나갈 수 있는데, false 면 그때 즉석 렌더 대신 404 를 내버린다(같은 SSG 인 /rooms/[id] 는
+기본값 true 라 즉석 렌더로 살아서 멀쩡했다). → 그 줄 삭제로 해결. 틀린 열쇠 404 는
+컴포넌트의 notFound() 가 그대로 지킨다. **이 프로젝트에서 dynamicParams=false 금지.**
+
+**라이브 검증** — 맞는 열쇠 200(제목 ABEL LABORATORY·noindex) · 틀린 열쇠 404 · /universe 404 ·
+robots Disallow /w/ · sitemap 흔적 0 · 영상(mp4) 서빙 정상.
+
+**남은 수동 작업(사장님)** — NHN Cloud 콘솔에서 사자의 서 전용 알림톡 템플릿 등록(주소 포함).
+심사 통과 후 템플릿 코드를 받으면 `npx wrangler secret put NHN_TPL_CONFIRM_DUAT` 로 넣는다.
+그 전까지 알림톡·문자 폴백의 주소 한 줄은 문자(LMS)로만 나간다.
 ## 2026-08-22 (5차) — 사장님 화면 편집 20건 반영 + 따옴표 제거 + 스크롤 유도
 
 - **화면 편집 도구(edit-world)로 저장하신 줄바꿈 20건** — 도구가 6곳만 반영했다(배열 속 문장·

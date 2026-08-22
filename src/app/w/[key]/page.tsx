@@ -104,8 +104,10 @@ function DnaSvg({ className }: { className?: string }) {
 export function generateStaticParams() {
   return WORLD_KEYS.map((key) => ({ key }));
 }
-// 목록에 없는 열쇠는 서버를 거치지도 않고 바로 404. (요청 낭비 0)
-export const dynamicParams = false;
+/* ⚠️ dynamicParams=false 를 쓰면 안 된다 (2026-08-22 배포에서 라이브 404 사고).
+   Cloudflare(OpenNext)에선 미리 만든 페이지의 캐시 조회가 빗나갈 수 있는데,
+   false 면 그때 즉석 렌더 대신 404 를 내버린다. 기본값(true)이면 즉석 렌더로 살아난다.
+   틀린 열쇠의 404 는 위 컴포넌트의 notFound() 가 그대로 지킨다. */
 
 export default async function UniversePage({ params }: { params: Promise<{ key: string }> }) {
   const { key } = await params;
