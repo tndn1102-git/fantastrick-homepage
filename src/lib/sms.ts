@@ -383,8 +383,19 @@ export async function sendTestAlimtalk(phone: string): Promise<{ ok: boolean; er
 // 타입 → 카카오 알림톡 템플릿코드. 입금확인/확정=확정 템플릿, 취소=취소 템플릿.
 // ⚠️ process.env 를 모듈 로드 시점에 한 번만 읽으면 워커에서 값이 늦게 붙는 경우 undefined 로 굳는다.
 //    함수로 감싸 호출할 때마다 읽는다.
-function kakaoTemplateCode(type: string): string | undefined {
-  const confirm = process.env.NHN_TPL_CONFIRM;
+function kakaoTemplateCode(type: string, themeId?: string): string | undefined {
+  /* 〈사자의 서〉 예약자에게만 세계관 자료실 주소를 보낸다.
+     알림톡 본문은 카카오 심사를 받은 템플릿 그 자체라, 코드에서 문장을 끼워 넣을 수 없다.
+     그래서 주소가 들어간 템플릿을 따로 등록하고, 그 테마일 때만 그 번호를 쓴다.
+     ⚠️ NHN_TPL_CONFIRM_DUAT 이 없으면 공용 템플릿으로 그냥 나간다 — 등록 전까지 사고가 없다.
+     ⚠️ NHN 은 변수를 **이름표**로 넣는다(가비아처럼 순서가 아니다).
+        두 템플릿의 변수 이름(#{이름}#{테마}#{날짜}#{시간})만 같으면 되고, 순서는 달라도 안전하다.
+     ⚠️ 문자(LMS) 폴백 문구도 같이 맞춰야 한다 — sms-templates.ts 의 "payment:bookofduat".
+        한쪽만 고치면 같은 손님이 카톡이냐 문자냐에 따라 다른 안내를 받는다. */
+  const confirm =
+    themeId === "bookofduat" && process.env.NHN_TPL_CONFIRM_DUAT
+      ? process.env.NHN_TPL_CONFIRM_DUAT
+      : process.env.NHN_TPL_CONFIRM;
   const cancel = process.env.NHN_TPL_CANCEL;
   return { payment: confirm, confirm, cancel, admin_cancel: cancel }[type];
 }
@@ -449,7 +460,7 @@ export async function sendAlimtalk(
     return r.ok ? { ok: true } : null;
   }
 
-  const templateCode = kakaoTemplateCode(type);
+  const templateCode = kakaoTemplateCode(type, themeId);
   if (!kakaoConfigured() || !templateCode) return null; // 미설정 → SMS 폴백
 
   const r = await nhnSendAlimtalk(phone, templateCode, vars, body);
