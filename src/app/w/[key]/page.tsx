@@ -78,6 +78,19 @@ const POSTS = [
   { date: "릴스", t: "인류의 희망, 레드크라운", s: "영상 · 프로젝트 발표", url: "https://www.instagram.com/reel/DBOPjLOs0lC/" },
 ];
 
+/* DNA 이중나선 장식 — 위장 표면(파랑)과 성물 문서(금색)에서 재사용. 순수 장식이라 aria-hidden. */
+function DnaSvg({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 120 600" aria-hidden="true" focusable="false">
+      <path d="M60 0 C100 15 100 45 60 60 C20 75 20 105 60 120 C100 135 100 165 60 180 C20 195 20 225 60 240 C100 255 100 285 60 300 C20 315 20 345 60 360 C100 375 100 405 60 420 C20 435 20 465 60 480 C100 495 100 525 60 540 C20 555 20 585 60 600" />
+      <path d="M60 0 C20 15 20 45 60 60 C100 75 100 105 60 120 C20 135 20 165 60 180 C100 195 100 225 60 240 C20 255 20 285 60 300 C100 315 100 345 60 360 C20 375 20 405 60 420 C100 435 100 465 60 480 C20 495 20 525 60 540 C100 555 100 585 60 600" />
+      {[30, 90, 150, 210, 270, 330, 390, 450, 510, 570].map((y) => (
+        <line key={y} x1={32} y1={y} x2={88} y2={y} />
+      ))}
+    </svg>
+  );
+}
+
 /* 열쇠가 맞을 때만 페이지를 준다. 틀리면 그냥 '없는 주소'(404)로 보인다 —
    "비밀번호가 틀렸습니다" 같은 말을 하면 여기에 뭔가 있다는 걸 알려주는 셈이라 그러지 않는다. */
 export function generateStaticParams() {
@@ -98,6 +111,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
           게시물의 밝은 얼굴(LET'S GET 파스텔·ADAM 일러스트)을 그대로 옮긴, 아무 문제 없어 보이는 껍데기.
           메뉴는 눌리지 않는다 — 위장 사이트니까. */}
       <section className="uv-cover">
+        <DnaSvg className="uv-dna cover" />
         <div className="wrap">
           <nav className="uv-cover-nav" aria-hidden="true">
             <span className="cn-logo">ABEL <b>LAB</b></span>
@@ -134,6 +148,15 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
             </div>
           </div>
 
+          {/* 연구 현장 사진 — 연구소가 스스로 공개한 홍보 영상(첨부 3)에서 자른 스틸.
+              밝은 표면에 '진짜 연구소 같은' 얼굴을 하나 더 얹는다. */}
+          <div className="uv-cover-photos" aria-hidden="true">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/videos/lab-blue.webp" alt="" width={720} height={330} loading="lazy" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/videos/lab-red.webp" alt="" width={720} height={330} loading="lazy" />
+          </div>
+
           <div className="uv-cover-banner">
             <div>
               <div className="cb-t">BRING OUT THE HEALTH AND HAPPY</div>
@@ -153,7 +176,6 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
       <div className="uv-gate">
         <div className="uv-tape" role="presentation"><span>RESTRICTED AREA · 관계자 외 접근 금지</span></div>
         <div className="wrap uv-gate-term">
-          <p className="gt-line">&gt; 접속 경로 확인… 외부 초대 링크</p>
           <p className="gt-line">&gt; 직원 인증 대기… <span className="gt-grant">ACCESS GRANTED :: CLEARANCE LEVEL D</span></p>
           <p className="gt-warn">※ 본 접속은 기록됩니다. 열람 내용의 외부 유출을 금합니다.</p>
         </div>
@@ -163,11 +185,18 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
       <section className="uv-net">
         <div className="wrap">
           <div className="uv-sys">
-            <div className="sys-t">ABEL LABORATORY // INTERNAL ARCHIVE</div>
-            <div className="sys-row">
-              <span>열람등급 <b>LEVEL D</b></span>
-              <span>문서 <b>5건</b> · 첨부 <b>2건</b> · 감사메모 <b>1건</b></span>
-              <span>사본 생성 <b>차단됨</b></span>
+            <div>
+              <div className="sys-t">ABEL LABORATORY // INTERNAL ARCHIVE</div>
+              <div className="sys-row">
+                <span>열람등급 <b>LEVEL D</b></span>
+                <span>문서 <b>5건</b> · 첨부 <b>3건</b> · 감사메모 <b>1건</b></span>
+                <span>사본 생성 <b>차단됨</b></span>
+              </div>
+            </div>
+            <div className="sys-live" aria-hidden="true">
+              <span className="rec"><i />REC</span>
+              <span>LIVE</span>
+              <div className="uv-radar" />
             </div>
           </div>
 
@@ -219,6 +248,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
 
           {/* ── 문서 02 · 성물 ── */}
           <article className="uv-doc gold reveal">
+            <DnaSvg className="uv-dna doc" />
             <div className="uv-doc-head">
               <span className="uv-doc-no">AL-DOC-02</span>
               <h2>성물 — 정의와 상태 분류</h2>
@@ -299,6 +329,14 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               </p>
               <p className="byline">XXX 기자(XXX@XXX.XX.XX)</p>
             </article>
+
+            <p className="uv-attach"><b>첨부 2</b> — 회수 현장 촬영 자료</p>
+            <figure className="uv-shot">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/videos/duat-relic.webp" alt="사원 지하에서 발견된 사자의 서" width={720} height={330} loading="lazy" />
+              <span className="sh-a">● REC</span>
+              <span className="sh-b">SITE: EGY · 2031</span>
+            </figure>
           </article>
 
           {/* ── 문서 04 · 레드크라운 ── */}
@@ -315,6 +353,14 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               다른 약들처럼 특정 질병이나 증상에만 적용되는 것이 아닌, 어떤 상태에서도 약을 먹게 되면
               건강해지는 이른바 <b>&lsquo;만병통치약&rsquo;</b>이라고 알려져 있다.
             </p>
+
+            {/* 생체 신호 곡선 — 아래 실험 기록(활성 → 정지)을 그림으로 옮긴 것. 뛰다가, 멎는다. */}
+            <div className="uv-ecg" aria-hidden="true">
+              <svg viewBox="0 0 600 80" preserveAspectRatio="none">
+                <path pathLength={1000} d="M0 40 H55 L63 40 L70 16 L78 64 L85 40 H140 L148 40 L155 14 L163 66 L170 40 H225 L233 40 L240 18 L248 62 L255 40 H320 H600" />
+              </svg>
+              <span className="ecg-tag">실험체 생체 신호 — <b>신호 소실</b></span>
+            </div>
 
             <div className="uv-lab-log">
               <div className="ll-head">실험 기록 — SNS 공개 영상 (실험체: 토끼)</div>
@@ -348,7 +394,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               </div>
             </div>
 
-            <p className="uv-attach"><b>첨부 2</b> — 대외 홍보 영상 (배포 승인본 · 59초)</p>
+            <p className="uv-attach"><b>첨부 3</b> — 대외 홍보 영상 (배포 승인본 · 59초)</p>
             <figure className="uv-video">
               <video
                 controls

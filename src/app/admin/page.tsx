@@ -1826,11 +1826,16 @@ function ManualRefundForm({ onDone }: { onDone: () => void }) {
 
 /* 💸 환불 처리 — 행을 항상 펼쳐 둔다(.rrow.open). 계좌를 봐야 일이 시작되므로 클릭 1회를 없앰.
    사장님 동선: [계좌 복사] → 은행앱 이체 → [✓ N원 환불 완료]  */
+type DoneItem = { key: string; at: string; who: string; desc: string; amount: number; manual?: ManualRefund; res?: Reservation; label: string; ok: boolean };
+
 function RefundQueue({ onDone }: { onDone: () => void }) {
   const [rows, setRows] = useState<Reservation[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  /* 환불 완료 뒤에는 고객 정보를 볼 곳이 없었다(2026-08-22 사장님 지적).
+     완료 목록의 이름을 누르면 이 창이 뜬다 — 보기 전용, 여기서 고치는 건 없다. */
+  const [detail, setDetail] = useState<DoneItem | null>(null);
 
   /* 매장 접수 환불도 같이 불러온다 — 처리 내역을 아래 "최근 환불 완료"에 합쳐 보이기 위해서.
      따로 두면 "환불을 어디서 했더라"를 두 군데서 찾아야 한다(2026-08-20 사장님 지시). */
@@ -1865,7 +1870,6 @@ function RefundQueue({ onDone }: { onDone: () => void }) {
   const refundStamp = (r: Reservation) => r.refunded_at || r.cancelled_at || "";
   /* 최근 환불 완료 = 홈페이지 취소분 + 매장 접수분을 **한 줄로 합친다**(2026-08-20 사장님 지시).
      기준 시각: 홈페이지분은 환불 보낸 시각, 매장분은 처리한 시각. 최근 것이 위로. */
-  type DoneItem = { key: string; at: string; who: string; desc: string; amount: number; manual?: ManualRefund; res?: Reservation; label: string; ok: boolean };
   const done: DoneItem[] = [
     ...rows.filter((r) => r.refunded).map((r): DoneItem => ({
       key: "res:" + r.id, at: refundStamp(r), who: r.refund_holder || r.name,
@@ -1981,7 +1985,9 @@ function RefundQueue({ onDone }: { onDone: () => void }) {
                 <span className="when" style={{ color: "var(--faint)" }}>{formatStampShort(d.at)}</span>
                 {/* 🏪 = 매장에서 접수한 환불. 홈페이지 취소분과 한 줄로 섞이므로 표시로 가른다 */}
                 {d.manual && <span className="src-tag" style={{ background: "#F7E3EE", color: MANUAL_COLOR }}>🏪 매장</span>}
-                <span className="who">{d.who}</span>
+                <span className="who">
+                  <button type="button" className="who-link" title="고객 정보 보기" onClick={() => setDetail(d)}>{d.who}</button>
+                </span>
                 <span className="tname">{d.desc}</span>
                 <span className="amt">{d.amount.toLocaleString()}원</span>
                 <span className="rt">
@@ -2007,6 +2013,44 @@ function RefundQueue({ onDone }: { onDone: () => void }) {
             </div>
           ))}
         </>
+      )}
+
+      {/* 👤 환불 완료 고객 정보 창 — 예약 상세 창과 같은 modal 문법(보기 전용) */}
+      {detail && (
+        <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) setDetail(null); }}>
+          <div className="modal">
+            <button className="close-x" onClick={() => setDetail(null)} aria-label="닫기">×</button>
+            <h3>{detail.who}님 · 환불 정보</h3>
+            <div className="res-summary">
+              {detail.res ? (
+                <>
+                  <div className="r"><span>예약자</span><b>{detail.res.name}</b></div>
+                  <div className="r"><span>전화</span><b><Phone v={detail.res.phone} /></b></div>
+                  <div className="r"><span>테마</span><b>{detail.res.theme_name}</b></div>
+                  <div className="r"><span>예약일시</span><b>{formatDate(detail.res.date)} {detail.res.time} · {detail.res.people}명</b></div>
+                  <div className="r"><span>예약금</span><b>{detail.res.deposit.toLocaleString()}원{detail.res.deposit_payer ? ` (입금자 ${detail.res.deposit_payer})` : ""}</b></div>
+                  <div className="r"><span>환불액</span><b>{refundAmount(detail.res).toLocaleString()}원 ({detail.res.refund_rate ?? 100}%)</b></div>
+                  <div className="r"><span>환불계좌</span><b>{detail.res.refund_bank || "-"} {detail.res.refund_account || ""}{detail.res.refund_holder ? ` · 예금주 ${detail.res.refund_holder}` : ""}</b></div>
+                  <div className="r"><span>취소</span><b>{formatStamp(detail.res.cancelled_at)} {cancelledBy(detail.res)}</b></div>
+                  {detail.res.refunded_at && <div className="r"><span>환불 완료</span><b>{formatStamp(detail.res.refunded_at)}</b></div>}
+                  {detail.res.admin_note && <div className="r"><span>메모</span><b>{detail.res.admin_note}</b></div>}
+                </>
+              ) : detail.manual ? (
+                <>
+                  <div className="r"><span>구분</span><b>🏪 매장에서 접수한 환불</b></div>
+                  <div className="r"><span>이름</span><b>{detail.manual.name}</b></div>
+                  <div className="r"><span>금액</span><b>{detail.manual.amount.toLocaleString()}원</b></div>
+                  <div className="r"><span>계좌</span><b>{detail.manual.bank} {detail.manual.account} · 예금주 {detail.manual.holder}</b></div>
+                  {detail.manual.reason && <div className="r"><span>사유</span><b>{detail.manual.reason}</b></div>}
+                  {detail.manual.staff && <div className="r"><span>접수 직원</span><b>{detail.manual.staff}</b></div>}
+                  <div className="r"><span>접수</span><b>{formatStamp(detail.manual.created_at)}</b></div>
+                  {detail.manual.done_at && <div className="r"><span>처리</span><b>{formatStamp(detail.manual.done_at)}</b></div>}
+                  {detail.manual.memo && <div className="r"><span>메모</span><b>{detail.manual.memo}</b></div>}
+                </>
+              ) : null}
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

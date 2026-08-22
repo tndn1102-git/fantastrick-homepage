@@ -2090,3 +2090,9 @@ form.cform{border:1px solid rgba(122,59,184,.28);border-radius:var(--r-lg);paddi
 .cw-btnrow{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 6px}
 
 
+
+/* 환불 완료 목록 — 이름을 누르면 고객 정보 창 (2026-08-22 사장님 요청).
+   누를 수 있다는 표시는 점선 밑줄로만 — 파란 링크색을 쓰면 전화번호 링크와 헷갈린다. */
+.rrow .who-link{background:none;border:none;padding:0;font:inherit;font-weight:700;color:var(--text);
+  cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}
+.rrow .who-link:hover{text-decoration-style:solid}
