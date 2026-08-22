@@ -99,14 +99,8 @@
 
 /* ── 슬로건 히어로 — 회사의 얼굴 ──
    명조 세리프(레이아웃이 전역으로 싣는 나눔명조) + 그라디언트 하이라이트 + 형광펜 밑줄.
-   가운데 정렬로 '브랜드 선언' 느낌을 준다. 배경엔 큰 따옴표 워터마크. */
+   가운데 정렬로 '브랜드 선언' 느낌을 준다. (따옴표 워터마크는 2026-08-22 사장님 지시로 뺐다) */
 .uv-cover-hero { position: relative; padding: 88px 0 12px; text-align: center; }
-.uv-cover-hero::before {
-  content: "\201C"; position: absolute; top: 18px; left: 50%; margin-left: -340px;
-  font-family: "Nanum Myeongjo", serif; font-size: 230px; line-height: 1;
-  color: rgba(47, 111, 184, .1); pointer-events: none; user-select: none;
-}
-@media (max-width: 760px) { .uv-cover-hero::before { margin-left: 0; left: 2px; font-size: 150px; top: 30px; } }
 .ch-badge {
   display: inline-flex; align-items: center; gap: 9px; padding: 9px 18px; border-radius: 999px;
   background: #fff; color: var(--cov-blue-deep); font-size: 11.5px; font-weight: 800; letter-spacing: .26em;
@@ -146,6 +140,36 @@
 }
 @keyframes uv-rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 @keyframes uv-shine { to { background-position: -220% 0; } }
+
+/* 스크롤 유도 — 마우스 윤곽 안에서 점이 굴러 내려가고, 아래 화살표가 이어서 깜빡인다 */
+.ch-scroll {
+  margin-top: 42px; display: flex; flex-direction: column; align-items: center; gap: 7px;
+  animation: uv-rise .7s ease .4s both;
+}
+.ch-scroll .mouse {
+  width: 25px; height: 40px; border: 2px solid #8aa6c6; border-radius: 14px;
+  display: block; position: relative;
+}
+.ch-scroll .mouse i {
+  position: absolute; left: 50%; top: 7px; width: 4px; height: 9px; margin-left: -2px;
+  border-radius: 2px; background: #2f7fd4;
+  animation: uv-wheel 1.9s ease-in-out infinite;
+}
+@keyframes uv-wheel {
+  0% { transform: translateY(0); opacity: 1; }
+  65% { transform: translateY(13px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 0; }
+}
+.ch-scroll .chev {
+  width: 10px; height: 10px; border-right: 2px solid #8aa6c6; border-bottom: 2px solid #8aa6c6;
+  transform: rotate(45deg);
+  animation: uv-chev 1.9s ease-in-out infinite;
+}
+@keyframes uv-chev {
+  0%, 100% { opacity: .35; transform: rotate(45deg) translate(0, 0); }
+  50% { opacity: 1; transform: rotate(45deg) translate(3px, 3px); }
+}
+.ch-scroll .txt { font-size: 10px; font-weight: 800; letter-spacing: .34em; color: #8aa6c6; }
 
 /* 홍보 카드 3장 — 지나치게 깔끔한, 아무 문제 없어 보이는 얼굴 */
 .uv-cover-cards { margin-top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
@@ -521,5 +545,6 @@
   .uv-cover-photos img:hover { transform: none; }
   .ch-badge, .ch-slogan, .ch-rule, .uv-cover-hero .ch-sub { animation: none; }
   .ch-slogan em { animation: none; }
+  .ch-scroll, .ch-scroll .mouse i, .ch-scroll .chev { animation: none; }
   .uv-news { transform: none; }
 }

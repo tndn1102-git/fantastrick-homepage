@@ -37,15 +37,15 @@ export const metadata: Metadata = {
 const ROLES = [
   {
     t: "세계 기구적인 역할 수행",
-    d: "강대국의 지원을 받아 운영되며, 어느 한 국가가 성물을 이용해 국가 간 힘의 균형을 깨는 것을 방지합니다.",
+    d: "강대국의 지원을 받아 운영되며, 어느 한 국가가 성물을 이용해 국가 간 힘의 균형을\n깨는 것을 방지합니다.",
   },
   {
     t: "보호관리시설 설치",
-    d: "성물은 아담이 직접 설계·관리하는 보호관리시설에서 관리됩니다. 각국의 이해관계를 고려해 시설은 비밀리에 설치되었으며, 어떤 성물을 보관 중인지는 기밀사항입니다.",
+    d: "성물은 아담이 직접 설계·관리하는 보호관리시설에서 관리됩니다. 각국의 이해관계를 고려해 시설은 비밀리에 설치되었으며,\n어떤 성물을 보관 중인지는 기밀사항입니다.",
   },
   {
     t: "성물 연구",
-    d: "성물의 특성과 힘을 연구해 인류 발전에 기여할 방안을 모색합니다. 이를 위해 자회사 ABEL LAB 을 설립했습니다.",
+    d: "성물의 특성과 힘을 연구해 인류 발전에 기여할 방안을 모색합니다. 이를 위해 자회사\nABEL LAB 을 설립했습니다.",
   },
 ];
 
@@ -76,6 +76,15 @@ const POSTS = [
   { date: "2023. 02. 16.", t: "아벨연구소, 인류의 미래를 지키다", s: "3장 · 성물공학 특별기획 지면 — 〈사자의 서〉 발견 경위", url: "https://www.instagram.com/p/CosDkd0PsVL/" },
   { date: "릴스", t: "인류의 희망, 레드크라운", s: "영상 · 프로젝트 발표", url: "https://www.instagram.com/reel/DBOPjLOs0lC/" },
 ];
+
+/* 문자열 속 \n 을 PC 전용 줄바꿈으로 — 폰(≤600px)에서는 br 이 숨고 공백으로 흐른다.
+   화면 편집 도구가 배열 속 문장의 줄바꿈을 소스에 못 적는 한계를 메우는 렌더 짝. */
+function withBr(text: string) {
+  const parts = text.split("\n");
+  return parts.map((p, i) => (
+    <span key={i}>{p.trim()}{i < parts.length - 1 ? " " : ""}{i < parts.length - 1 && <br className="pc-br" />}</span>
+  ));
+}
 
 /* DNA 이중나선 장식 — 위장 표면(파랑)과 성물 문서(금색)에서 재사용. 순수 장식이라 aria-hidden. */
 function DnaSvg({ className }: { className?: string }) {
@@ -130,9 +139,15 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
             </h1>
             <div className="ch-rule" aria-hidden="true" />
             <p className="ch-sub">
-              생명과학의 선두주자 〈아벨 연구소〉는 세균과 바이러스, 그리고 유전적 질병에 대한
+              생명과학의 선두주자 〈아벨 연구소〉는 세균과 바이러스, <br className="pc-br" />그리고 유전적 질병에 대한
               치료제를 연구 개발하고 있습니다.
             </p>
+            {/* 아래에 내용이 더 있다는 표시 — 마우스 모양 + 굴러 내려가는 점 + 화살표 */}
+            <div className="ch-scroll" aria-hidden="true">
+              <span className="mouse"><i /></span>
+              <span className="chev" />
+              <span className="txt">SCROLL</span>
+            </div>
           </div>
 
           <div className="uv-cover-cards">
@@ -144,12 +159,12 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
             <div className="uv-ccard">
               <span className="cc-k">Campaign</span>
               <b>LET&rsquo;S GET 캠페인</b>
-              <p>치료의 기회와 의료 혜택을 받기 어려웠던 분들을 위한 최고의 기회. 여러분의 많은 관심과 참여를 기다립니다.</p>
+              <p>치료의 기회와 의료 혜택을 받기 어려웠던 분들을 위한 최고의 기회. 여러분의 많은 <br className="pc-br" />관심과 참여를 기다립니다.</p>
             </div>
             <div className="uv-ccard">
               <span className="cc-k">Partnership</span>
               <b>ADAM Inc. 자회사</b>
-              <p>세계적 기업 아담의 자회사로서, 과학과 성물 에너지를 융합하는 기술을 연구하여 인류 발전에 기여하고 있습니다.</p>
+              <p>세계적 기업 아담의 자회사로서, 과학과 성물 에너지를 융합하는 기술을 연구하여 <br className="pc-br" />인류 발전에 기여하고 있습니다.</p>
             </div>
           </div>
 
@@ -221,7 +236,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               <span>분류: 조직</span><span>작성: 보안과</span><span>배포: 내부 한정</span>
             </div>
             <p className="uv-doc-lead">
-              아담은 중립적 입장에서 성물을 관리함으로써, 어느 한 국가가 성물을 이용해
+              아담은 중립적 입장에서 성물을 관리함으로써, <br className="pc-br" />어느 한 국가가 성물을 이용해
               국가 간 힘의 균형을 깨는 것을 방지하고 있다.
             </p>
 
@@ -230,14 +245,14 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
                 <span className="n-tag">Parent Company</span>
                 <b className="n-name">ADAM Inc.</b>
                 <span className="n-ko">아담 — 성물을 관리하는 세계적 보안 기업</span>
-                <p>성물을 발견·회수하고, 각국에 비밀리에 설치된 보호관리시설에서 관리한다.</p>
+                <p>성물을 발견·회수하고, 각국에 비밀리에 <br className="pc-br" />설치된 보호관리시설에서 관리한다.</p>
               </div>
               <div className="uv-org-link" aria-hidden="true">자회사</div>
               <div className="uv-node danger">
                 <span className="n-tag">Subsidiary</span>
                 <b className="n-name">ABEL LAB</b>
                 <span className="n-ko">아벨 연구소 — 생명과학 연구</span>
-                <p>성물 중 생명과학에 적합한 것을 연구해, 인류사회에 공헌할 신약과 기술을 개발한다.</p>
+                <p>성물 중 생명과학에 적합한 것을 연구해, <br className="pc-br" />인류사회에 공헌할 신약과 기술을 개발한다.</p>
               </div>
             </div>
 
@@ -245,7 +260,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               {ROLES.map((r) => (
                 <div className="uv-role" key={r.t}>
                   <b>{r.t}</b>
-                  <p>{r.d}</p>
+                  <p>{withBr(r.d)}</p>
                 </div>
               ))}
             </div>
@@ -265,7 +280,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
             <p className="uv-doc-lead">
               성물이라 불리는 물질 혹은 현상들은 각국의 신화·설화뿐 아니라, 여러 종교에서 말하는
               신성한 물건 및 이적들을 통칭하는 개념이다. 성물은 각각의 고유한 능력이 깃들어 있으며,
-              과거에 이 성물들이 보여준 능력이나 초자연적 현상들이 후대에 신화·설화 등으로 전해진 것들도 있다.
+              과거에 이 성물들이 보여준 능력이나 <br className="pc-br" />초자연적 현상들이 후대에 신화·설화 등으로 전해진 것들도 있다.
             </p>
 
             <dl className="uv-defs">
@@ -289,8 +304,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               <span>발견: 2031년 · 이집트</span><span>지정: 성물 · ADAM 관리</span><span>활용: 레드크라운 베이스</span>
             </div>
             <p className="uv-doc-lead">
-              레드크라운의 베이스로 사용되는 성물. 2031년 이집트의 버려진 사원 지하에서 발견되었다.
-              회수 경위는 아래 대외 배포 기사와 같다.
+              레드크라운의 베이스로 사용되는 성물. 2031년 이집트의 버려진 사원 지하에서 발견되었다. <br className="pc-br" />회수 경위는 아래 대외 배포 기사와 같다.
             </p>
 
             <p className="uv-attach"><b>첨부 1</b> — 대외 배포 기사 사본 (성물공학 특별기획)</p>
@@ -322,7 +336,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
 
               <blockquote>
                 &ldquo;목이 너무 말랐던 탐험가 동료들이 주변을 살펴보던 중 사자의 서 주변에 고여 있는 붉은 액체를
-                발견하고는 바로 마셨어요. 그랬더니 갑자기 그 액체를 마신 동료들의 모든 상처가 치유됐습니다.
+                발견하고는 바로 마셨어요. <br className="pc-br" />그랬더니 갑자기 그 액체를 마신 동료들의 모든 상처가 치유됐습니다.
                 덕분에 구출될 때까지 버틸 수 있었어요.&rdquo;
                 <cite>— 탐험가 A씨(36)</cite>
               </blockquote>
@@ -355,8 +369,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               <span>기반: 성물 〈사자의 서〉</span><span>구분: 신약 · 임상 전</span><span>통칭: 만병통치약</span>
             </div>
             <p className="uv-doc-lead">
-              다른 약들처럼 특정 질병이나 증상에만 적용되는 것이 아닌, 어떤 상태에서도 약을 먹게 되면
-              건강해지는 이른바 <b>&lsquo;만병통치약&rsquo;</b>이라고 알려져 있다.
+              다른 약들처럼 특정 질병이나 증상에만 적용되는 것이 아닌, 어떤 상태에서도 약을 먹게 되면 <br className="pc-br" />건강해지는 이른바 <b>&lsquo;만병통치약&rsquo;</b>이라고 알려져 있다.
             </p>
 
             {/* 생체 신호 곡선 — 아래 실험 기록(활성 → 정지)을 그림으로 옮긴 것. 뛰다가, 멎는다. */}
@@ -386,15 +399,15 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
             <div className="uv-2col">
               <div className="uv-panel">
                 <h3>공개 이후</h3>
-                <p>해당 동영상은 순식간에 SNS 를 통해 퍼져나갔고, 실험에 대한 윤리문제를 제기하는 등 부정적인 시선도 많았다.</p>
+                <p>해당 동영상은 순식간에 SNS 를 통해 퍼져나갔고, 실험에 대한 <br className="pc-br" />윤리문제를 제기하는 등 부정적인 시선도 많았다.</p>
                 <p>
                   <span className="em">그러나</span> 해당 동영상을 통해 많은 사람들이 레드크라운에 대해 알게 되었고,
-                  레드크라운 프로젝트는 수많은 사람들의 응원과 지원 속에 지금의 결과를 가져올 수 있었다.
+                  레드크라운 프로젝트는 수많은 사람들의 응원과 지원 속에 지금의 <br className="pc-br" />결과를 가져올 수 있었다.
                 </p>
               </div>
               <div className="uv-panel">
                 <h3>현재</h3>
-                <p>부정적인 시선은 현재 완전히 사라진 상황이다. 그 이유는 LET&rsquo;S GET 캠페인 — 문서 05.</p>
+                <p>부정적인 시선은 현재 완전히 사라진 상황이다. 그 이유는 <br className="pc-br" />LET&rsquo;S GET 캠페인 — 문서 05.</p>
                 <p>전문가들은 이미 안정성 테스트는 완료되었다고 보고하고 있다.</p>
               </div>
             </div>
@@ -440,9 +453,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
               <span>성격: 참여형 캠페인 · 시판 전 임상실험</span><span>대외 명분: 사회 공익 실현</span>
             </div>
             <p className="uv-doc-lead">
-              성물을 기반한 기술로 개발한 신약 레드크라운의 임상실험을 위한 참여형 캠페인.
-              의료서비스를 받기 힘든 사회적 약자들에게 레드크라운을 제공하여
-              사회 공익을 실현하겠다는 취지로 진행하고 있다.
+              성물을 기반한 기술로 개발한 신약 레드크라운의 임상실험을 위한 참여형 캠페인. <br className="pc-br" />의료서비스를 받기 힘든 사회적 약자들에게 레드크라운을 제공하여 <br className="pc-br" />사회 공익을 실현하겠다는 취지로 진행하고 있다.
             </p>
 
             <div className="uv-lets">
@@ -461,7 +472,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
             <div className="uv-panel" style={{ marginTop: 16 }}>
               <p>
                 해당 캠페인은 시판 전 임상실험으로써의 성격도 같이 하고 있기 때문에 절실한 사람들을
-                실험 쥐로 이용하고 있다는 비판도 있으나, 전문가들은 사회적 약자에게 조금 더 봉사하기 위한
+                실험 쥐로 이용하고 있다는 비판도 있으나, <br className="pc-br" />전문가들은 사회적 약자에게 조금 더 봉사하기 위한
                 아벨연구소의 선행을 매도해선 안 된다고 평가하고 있다.
               </p>
               <p>
@@ -480,7 +491,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
             </div>
             <p className="uv-audit-lead reveal">
               여기까지가 연구소가 공개한 전부다. 새로 밝혀진 것은 없다.
-              다만 위 문서들을 나란히 놓으면, 서로 맞지 않는 문장이 셋 남는다.
+              다만 위 문서들을 나란히 놓으면, <br className="pc-br" />서로 맞지 않는 문장이 셋 남는다.
             </p>
 
             <div className="uv-cracks">
@@ -520,7 +531,7 @@ export default async function UniversePage({ params }: { params: Promise<{ key: 
             </div>
 
             <div className="uv-audit-close reveal">
-              <p>그리고 아벨 연구소는 지금도, 당신의 많은 관심과 참여를 기다리고 있다.</p>
+              <p>그리고 아벨 연구소는 지금도, <br className="pc-br" />당신의 많은 관심과 참여를 기다리고 있다.</p>
               <div className="sig">Let&rsquo;s get — bring out the health and happy</div>
             </div>
           </section>
